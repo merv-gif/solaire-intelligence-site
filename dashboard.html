@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solaire Intelligence</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #111a2e;
+    --panel-2: #162241;
+    --line: #1f2d51;
+    --text: #e6edf7;
+    --muted: #8ea1c2;
+    --accent: #2fb5ff;
+    --accent-2: #3ce0c3;
+    --accent-water: #4aa8ff;
+    --accent-water-2: #2dd4bf;
+    --accent-solar: #ffb547;
+    --accent-solar-2: #ffd66b;
+    --warn: #ffb547;
+    --danger: #ff5a7a;
+    --ok: #3ce08f;
+    --radius: 14px;
+    --shadow: 0 6px 30px rgba(0,0,0,0.35);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f4f7fc;
+      --panel: #ffffff;
+      --panel-2: #eef3fb;
+      --line: #dbe3f0;
+      --text: #0c1a33;
+      --muted: #5a6b86;
+      --shadow: 0 6px 20px rgba(20,40,80,0.10);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent-solar), var(--accent-solar-2));
+    display: grid; place-items: center; color: #041425; font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .brand h1 { font-size: 18px; margin: 0; letter-spacing: 0.3px; }
+  .brand small { color: var(--muted); font-size: 12px; }
+  .conn {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--muted);
+    padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--panel);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.ok { background: var(--ok); box-shadow: 0 0 10px var(--ok); }
+  .dot.warn { background: var(--warn); }
+  .dot.err { background: var(--danger); }
+  .tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 6px; padding: 4px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; margin-bottom: 18px;
+  }
+  @media (max-width: 480px) {
+    .tabs { grid-template-columns: 1fr 1fr; }
+    .tabs button[data-module="solar"] { grid-column: 1 / -1; }
+  }
+  .tabs button {
+    all: unset; cursor: pointer; text-align: center;
+    padding: 12px 8px; border-radius: 11px;
+    color: var(--muted); font-weight: 700; font-size: 14px;
+    letter-spacing: .5px; transition: background .15s ease, color .15s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .tabs button:hover { color: var(--text); }
+  .tabs button.active {
+    color: #041425;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 2px 10px rgba(47,181,255,0.25);
+  }
+  .tabs button[data-module="water"].active {
+    background: linear-gradient(135deg, var(--accent-water), var(--accent-water-2));
+    box-shadow: 0 2px 10px rgba(74,168,255,0.25);
+  }
+  .tabs button[data-module="solar"].active {
+    background: linear-gradient(135deg, var(--accent-solar), var(--accent-solar-2));
+    box-shadow: 0 2px 10px rgba(255,181,71,0.25);
+  }
+  .tab-ico { font-size: 16px; }
+  .tab-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--muted); margin-left: 6px;
+  }
+  .tab-dot.ok   { background: var(--ok);    box-shadow: 0 0 6px var(--ok); }
+  .tab-dot.warn { background: var(--warn); }
+  .tab-dot.err  { background: var(--danger); }
+  .tabs button.active .tab-dot { filter: brightness(0.7); }
+  .view { display: none; }
+  .view.active { display: block; }
+  .grid { display: grid; gap: 14px; }
+  .grid.cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .grid.cols-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  @media (max-width: 720px) {
+    .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; }
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    margin: 0 0 12px 0; font-size: 13px; letter-spacing: 1.2px;
+    color: var(--muted); text-transform: uppercase; font-weight: 700;
+  }
+  .temp { background: linear-gradient(135deg, var(--panel), var(--panel-2)); }
+  .temp .big { font-family: var(--mono); font-size: 64px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+  .temp .unit { color: var(--muted); font-size: 22px; margin-left: 6px; }
+  .temp .target { color: var(--muted); margin-top: 6px; font-size: 13px; }
+  .temp .bar { margin-top: 14px; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .temp .bar > span {
+    display: block; height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    width: 0%; transition: width .3s ease;
+  }
+  .tank-card { background: linear-gradient(135deg, var(--panel), var(--panel-2)); }
+  .tank-lay { display: grid; grid-template-columns: 140px 1fr; gap: 22px; align-items: stretch; }
+  @media (max-width: 720px) { .tank-lay { grid-template-columns: 110px 1fr; gap: 16px; } }
+  .tank-viz {
+    position: relative; border: 2px solid var(--line); border-radius: 12px;
+    background: repeating-linear-gradient(180deg, transparent 0 24px, rgba(255,255,255,0.03) 24px 25px);
+    overflow: hidden; min-height: 190px;
+  }
+  .tank-fill {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 0%;
+    background: linear-gradient(180deg, var(--accent-water) 0%, var(--accent-water-2) 100%);
+    transition: height .6s cubic-bezier(.2,.8,.2,1);
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.25);
+  }
+  .tank-fill::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(255,255,255,0.55); }
+  .tank-ticks {
+    position: absolute; inset: 0; pointer-events: none;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 4px 6px; font-family: var(--mono); font-size: 9px;
+    color: rgba(230,237,247,0.45);
+  }
+  .tank-hero { display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+  .tank-hero .pct { font-family: var(--mono); font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+  .tank-hero .pct .unit { color: var(--muted); font-size: 22px; margin-left: 4px; }
+  .tank-hero .vol { font-family: var(--mono); font-size: 22px; color: var(--text); }
+  .tank-hero .vol .unit { color: var(--muted); font-size: 14px; margin-left: 4px; }
+  .tank-hero .sub { color: var(--muted); font-size: 13px; }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0; }
+  .row .label { color: var(--muted); font-size: 13px; }
+  .row .val { font-family: var(--mono); }
+  .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; cursor: pointer; background: var(--line); border-radius: 999px; transition: .2s; }
+  .slider::before { content: ""; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  .switch input:checked + .slider { background: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(22px); }
+  .switch input:disabled + .slider { opacity: .5; cursor: not-allowed; }
+  .num { display: inline-flex; align-items: center; gap: 8px; }
+  .num button {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--text); font-size: 16px; cursor: pointer;
+  }
+  .num button:hover { border-color: var(--accent); }
+  .num input {
+    width: 90px; text-align: center; font-family: var(--mono);
+    padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--text);
+  }
+  .sel {
+    padding: 8px 10px; font-family: inherit; font-size: 13px;
+    color: var(--text); background: var(--panel-2);
+    border: 1px solid var(--line); border-radius: 10px;
+    min-width: 160px;
+  }
+  .sel:hover { border-color: var(--accent); }
+  .chip {
+    display: inline-block; font-size: 11px; padding: 3px 8px;
+    border-radius: 999px; border: 1px solid var(--line);
+    color: var(--muted); margin-left: 6px;
+  }
+  .chip.on  { color: var(--ok);    border-color: var(--ok); }
+  .chip.off { color: var(--muted); }
+  .settings-btn {
+    background: var(--panel); color: var(--muted); border: 1px solid var(--line);
+    border-radius: 10px; padding: 6px 10px; cursor: pointer; font-size: 12px;
+  }
+  .settings-btn:hover { color: var(--text); border-color: var(--accent); }
+  .btn-action {
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; cursor: pointer; font-size: 13px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .btn-action:hover { border-color: var(--accent); }
+  .btn-action.warn   { color: var(--warn);   border-color: rgba(255,181,71,0.35); }
+  .btn-action.danger { color: var(--danger); border-color: rgba(255,90,122,0.35); }
+  .btn-action.warn:hover   { border-color: var(--warn); }
+  .btn-action.danger:hover { border-color: var(--danger); }
+  dialog {
+    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    border-radius: var(--radius); padding: 20px; max-width: 520px; width: 92%;
+    box-shadow: var(--shadow); max-height: 90vh; overflow: auto;
+  }
+  dialog::backdrop { background: rgba(0,0,0,0.55); }
+  dialog h3 { margin: 0 0 12px 0; font-size: 15px; }
+  dialog h4 { margin: 18px 0 4px 0; font-size: 11px; letter-spacing: 1.2px; color: var(--muted); text-transform: uppercase; font-weight: 700; }
+  dialog label { display: block; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  dialog input[type=text], dialog input[type=password] {
+    width: 100%; padding: 8px 10px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
+    font-family: var(--mono); margin-top: 4px;
+  }
+  dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  dialog button {
+    background: var(--accent); color: #041425; border: 0; padding: 8px 14px;
+    border-radius: 8px; font-weight: 600; cursor: pointer;
+  }
+  dialog button.ghost { background: transparent; color: var(--muted); }
+  footer { margin: 24px 0 8px 0; text-align: center; color: var(--muted); font-size: 12px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    font-size: 12px; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted);
+  }
+  .pill.on { color: var(--ok); border-color: var(--ok); }
+  .pill.off { color: var(--muted); }
+  .pill.warn { color: var(--warn); border-color: var(--warn); }
+  .pill.danger { color: var(--danger); border-color: var(--danger); }
+  .seg {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 6px; padding: 4px;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .seg button {
+    all: unset; cursor: pointer; text-align: center;
+    padding: 10px 8px; border-radius: 9px;
+    color: var(--muted); font-weight: 600; font-size: 13px;
+    letter-spacing: .3px; transition: background .15s ease, color .15s ease;
+  }
+  .seg button:hover { color: var(--text); }
+  .seg button.active {
+    color: #041425;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 2px 10px rgba(47,181,255,0.25);
+  }
+  .seg button[data-mode="on"].active  { background: var(--ok); color: #061a10; }
+  .seg button[data-mode="off"].active { background: var(--danger); color: #1a0608; }
+  .status-line {
+    margin: 12px 0 0 0; padding: 10px 12px;
+    border-radius: 10px; background: var(--panel-2);
+    font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .status-line .big { color: var(--text); font-weight: 600; }
+  .sch-win { display: grid; grid-template-columns: 80px 1fr auto 1fr; align-items: center; gap: 10px; margin: 8px 0; }
+  .sch-win .lbl { color: var(--muted); font-size: 12px; }
+  .sch-win .sep { color: var(--muted); }
+  .time-input { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 2px 6px; }
+  .time-input input { width: 40px; text-align: center; font-family: var(--mono); padding: 6px 2px; border: 0; background: transparent; color: var(--text); font-size: 15px; }
+  .time-input input:focus { outline: 1px solid var(--accent); border-radius: 4px; }
+  .time-input .colon { color: var(--muted); font-family: var(--mono); }
+  .time-input button { width: 22px; height: 22px; border-radius: 5px; background: transparent; color: var(--muted); border: 1px solid var(--line); cursor: pointer; font-size: 13px; line-height: 1; }
+  .time-input button:hover { color: var(--text); border-color: var(--accent); }
+  .timeline { margin-top: 14px; }
+  .timeline .track { position: relative; height: 22px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
+  .timeline .win { position: absolute; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(47,181,255,0.55), rgba(60,224,195,0.55)); }
+  .timeline .win.w2 { background: linear-gradient(90deg, rgba(60,224,195,0.55), rgba(47,181,255,0.55)); }
+  .timeline .now { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--warn); box-shadow: 0 0 6px var(--warn); }
+  .timeline .hours { display: flex; justify-content: space-between; margin-top: 4px; color: var(--muted); font-size: 10px; font-family: var(--mono); }
+  .locked-hint { color: var(--muted); font-size: 11px; margin-left: 6px; font-style: italic; }
+  .stat {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .stat .k { font-size: 11px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+  .stat .v { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
+  .stat .v .unit { color: var(--muted); font-size: 13px; margin-left: 4px; font-weight: 500; }
+  .stat.in  .v { color: var(--accent-water-2); }
+  .stat.out .v { color: var(--warn); }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+  @media (max-width: 720px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+  .flow-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .flow-big { display: flex; align-items: baseline; gap: 8px; font-family: var(--mono); font-size: 32px; font-weight: 700; }
+  .flow-big .unit { color: var(--muted); font-size: 14px; font-weight: 500; }
+  .action-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .gauge-card {
+    background: linear-gradient(135deg, var(--panel), var(--panel-2));
+    padding: 14px;
+  }
+  .gauge-card h2 {
+    display: flex; align-items: center; gap: 8px;
+    margin: 0 0 10px 0;
+  }
+  .gauge-card .gauge-ico { font-size: 18px; text-transform: none; letter-spacing: 0; }
+  .gauge-val {
+    font-family: var(--mono); font-size: 28px; font-weight: 700;
+    line-height: 1; letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .gauge-val .unit { font-size: 14px; color: var(--muted); margin-left: 4px; }
+  .gauge-sub { font-size: 12px; color: var(--muted); }
+  .ubar {
+    height: 10px; background: var(--line); border-radius: 999px; overflow: hidden;
+    position: relative;
+  }
+  .ubar > span {
+    display: block; height: 100%; width: 0%;
+    transition: width .4s ease;
+    border-radius: 999px;
+  }
+  .ubar.solar  > span { background: linear-gradient(90deg, var(--accent-solar), var(--accent-solar-2)); }
+  .ubar.load   > span { background: linear-gradient(90deg, #ff8a4d, #ffb547); }
+  .bbar {
+    height: 12px; background: var(--line); border-radius: 999px; overflow: hidden;
+    position: relative;
+  }
+  .bbar::before {
+    content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px;
+    width: 1px; background: rgba(255,255,255,0.35); transform: translateX(-0.5px);
+  }
+  .bbar > span {
+    display: block; height: 100%; width: 0%;
+    position: absolute; top: 0;
+    transition: left .4s ease, width .4s ease, background .4s ease;
+    border-radius: 999px;
+  }
+  .bbar.grid    > span.pos { background: linear-gradient(90deg, var(--accent-water), var(--danger)); }
+  .bbar.grid    > span.neg { background: linear-gradient(90deg, var(--ok), var(--accent-2)); }
+  .bbar.battery > span.pos { background: linear-gradient(90deg, var(--accent-2), var(--accent-solar)); }
+  .bbar.battery > span.neg { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+  .bbar-legend {
+    display: flex; justify-content: space-between;
+    margin-top: 4px; font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .soc-card { background: linear-gradient(135deg, var(--panel), var(--panel-2)); }
+  .soc-bar {
+    height: 18px; background: var(--line); border-radius: 999px; overflow: hidden;
+    position: relative;
+  }
+  .soc-bar > span {
+    display: block; height: 100%; width: 0%;
+    transition: width .6s cubic-bezier(.2,.8,.2,1), background .4s ease;
+    border-radius: 999px;
+  }
+  .soc-bar > span.high { background: linear-gradient(90deg, var(--ok), var(--accent-2)); }
+  .soc-bar > span.mid  { background: linear-gradient(90deg, var(--accent-solar), var(--accent-solar-2)); }
+  .soc-bar > span.low  { background: linear-gradient(90deg, var(--danger), var(--warn)); }
+  .soc-ticks {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 10px; color: var(--muted);
+    font-family: var(--mono);
+  }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 480px) { .stat-row { grid-template-columns: 1fr; } }
+  .stat {
+    text-align: center; padding: 12px 8px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .stat .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .stat .stat-val { font-family: var(--mono); font-size: 18px; font-weight: 700; margin-top: 4px; }
+  .stat .stat-val .unit { font-size: 11px; color: var(--muted); margin-left: 2px; }
+  .login-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .login-card {
+    width: 100%; max-width: 400px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 28px 24px;
+    box-shadow: var(--shadow);
+  }
+  .login-card .logo-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .login-card h2 {
+    margin: 0 0 6px 0; font-size: 18px; letter-spacing: 0.3px;
+    text-transform: none; color: var(--text);
+  }
+  .login-card .sub {
+    color: var(--muted); font-size: 13px; margin-bottom: 20px; line-height: 1.4;
+  }
+  .login-card label {
+    display: block; color: var(--muted); font-size: 12px;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+  }
+  .login-card input[type="text"],
+  .login-card input[type="email"],
+  .login-card input[type="password"] {
+    width: 100%; padding: 12px 14px; font-size: 16px;
+    background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px;
+    box-sizing: border-box;
+  }
+  .login-card input[type="text"] {
+    font-family: var(--mono); letter-spacing: 1.5px; text-transform: lowercase;
+  }
+  .login-card input[type="email"] { font-family: inherit; }
+  .login-card input[type="password"] { font-family: inherit; letter-spacing: 2px; }
+  .login-card input:focus { outline: none; border-color: var(--accent); }
+  .login-card .err {
+    color: var(--danger); font-size: 12px; margin-top: 8px; min-height: 16px;
+  }
+  .login-card .field { margin-bottom: 12px; }
+  .login-card button.primary {
+    width: 100%; margin-top: 14px; padding: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #041425; font-weight: 700; font-size: 14px;
+    border: 0; border-radius: 10px; cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+  .login-card button.primary:hover { filter: brightness(1.05); }
+  .login-card button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-card .footer-note {
+    margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 12px; line-height: 1.5;
+  }
+  .login-tabs {
+    display: flex; gap: 4px; padding: 4px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 10px; margin-bottom: 18px;
+  }
+  .login-tabs button {
+    flex: 1; padding: 8px 10px; font-size: 13px;
+    background: transparent; color: var(--muted); border: 0;
+    border-radius: 7px; cursor: pointer; font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .login-tabs button.active {
+    background: var(--panel); color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .login-tabs button:hover:not(.active) { color: var(--text); }
+  .account-list {
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;
+  }
+  .account-list button {
+    padding: 14px 16px; font-family: var(--mono); font-size: 15px;
+    letter-spacing: 1.5px; background: var(--panel-2); color: var(--text);
+    border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
+    text-align: left; transition: border-color 0.15s;
+  }
+  .account-list button:hover { border-color: var(--accent); }
+  .filter-bar-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 10px;
+  }
+  .filter-bar-head .filter-status-pill {
+    font-size: 12px; padding: 5px 12px; letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .filter-bar-head .filter-power-now {
+    font-size: 22px; font-weight: 700; color: var(--text);
+    font-family: var(--mono);
+  }
+  .filter-bar-head .filter-power-now .unit {
+    font-size: 13px; font-weight: 400; color: var(--muted);
+    margin-left: 3px;
+  }
+  .filter-bar-track {
+    position: relative;
+    height: 20px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .filter-bar-fill {
+    height: 100%;
+    background: hsl(0, 70%, 50%);
+    transition: width 0.6s ease, background-color 0.6s ease;
+    border-radius: 12px 0 0 12px;
+  }
+  .filter-bar-legend {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 11px; color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .filter-bar-legend strong { color: var(--text); font-family: var(--mono); }
+  .device-switcher {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 6px; margin-bottom: 14px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .device-switcher .lbl {
+    font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; padding: 0 8px 0 4px;
+  }
+  .device-switcher button.dev {
+    padding: 6px 12px; font-size: 13px; font-family: inherit;
+    background: transparent; color: var(--muted); border: 0;
+    border-radius: 7px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .device-switcher button.dev.active {
+    background: var(--panel); color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .device-switcher button.dev:hover:not(.active) { color: var(--text); }
+  .device-switcher button.dev .rename {
+    opacity: 0; padding: 2px 4px; font-size: 11px;
+    transition: opacity 0.15s; cursor: pointer;
+  }
+  .device-switcher button.dev.active .rename,
+  .device-switcher button.dev:hover .rename { opacity: 0.6; }
+  .device-switcher button.dev .rename:hover { opacity: 1; }
+  .signout-btn {
+    background: var(--panel); color: var(--muted); cursor: pointer;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 12px; font-size: 12px; font-family: inherit;
+  }
+  .signout-btn:hover { color: var(--text); border-color: var(--accent); }
+  .acct-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div id="loginOverlay" class="login-overlay" style="display:none;">
+  <div class="login-card">
+    <div class="logo-row">
+      <div class="logo">SI</div>
+      <div>
+        <h2>Solaire Intelligence</h2>
+        <div style="color:var(--muted);font-size:12px;">customer dashboard</div>
+      </div>
+    </div>
+    <div id="authStage1">
+      <div class="login-tabs" role="tablist">
+        <button type="button" id="tabSignin"  class="active" role="tab">Sign In</button>
+        <button type="button" id="tabSignup"               role="tab">Create Account</button>
+      </div>
+      <form id="signinForm" autocomplete="off">
+        <div class="field">
+          <label for="signinEmail">Email</label>
+          <input type="email" id="signinEmail" autocomplete="username"
+                 placeholder="you@example.com" required />
+        </div>
+        <div class="field">
+          <label for="signinPassword">Password</label>
+          <input type="password" id="signinPassword" autocomplete="current-password"
+                 placeholder="••••••••" required minlength="8" />
+        </div>
+        <div class="err" id="signinErr"></div>
+        <button type="submit" class="primary" id="signinBtn">Sign In</button>
+      </form>
+      <form id="signupForm" autocomplete="off" style="display:none;">
+        <div class="field">
+          <label for="signupEmail">Email</label>
+          <input type="email" id="signupEmail" autocomplete="username"
+                 placeholder="you@example.com" required />
+        </div>
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" autocomplete="new-password"
+                 placeholder="at least 8 characters" required minlength="8" />
+        </div>
+        <div class="field" id="signupAccountField">
+          <label for="signupAccount">Account ID</label>
+          <input type="text" id="signupAccount" maxlength="6"
+                 pattern="[a-fA-F0-9]{6}" placeholder="xxxxxx"
+                 autocapitalize="off" autocorrect="off" spellcheck="false" />
+          <div style="color:var(--muted);font-size:11px;margin-top:6px;line-height:1.4;">
+            6-character hex code from your purchase card. Leave blank if
+            you're an installer using an installer code below.
+          </div>
+        </div>
+        <details style="margin-bottom:12px;">
+          <summary style="color:var(--muted);font-size:12px;cursor:pointer;
+                          padding:6px 0;letter-spacing:0.5px;">
+            I have an installer code
+          </summary>
+          <div class="field" style="margin-top:10px;">
+            <label for="signupInstallerCode">Installer code</label>
+            <input type="text" id="signupInstallerCode"
+                   autocapitalize="off" autocorrect="off" spellcheck="false"
+                   placeholder="provided by Solaire Intelligence" />
+            <div style="color:var(--muted);font-size:11px;margin-top:6px;line-height:1.4;">
+              Installers don't need a hex code at sign-up — they'll enter
+              one each time they log in to view a customer's dashboard.
+            </div>
+          </div>
+        </details>
+        <div class="err" id="signupErr"></div>
+        <button type="submit" class="primary" id="signupBtn">Create Account</button>
+      </form>
+    </div>
+    <div id="authStage2" style="display:none;">
+      <div class="sub">
+        Signed in as <span id="authStage2Email" style="color:var(--text);"></span>
+        <span id="authStage2RoleBadge" style="display:none;
+              background:var(--accent-2);color:#041425;padding:2px 8px;
+              border-radius:999px;font-size:10px;letter-spacing:1px;
+              margin-left:8px;text-transform:uppercase;">installer</span>
+        <span id="authStage2Hint">.</span>
+      </div>
+      <div id="authStage2Customer">
+        <div class="account-list" id="accountList"></div>
+        <form id="linkAccountForm" autocomplete="off" style="margin-top:14px;">
+          <label for="linkAccountInput">Add another property</label>
+          <input type="text" id="linkAccountInput" maxlength="6"
+                 pattern="[a-fA-F0-9]{6}" placeholder="xxxxxx"
+                 autocapitalize="off" autocorrect="off" spellcheck="false" />
+          <div class="err" id="linkAccountErr"></div>
+          <button type="submit" class="primary">Link Account</button>
+        </form>
+      </div>
+      <div id="authStage2Installer" style="display:none;">
+        <form id="installerHexForm" autocomplete="off">
+          <label for="installerHexInput">Customer Account ID</label>
+          <input type="text" id="installerHexInput" maxlength="6"
+                 pattern="[a-fA-F0-9]{6}" placeholder="xxxxxx"
+                 autocapitalize="off" autocorrect="off" spellcheck="false" required />
+          <div style="color:var(--muted);font-size:11px;margin-top:6px;line-height:1.4;">
+            Type the 6-character hex code of the customer whose dashboard
+            you want to view.
+          </div>
+          <div class="err" id="installerHexErr"></div>
+          <button type="submit" class="primary">View Dashboard</button>
+        </form>
+      </div>
+      <button type="button" id="signoutFromStage2" class="signout-btn"
+              style="margin-top:12px;width:100%;">Sign out</button>
+    </div>
+    <div class="footer-note">
+      Lost your Account ID? Contact your installer or
+      <a href="mailto:support@solaire-intelligence.co.za">support@solaire-intelligence.co.za</a>.
+    </div>
+  </div>
+</div>
+<div class="wrap" id="appWrap" style="display:none;">
+  <header>
+    <div class="brand">
+      <div class="logo">SI</div>
+      <div>
+        <h1>Solaire Intelligence</h1>
+        <small id="hostLabel">connecting…</small>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span class="acct-chip" id="acctChip" title="Signed-in Account ID">
+        <span style="opacity:.6;">acct</span>
+        <span id="acctLabel">—</span>
+      </span>
+      <div class="conn" id="conn">
+        <span class="dot" id="connDot"></span>
+        <span id="connText">disconnected</span>
+      </div>
+      <button class="signout-btn" id="signoutBtn" title="Sign out / switch account">Sign out</button>
+      <button class="settings-btn" id="settingsBtn" title="Settings">⚙︎</button>
+    </div>
+  </header>
+  <div class="tabs" id="moduleTabs" role="tablist">
+    <button data-module="pool"  id="tab-pool"  class="active" type="button">
+      <span class="tab-ico">🏊</span><span>Pool</span><span class="tab-dot" id="poolTabDot"></span>
+    </button>
+    <button data-module="water" id="tab-water" type="button">
+      <span class="tab-ico">💧</span><span>Water</span><span class="tab-dot" id="waterTabDot"></span>
+    </button>
+    <button data-module="solar" id="tab-solar" type="button">
+      <span class="tab-ico">☀️</span><span>Solar</span><span class="tab-dot" id="solarTabDot"></span>
+    </button>
+  </div>
+  <section id="pool-view" class="view active">
+    <div class="device-switcher" id="poolDeviceSwitcher" style="display:none;"></div>
+    <div class="grid cols-2">
+      <div class="card temp">
+        <h2>Pool temperature</h2>
+        <div><span class="big" id="poolTemp">--.-</span><span class="unit">°C</span></div>
+        <div class="target">Target: <span id="targetTempLabel">--.-</span> °C · Heat: <span id="heatPill" class="pill off">off</span></div>
+        <div class="bar"><span id="tempBar"></span></div>
+      </div>
+      <div class="card">
+        <h2>Target temperature</h2>
+        <div class="row">
+          <div class="label">Setpoint</div>
+          <div class="num">
+            <button data-step="-0.5" data-pool-for="target_temp">−</button>
+            <input type="number" id="input-target_temp" step="0.5" min="15" max="35" />
+            <button data-step="0.5" data-pool-for="target_temp">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Heat pump enable</div>
+          <label class="switch"><input type="checkbox" id="sw-hp_enable"/><span class="slider"></span></label>
+        </div>
+        <div class="row">
+          <div class="label">Interlock (pump running)</div>
+          <span id="pumpInterlock" class="pill off">idle</span>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Outputs</h2>
+      <div class="grid cols-3">
+        <div><div class="row">
+          <div class="label">Pump <span id="pump-chip" class="chip off">OFF</span></div>
+          <label class="switch"><input type="checkbox" id="sw-pump"/><span class="slider"></span></label>
+        </div></div>
+        <div><div class="row">
+          <div class="label">Light <span id="light-chip" class="chip off">OFF</span></div>
+          <label class="switch"><input type="checkbox" id="sw-light"/><span class="slider"></span></label>
+        </div></div>
+        <div><div class="row">
+          <div class="label">Heat pump <span id="heat_pump-chip" class="chip off">OFF</span></div>
+          <label class="switch"><input type="checkbox" id="sw-heat_pump" disabled/><span class="slider"></span></label>
+        </div></div>
+      </div>
+      <div class="pill-row" style="margin-top:6px;">
+        <span class="pill warn">Heat pump switch is read-only — controlled by the on-device logic</span>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Pump control</h2>
+      <div class="seg" role="tablist" id="pumpModeSeg">
+        <button data-mode="auto" id="mode-auto" type="button">Auto schedule</button>
+        <button data-mode="on"   id="mode-on"   type="button">Run now</button>
+        <button data-mode="off"  id="mode-off"  type="button">Off</button>
+      </div>
+      <div class="status-line"><span id="pumpStatusText">—</span></div>
+      <div id="scheduleEditor">
+        <div class="sch-win">
+          <span class="lbl">Window 1</span>
+          <div class="time-input">
+            <button data-step="-1" data-pool-for="pump_start" type="button">−</button>
+            <input type="number" id="input-pump_start" step="1" min="0" max="23" />
+            <span class="colon">:00</span>
+            <button data-step="1" data-pool-for="pump_start" type="button">+</button>
+          </div>
+          <span class="sep">→</span>
+          <div class="time-input">
+            <button data-step="-1" data-pool-for="pump_stop" type="button">−</button>
+            <input type="number" id="input-pump_stop" step="1" min="0" max="23" />
+            <span class="colon">:00</span>
+            <button data-step="1" data-pool-for="pump_stop" type="button">+</button>
+          </div>
+        </div>
+        <div class="sch-win">
+          <span class="lbl">Window 2</span>
+          <div class="time-input">
+            <button data-step="-1" data-pool-for="pump2_start" type="button">−</button>
+            <input type="number" id="input-pump2_start" step="1" min="0" max="23" />
+            <span class="colon">:00</span>
+            <button data-step="1" data-pool-for="pump2_start" type="button">+</button>
+          </div>
+          <span class="sep">→</span>
+          <div class="time-input">
+            <button data-step="-1" data-pool-for="pump2_stop" type="button">−</button>
+            <input type="number" id="input-pump2_stop" step="1" min="0" max="23" />
+            <span class="colon">:00</span>
+            <button data-step="1" data-pool-for="pump2_stop" type="button">+</button>
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="track" id="tlTrack">
+            <div class="win" id="tlWin1"></div>
+            <div class="win w2" id="tlWin2"></div>
+            <div class="now" id="tlNow"></div>
+          </div>
+          <div class="hours"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+        </div>
+        <div class="pill-row" style="margin-top:10px;">
+          <span class="pill">Tip: set a stop hour earlier than the start hour (e.g. 22 → 06) for an overnight window.</span>
+          <span class="pill">To disable a window, set start = stop.</span>
+        </div>
+      </div>
+      <input type="checkbox" id="sw-pump_timer_enable" style="display:none" aria-hidden="true" />
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Power meter</h2>
+      <div class="grid cols-2">
+        <div>
+          <div><span class="big" id="pzemPower">--</span><span class="unit">W</span></div>
+          <div class="target">Live draw — &gt;0 means pump is running</div>
+        </div>
+        <div>
+          <div><span class="big" id="pzemCurrent">--</span><span class="unit">A</span></div>
+          <div class="target">Pump current (RMS)</div>
+        </div>
+        <div>
+          <div><span class="big" id="pzemVoltage">--</span><span class="unit">V</span></div>
+          <div class="target">Mains voltage</div>
+        </div>
+        <div>
+          <div><span class="big" id="pzemPF">--</span></div>
+          <div class="target">Power factor (1.0 = pure resistive)</div>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Filter health</h2>
+      <div class="filter-bar-head">
+        <span id="filterStatusPill" class="pill filter-status-pill">--</span>
+        <div class="filter-power-now"><span id="filterPowerNow">--</span><span class="unit">W</span></div>
+      </div>
+      <div class="filter-bar-track">
+        <div class="filter-bar-fill" id="filterBarFill" style="width:0%;"></div>
+      </div>
+      <div class="filter-bar-legend">
+        <span>Backwash <strong id="filterBarDirtyLabel">--</strong>W</span>
+        <span>Clean <strong id="filterBarCleanLabel">--</strong>W</span>
+      </div>
+      <div class="row" style="margin-top:14px;">
+        <div class="label">Clean baseline</div>
+        <div class="num">
+          <button data-step="-50" data-pool-for="filter_clean_threshold" type="button">−</button>
+          <input type="number" id="input-filter_clean_threshold" step="10" min="100" max="3000" />
+          <button data-step="50" data-pool-for="filter_clean_threshold" type="button">+</button>
+          <span class="unit">W</span>
+        </div>
+      </div>
+      <div class="pill-row" style="margin-top:6px;">
+        <span class="pill">Centrifugal-pump physics: clogged filter = lower draw. After a backwash, set this to the wattage you see — alerts are computed from it.</span>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Pump safety</h2>
+      <div class="row">
+        <div class="label">Dry-run status</div>
+        <span id="dryRunStatusPill" class="pill">--</span>
+      </div>
+      <div class="row">
+        <div class="label">Protection enabled</div>
+        <label class="switch"><input type="checkbox" id="sw-dry_run_enable"/><span class="slider"></span></label>
+      </div>
+      <div class="row">
+        <div class="label">Trip threshold</div>
+        <div class="target"><span id="dryRunTripThresholdLabel">--</span> W &nbsp;<span class="muted">(auto, 65% of clean baseline)</span></div>
+      </div>
+      <div class="row">
+        <div class="label">Grace period</div>
+        <div class="num">
+          <button data-step="-5" data-pool-for="dry_run_grace_seconds" type="button">−</button>
+          <input type="number" id="input-dry_run_grace_seconds" step="5" min="5" max="300" />
+          <button data-step="5" data-pool-for="dry_run_grace_seconds" type="button">+</button>
+          <span class="unit">s</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">Manual reset</div>
+        <button id="btnDryRunReset" type="button" disabled>Reset trip</button>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card" id="maintenanceCard">
+      <h2>Maintenance mode</h2>
+      <div class="row">
+        <div class="label">Status</div>
+        <span id="maintenancePill" class="pill">inactive</span>
+      </div>
+      <div class="row">
+        <div class="label">Engage</div>
+        <label class="switch"><input type="checkbox" id="sw-maintenance_mode"/><span class="slider"></span></label>
+      </div>
+    </div>
+  </section>
+  <section id="water-view" class="view">
+    <div class="device-switcher" id="waterDeviceSwitcher" style="display:none;"></div>
+    <div class="card tank-card">
+      <h2>Tank level</h2>
+      <div class="tank-lay">
+        <div class="tank-viz" aria-hidden="true">
+          <div class="tank-fill" id="tankFill"></div>
+          <div class="tank-ticks"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div>
+        </div>
+        <div class="tank-hero">
+          <div class="pct"><span id="tankPct">--.-</span><span class="unit">%</span></div>
+          <div class="vol"><span id="tankVol">----</span><span class="unit">L</span></div>
+          <div class="sub">
+            <span id="tankLevelCm">--.-</span> cm of <span id="tankHeightMax">---</span> cm ·
+            capacity <span id="tankVolMax">----</span> L
+          </div>
+          <div class="pill-row" style="margin-top:6px;">
+            <span id="lowTankPill" class="pill off">low-level ok</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="grid cols-2">
+      <div class="card">
+        <h2>Live flow</h2>
+        <div class="flow-big"><span id="flowRate">0.0</span><span class="unit">L/min</span></div>
+        <div class="flow-split">
+          <div class="stat in">
+            <div class="k">Inflow rate</div>
+            <div class="v"><span id="inflowRate">0.0</span><span class="unit">L/min</span></div>
+          </div>
+          <div class="stat out">
+            <div class="k">Outflow rate</div>
+            <div class="v"><span id="outflowRate">0.0</span><span class="unit">L/min</span></div>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px;">
+          <div class="label">Tick delta</div>
+          <div class="val"><span id="deltaL">0.00</span> L</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Settings</h2>
+        <div class="row">
+          <div class="label">Total volume</div>
+          <div class="num">
+            <button data-step="-10" data-water-for="tank_total_volume_cfg" type="button">−</button>
+            <input type="number" id="input-tank_total_volume_cfg" step="10" min="100" max="10000" />
+            <button data-step="10" data-water-for="tank_total_volume_cfg" type="button">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Tank height (cm)</div>
+          <div class="num">
+            <button data-step="-1" data-water-for="tank_height_cm_cfg" type="button">−</button>
+            <input type="number" id="input-tank_height_cm_cfg" step="1" min="50" max="300" />
+            <button data-step="1" data-water-for="tank_height_cm_cfg" type="button">+</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="label">Low-level warn (%)</div>
+          <div class="num">
+            <button data-step="-1" data-water-for="low_level_pct_cfg" type="button">−</button>
+            <input type="number" id="input-low_level_pct_cfg" step="1" min="5" max="50" />
+            <button data-step="1" data-water-for="low_level_pct_cfg" type="button">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Recent Water Events</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="k">Last</div>
+          <div class="v"><span id="lastEvent1">--</span><span class="unit">L</span></div>
+        </div>
+        <div class="stat">
+          <div class="k">Previous</div>
+          <div class="v"><span id="lastEvent2">--</span><span class="unit">L</span></div>
+        </div>
+        <div class="stat">
+          <div class="k">Earlier</div>
+          <div class="v"><span id="lastEvent3">--</span><span class="unit">L</span></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 14px;">
+        <div class="label">Min event size</div>
+        <div class="num">
+          <button data-step="-0.5" data-water-for="event_threshold_cfg" type="button">−</button>
+          <input type="number" id="input-event_threshold_cfg" step="0.5" min="1" max="50" />
+          <button data-step="0.5" data-water-for="event_threshold_cfg" type="button">+</button>
+          <span class="label" style="margin-left:6px;">L</span>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Totals</h2>
+      <div class="stats-grid">
+        <div class="stat in"><div class="k">Today in</div><div class="v"><span id="inToday">--</span><span class="unit">L</span></div></div>
+        <div class="stat in"><div class="k">Month in</div><div class="v"><span id="inMonth">--</span><span class="unit">L</span></div></div>
+        <div class="stat in"><div class="k">Lifetime in</div><div class="v"><span id="inTotal">--</span><span class="unit">L</span></div></div>
+        <div class="stat out"><div class="k">Today out</div><div class="v"><span id="outToday">--</span><span class="unit">L</span></div></div>
+        <div class="stat out"><div class="k">Month out</div><div class="v"><span id="outMonth">--</span><span class="unit">L</span></div></div>
+        <div class="stat out"><div class="k">Lifetime out</div><div class="v"><span id="outTotal">--</span><span class="unit">L</span></div></div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Actions</h2>
+      <div class="action-row">
+        <button class="btn-action warn"   id="btnResetTotals">Reset water totals</button>
+        <button class="btn-action danger" id="btnRestartWater">Restart device</button>
+      </div>
+      <div class="pill-row" style="margin-top:10px;">
+        <span class="pill">IP: <span id="waterIp" style="font-family:var(--mono)">—</span></span>
+      </div>
+    </div>
+  </section>
+  <section id="solar-view" class="view">
+    <div class="device-switcher" id="solarDeviceSwitcher" style="display:none;"></div>
+    <div class="grid cols-2">
+      <div class="card gauge-card">
+        <h2><span class="gauge-ico">☀️</span> Solar Power</h2>
+        <div class="gauge-val"><span id="solarPv">--</span><span class="unit">W</span></div>
+        <div class="ubar solar"><span id="solarPvBar"></span></div>
+        <div class="bbar-legend"><span>0</span><span id="solarPvMaxLabel">8 kW</span></div>
+      </div>
+      <div class="card gauge-card">
+        <h2><span class="gauge-ico">⚡</span> Grid Power</h2>
+        <div class="gauge-val"><span id="solarGrid">--</span><span class="unit">W</span></div>
+        <div class="bbar grid"><span id="solarGridBar"></span></div>
+        <div class="bbar-legend"><span>← export</span><span id="solarGridDir">—</span><span>import →</span></div>
+      </div>
+      <div class="card gauge-card">
+        <h2><span class="gauge-ico">🏠</span> Load Power</h2>
+        <div class="gauge-val"><span id="solarLoad">--</span><span class="unit">W</span></div>
+        <div class="ubar load"><span id="solarLoadBar"></span></div>
+        <div class="bbar-legend"><span>0</span><span id="solarLoadMaxLabel">8 kW</span></div>
+      </div>
+      <div class="card gauge-card">
+        <h2><span class="gauge-ico">🔋</span> Battery Power</h2>
+        <div class="gauge-val"><span id="solarBattPwr">--</span><span class="unit">W</span></div>
+        <div class="bbar battery"><span id="solarBattPwrBar"></span></div>
+        <div class="bbar-legend"><span>← discharging</span><span id="solarBattDir">—</span><span>charging →</span></div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card soc-card">
+      <h2>Battery State of Charge</h2>
+      <div class="gauge-val"><span id="solarSoc">--</span><span class="unit">%</span></div>
+      <div class="soc-bar"><span id="solarSocBar"></span></div>
+      <div class="soc-ticks"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>Today</h2>
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-label">Solar produced</div>
+          <div class="stat-val"><span id="solarPvToday">--</span><span class="unit">kWh</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Grid imported</div>
+          <div class="stat-val"><span id="solarGridImportToday">--</span><span class="unit">kWh</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Load consumed</div>
+          <div class="stat-val"><span id="solarLoadToday">--</span><span class="unit">kWh</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>🔧 SOC Schedule</h2>
+      <div class="row"><div class="label">🕛 00:00 → 07:00</div><div class="num">
+        <button data-step="-5" data-gateway-for="prog1_capacity">−</button>
+        <input type="number" id="input-prog1_capacity" step="1" min="0" max="100" />
+        <button data-step="5"  data-gateway-for="prog1_capacity">+</button>
+        <span class="label" style="margin-left:6px;">%</span>
+      </div></div>
+      <div class="row"><div class="label">🌅 07:00 → 10:00</div><div class="num">
+        <button data-step="-5" data-gateway-for="prog2_capacity">−</button>
+        <input type="number" id="input-prog2_capacity" step="1" min="0" max="100" />
+        <button data-step="5"  data-gateway-for="prog2_capacity">+</button>
+        <span class="label" style="margin-left:6px;">%</span>
+      </div></div>
+      <div class="row"><div class="label">🌤 10:00 → 14:00</div><div class="num">
+        <button data-step="-5" data-gateway-for="prog3_capacity">−</button>
+        <input type="number" id="input-prog3_capacity" step="1" min="0" max="100" />
+        <button data-step="5"  data-gateway-for="prog3_capacity">+</button>
+        <span class="label" style="margin-left:6px;">%</span>
+      </div></div>
+      <div class="row"><div class="label">🌇 14:00 → 17:00</div><div class="num">
+        <button data-step="-5" data-gateway-for="prog4_capacity">−</button>
+        <input type="number" id="input-prog4_capacity" step="1" min="0" max="100" />
+        <button data-step="5"  data-gateway-for="prog4_capacity">+</button>
+        <span class="label" style="margin-left:6px;">%</span>
+      </div></div>
+      <div class="row"><div class="label">🌙 17:00 → 21:00</div><div class="num">
+        <button data-step="-5" data-gateway-for="prog5_capacity">−</button>
+        <input type="number" id="input-prog5_capacity" step="1" min="0" max="100" />
+        <button data-step="5"  data-gateway-for="prog5_capacity">+</button>
+        <span class="label" style="margin-left:6px;">%</span>
+      </div></div>
+      <div class="row"><div class="label">🌛 21:00 → 00:00</div><div class="num">
+        <button data-step="-5" data-gateway-for="prog6_capacity">−</button>
+        <input type="number" id="input-prog6_capacity" step="1" min="0" max="100" />
+        <button data-step="5"  data-gateway-for="prog6_capacity">+</button>
+        <span class="label" style="margin-left:6px;">%</span>
+      </div></div>
+    </div>
+    <div style="height:14px;"></div>
+    <div class="card">
+      <h2>⚙️ Inverter Controls</h2>
+      <div class="row">
+        <div class="label">Priority</div>
+        <select id="sel-energy_pattern" class="sel" style="min-width:180px;">
+          <option value="">—</option>
+          <option value="Battery first">Battery first</option>
+          <option value="Load first">Load first</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Work Mode</div>
+        <select id="sel-work_mode" class="sel" style="min-width:180px;">
+          <option value="">—</option>
+          <option value="Selling First">Selling First</option>
+          <option value="Zero Export + Limit to Load Only">Zero Export + Limit to Load Only</option>
+          <option value="Limited to Home">Limited to Home</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="label">Grid Charge <span id="toggle_grid_charge-chip" class="chip off">OFF</span></div>
+        <label class="switch"><input type="checkbox" id="sw-toggle_grid_charge"/><span class="slider"></span></label>
+      </div>
+      <div class="row">
+        <div class="label">Grid Charge Amps</div>
+        <div class="num">
+          <button data-step="-5" data-gateway-for="grid_charge_amps">−</button>
+          <input type="number" id="input-grid_charge_amps" step="1" min="0" max="120" />
+          <button data-step="5"  data-gateway-for="grid_charge_amps">+</button>
+          <span class="label" style="margin-left:6px;">A</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="label">Priority Load <span id="toggle_priority_load-chip" class="chip off">OFF</span></div>
+        <label class="switch"><input type="checkbox" id="sw-toggle_priority_load"/><span class="slider"></span></label>
+      </div>
+      <div class="row">
+        <div class="label">Solar Sell <span id="toggle_solar_sell-chip" class="chip off">OFF</span></div>
+        <label class="switch"><input type="checkbox" id="sw-toggle_solar_sell"/><span class="slider"></span></label>
+      </div>
+      <div class="row">
+        <div class="label">Use Timer <span id="toggle_system_timer-chip" class="chip off">OFF</span></div>
+        <label class="switch"><input type="checkbox" id="sw-toggle_system_timer"/><span class="slider"></span></label>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">
+        ⚠ Changes write directly to the inverter. Wait for state to confirm before further edits.
+      </div>
+    </div>
+  </section>
+  <footer>
+    Solaire Intelligence · ESPHome web_server v3
+  </footer>
+</div>
+<dialog id="settingsDlg">
+  <h3>Connection settings</h3>
+  <h4>Pool module</h4>
+  <label>Pool host (e.g. <span style="font-family:var(--mono)">http://si-pool.local</span>)</label>
+  <input type="text" id="inpPoolHost" placeholder="http://si-pool.local" />
+  <label>Basic auth username (optional)</label>
+  <input type="text" id="inpPoolUser" autocomplete="off" />
+  <label>Basic auth password (optional)</label>
+  <input type="password" id="inpPoolPass" autocomplete="off" />
+  <h4>Water module</h4>
+  <label>Water host (e.g. <span style="font-family:var(--mono)">http://water-tank.local</span>)</label>
+  <input type="text" id="inpWaterHost" placeholder="http://water-tank.local" />
+  <label>Basic auth username (optional)</label>
+  <input type="text" id="inpWaterUser" autocomplete="off" />
+  <label>Basic auth password (optional)</label>
+  <input type="password" id="inpWaterPass" autocomplete="off" />
+  <div class="actions">
+    <button class="ghost" id="dlgCancel">Cancel</button>
+    <button id="dlgSave">Save</button>
+  </div>
+</dialog>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>
+// Full dashboard JS — see source for complete implementation
+</script>
+</body>
+</html>
