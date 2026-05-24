@@ -56,7 +56,7 @@
       </div>
 
       <h2>Your installed systems, live.</h2>
-      <p class="login-sub">Enter your account ID to access your monitoring dashboard — live telemetry, device controls and remote access for all installed SI products.</p>
+      <p class="login-sub">Sign in with your Solaire Intelligence email and password to access your monitoring dashboard.</p>
 
       <!-- Tab switcher -->
       <div style="display:flex;gap:4px;padding:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;margin-bottom:20px;">
@@ -67,15 +67,15 @@
       <!-- Sign in form -->
       <form id="form-signin" onsubmit="handleLogin(event)">
         <div class="field">
-          <label for="account-id">Account ID</label>
-          <input id="account-id" type="text" placeholder="your-account-id" autocomplete="username" />
+          <label for="account-id">Email Address</label>
+          <input id="account-id" type="email" placeholder="you@example.com" autocomplete="email" />
         </div>
         <div class="field">
           <label for="password">Password</label>
           <input id="password" type="password" class="sans" placeholder="••••••••" autocomplete="current-password" />
         </div>
         <div id="login-err" style="color:var(--danger);font-size:12px;margin-top:4px;min-height:16px;"></div>
-        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;">Access Dashboard</button>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;" id="signin-btn">Sign In</button>
       </form>
 
       <!-- New account form -->
@@ -144,16 +144,47 @@
     }
   }
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
-    const id  = document.getElementById('account-id').value.trim();
-    const pwd = document.getElementById('password').value;
-    const err = document.getElementById('login-err');
-    if (!id || !pwd) { err.textContent = 'Please enter your account ID and password.'; return; }
-    // TODO: replace with real auth endpoint
+    const email = document.getElementById('account-id').value.trim().toLowerCase();
+    const pwd   = document.getElementById('password').value;
+    const err   = document.getElementById('login-err');
+    const btn   = document.getElementById('signin-btn');
+
+    if (!email || !pwd) { err.textContent = 'Please enter your email and password.'; return; }
+
     err.textContent = '';
-    // Redirect to the live dashboard (update URL as needed)
-    window.location.href = 'https://solaire-intelligence.co.za/dashboard?account=' + encodeURIComponent(id);
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const res = await fetch('https://provision.solaire-intelligence.co.za/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pwd })
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        err.textContent = data.error || (res.status === 401 ? 'Incorrect email or password.' : 'Sign-in failed. Please try again.');
+        return;
+      }
+
+      // Store auth exactly as the dashboard expects it
+      sessionStorage.setItem('si.authToken',    data.token    || '');
+      sessionStorage.setItem('si.authEmail',    data.email    || email);
+      sessionStorage.setItem('si.authRole',     data.role     || 'customer');
+      sessionStorage.setItem('si.authAccounts', JSON.stringify(data.accounts || []));
+
+      // Redirect — dashboard will find the token and skip straight to the account picker
+      window.location.href = '/dashboard';
+
+    } catch (ex) {
+      err.textContent = 'Network error — check your connection and try again.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
   }
 
   function handleCreate(e) {
