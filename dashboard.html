@@ -1172,7 +1172,1999 @@
 </dialog>
 <script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 <script>
-// Full dashboard JS — see source for complete implementation
+(() => {
+  "use strict";
+
+  // ============================================================================
+  // AUTH GATE — server-backed email/password + Account ID two-factor.
+  // ============================================================================
+  // Trust model (V2, this build):
+  //   1. Customer signs up at the SI provisioning server with email +
+  //      password + their hex Account ID. Server stores bcrypt hash and
+  //      links the user to that customer_id.
+  //   2. Login returns an HMAC-signed bearer token (24h TTL) and the list
+  //      of customer_ids the user is authorized for.
+  //   3. Token is held in sessionStorage — clears when the tab closes, so
+  //      a shared family laptop doesn't leak a multi-day session.
+  //   4. The hex code is selected from the linked-accounts list (or a new
+  //      one can be linked from inside the dashboard) before the data view
+  //      reveals.
+  //
+  // V2.1 (next): broker-side hardening. Right now MQTT creds are still
+  // baked into this HTML; the auth gate is a UI gate, not a network gate.
+  // The next iteration will exchange the bearer token for short-lived
+  // MQTT credentials scoped to si/<accountId>/# only.
+  // ============================================================================
+  const ACCT_RE = /^[a-f0-9]{6}$/;
+
+  // Provisioning server base URL. Adjust if you front it on a different host.
+  // Same origin works on the production deployment (nginx proxies /auth/* to
+  // the gunicorn upstream); keep this configurable for local-file testing.
+  const AUTH_BASE = window.SI_AUTH_BASE || "https://provision.solaire-intelligence.co.za";
+
+  // Storage keys — sessionStorage so closing the tab signs out.
+  const TOKEN_KEY    = "si.authToken";
+  const EMAIL_KEY    = "si.authEmail";
+  const ROLE_KEY     = "si.authRole";       // "customer" | "installer" | "admin"
+  const ACCOUNTS_KEY = "si.authAccounts";   // JSON array (customers only)
+  const ACCT_KEY     = "si.accountId";      // currently-selected hex
+
+  const $login   = document.getElementById("loginOverlay");
+  const $app     = document.getElementById("appWrap");
+  const $stage1  = document.getElementById("authStage1");
+  const $stage2  = document.getElementById("authStage2");
+
+  const showLogin = () => {
+    $app.style.display = "none";
+    $login.style.display = "flex";
+  };
+  const showApp = () => {
+    $login.style.display = "none";
+    $app.style.display = "block";
+  };
+
+  // ---------- Stage 1: tab switching (Sign In <-> Create Account) ----------
+  const $tabSignin = document.getElementById("tabSignin");
+  const $tabSignup = document.getElementById("tabSignup");
+  const $signinForm = document.getElementById("signinForm");
+  const $signupForm = document.getElementById("signupForm");
+  const switchTab = (which) => {
+    const isSignin = which === "signin";
+    $tabSignin.classList.toggle("active",  isSignin);
+    $tabSignup.classList.toggle("active", !isSignin);
+    $signinForm.style.display = isSignin ? "block" : "none";
+    $signupForm.style.display = isSignin ? "none"  : "block";
+    setTimeout(() => {
+      document.getElementById(isSignin ? "signinEmail" : "signupEmail").focus();
+    }, 50);
+  };
+  $tabSignin.addEventListener("click", () => switchTab("signin"));
+  $tabSignup.addEventListener("click", () => switchTab("signup"));
+
+  // ---------- API helpers ----------
+  const apiPost = async (path, body, token) => {
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${AUTH_BASE}${path}`, {
+      method: "POST", headers, body: JSON.stringify(body || {}),
+    });
+    let data = null;
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, status: res.status, data: data || {} };
+  };
+  const apiGet = async (path, token) => {
+    const headers = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${AUTH_BASE}${path}`, { method: "GET", headers });
+    let data = null;
+    try { data = await res.json(); } catch {}
+    return { ok: res.ok, status: res.status, data: data || {} };
+  };
+
+  const errMessage = (status, errCode) => ({
+    "invalid_email":             "That doesn't look like a valid email.",
+    "weak_password":             "Password must be at least 8 characters.",
+    "invalid_account_id":        "Account ID must be 6 hex characters (a–f, 0–9).",
+    "account_not_found":         "No device registered to that Account ID. Check the hex code.",
+    "email_already_registered":  "That email is already registered. Try signing in instead.",
+    "account_already_claimed":   "This Account ID is already linked to another user. If you own this device, contact support to transfer it.",
+    "invalid_installer_code":    "That installer code isn't valid. Check with Solaire Intelligence.",
+    "not_authorized_for_account":"You're not authorized to view that account.",
+    "invalid_credentials":       "Wrong email or password.",
+    "missing_token":             "Please sign in again.",
+    "invalid_or_expired_token":  "Your session expired. Please sign in again.",
+  }[errCode] || (status === 0
+      ? "Couldn't reach the server. Check your internet connection."
+      : `Something went wrong (${status}). Try again.`));
+
+  // ---------- Persist login result ----------
+  const persistAuth = ({ token, email, role, accounts }) => {
+    sessionStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(EMAIL_KEY, email);
+    sessionStorage.setItem(ROLE_KEY,  role || "customer");
+    sessionStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts || []));
+  };
+  const clearAuth = () => {
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(EMAIL_KEY);
+    sessionStorage.removeItem(ROLE_KEY);
+    sessionStorage.removeItem(ACCOUNTS_KEY);
+    sessionStorage.removeItem(ACCT_KEY);
+  };
+  const isInstaller = () =>
+    ["installer", "admin"].includes(sessionStorage.getItem(ROLE_KEY));
+
+  // ---------- Sign-in submit ----------
+  $signinForm.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const errEl = document.getElementById("signinErr");
+    const btn   = document.getElementById("signinBtn");
+    errEl.textContent = "";
+    btn.disabled = true; btn.textContent = "Signing in…";
+    try {
+      const email    = document.getElementById("signinEmail").value.trim().toLowerCase();
+      const password = document.getElementById("signinPassword").value;
+      const r = await apiPost("/auth/login", { email, password });
+      if (!r.ok) { errEl.textContent = errMessage(r.status, r.data.error); return; }
+      persistAuth(r.data);
+      proceedAfterAuth(r.data.accounts || []);
+    } catch (e) {
+      errEl.textContent = errMessage(0, null);
+    } finally {
+      btn.disabled = false; btn.textContent = "Sign In";
+    }
+  });
+
+  // ---------- Create-account submit ----------
+  $signupForm.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const errEl = document.getElementById("signupErr");
+    const btn   = document.getElementById("signupBtn");
+    errEl.textContent = "";
+    btn.disabled = true; btn.textContent = "Creating…";
+    try {
+      const email          = document.getElementById("signupEmail").value.trim().toLowerCase();
+      const password       = document.getElementById("signupPassword").value;
+      const account_id     = document.getElementById("signupAccount").value.trim().toLowerCase();
+      const installer_code = document.getElementById("signupInstallerCode").value.trim();
+
+      // Installer signup: hex code optional. Customer signup: hex code required.
+      if (!installer_code && !ACCT_RE.test(account_id)) {
+        errEl.textContent = "Account ID must be 6 hex characters (a–f, 0–9).";
+        return;
+      }
+      const body = { email, password };
+      if (installer_code) body.installer_code = installer_code;
+      if (account_id)     body.account_id     = account_id;
+
+      const r = await apiPost("/auth/signup", body);
+      if (!r.ok) { errEl.textContent = errMessage(r.status, r.data.error); return; }
+      persistAuth(r.data);
+      proceedAfterAuth(r.data.accounts || []);
+    } catch (e) {
+      errEl.textContent = errMessage(0, null);
+    } finally {
+      btn.disabled = false; btn.textContent = "Create Account";
+    }
+  });
+
+  // ---------- Stage 2: account picker + link new account ----------
+  const renderAccountPicker = (accounts) => {
+    const list = document.getElementById("accountList");
+    list.innerHTML = "";
+    accounts.forEach((acct) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = acct;
+      b.addEventListener("click", () => selectAccount(acct));
+      list.appendChild(b);
+    });
+    document.getElementById("authStage2Email").textContent =
+      sessionStorage.getItem(EMAIL_KEY) || "";
+  };
+
+  const selectAccount = (acct) => {
+    sessionStorage.setItem(ACCT_KEY, acct);
+    location.reload();   // simplest path: re-run the IIFE with accountId set
+  };
+
+  document.getElementById("linkAccountForm").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const errEl = document.getElementById("linkAccountErr");
+    errEl.textContent = "";
+    const acct  = document.getElementById("linkAccountInput").value.trim().toLowerCase();
+    if (!ACCT_RE.test(acct)) {
+      errEl.textContent = "Account ID must be 6 hex characters (a–f, 0–9).";
+      return;
+    }
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const r = await apiPost("/auth/link_account", { account_id: acct }, token);
+    if (!r.ok) { errEl.textContent = errMessage(r.status, r.data.error); return; }
+    sessionStorage.setItem(ACCOUNTS_KEY, JSON.stringify(r.data.accounts || []));
+    selectAccount(acct);   // jump straight into the freshly-linked one
+  });
+
+  document.getElementById("signoutFromStage2").addEventListener("click", () => {
+    clearAuth();
+    location.reload();
+  });
+
+  // ---------- Routing after a successful auth ----------
+  const proceedAfterAuth = (accounts) => {
+    // Installer / admin: always show the hex-code prompt — no picker.
+    // They might be looking at a different customer each session.
+    if (isInstaller()) {
+      $stage1.style.display = "none";
+      $stage2.style.display = "block";
+      document.getElementById("authStage2RoleBadge").style.display = "inline-block";
+      document.getElementById("authStage2Hint").textContent =
+        " — type a customer's Account ID below.";
+      document.getElementById("authStage2Customer").style.display = "none";
+      document.getElementById("authStage2Installer").style.display = "block";
+      document.getElementById("authStage2Email").textContent =
+        sessionStorage.getItem(EMAIL_KEY) || "";
+      setTimeout(() => document.getElementById("installerHexInput").focus(), 50);
+      return;
+    }
+
+    // Customer flow: auto-pick if exactly one account, else show picker.
+    if (accounts.length === 1) {
+      selectAccount(accounts[0]);
+    } else if (accounts.length > 1) {
+      $stage1.style.display = "none";
+      $stage2.style.display = "block";
+      document.getElementById("authStage2Customer").style.display = "block";
+      document.getElementById("authStage2Installer").style.display = "none";
+      renderAccountPicker(accounts);
+    } else {
+      // Edge case: customer with zero linked accounts.
+      $stage1.style.display = "none";
+      $stage2.style.display = "block";
+      document.getElementById("authStage2Customer").style.display = "block";
+      document.getElementById("authStage2Installer").style.display = "none";
+      renderAccountPicker([]);
+      document.getElementById("linkAccountInput").focus();
+    }
+  };
+
+  // ---------- Installer hex submit ----------
+  document.getElementById("installerHexForm").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const errEl = document.getElementById("installerHexErr");
+    errEl.textContent = "";
+    const acct = document.getElementById("installerHexInput").value.trim().toLowerCase();
+    if (!ACCT_RE.test(acct)) {
+      errEl.textContent = "Account ID must be 6 hex characters (a–f, 0–9).";
+      return;
+    }
+    const token = sessionStorage.getItem(TOKEN_KEY);
+    const r = await apiPost("/auth/verify_account", { account_id: acct }, token);
+    if (!r.ok) { errEl.textContent = errMessage(r.status, r.data.error); return; }
+    selectAccount(acct);
+  });
+
+  // ---------- Existing-session check on page load ----------
+  const token = sessionStorage.getItem(TOKEN_KEY);
+  let accountId = (sessionStorage.getItem(ACCT_KEY) || "").trim().toLowerCase();
+  if (!ACCT_RE.test(accountId)) accountId = "";
+
+  // Top-level header sign-out: nuke everything and reload.
+  document.getElementById("signoutBtn").addEventListener("click", () => {
+    if (!confirm("Sign out?")) return;
+    clearAuth();
+    location.reload();
+  });
+
+  // ---------- Magic-URL onboarding ----------
+  // ?installer=<code>   — pre-configures the signup form for installer
+  //                       onboarding. Hides the hex-code field and the
+  //                       installer-code disclosure; just email + password
+  //                       remain visible. Code is stripped from the URL
+  //                       after read so it's not visible in the address bar.
+  // ?id=<hex>           — pre-fills the customer hex code in signup.
+  //                       Useful for the QR sticker on the device box.
+  const applyMagicUrlParams = () => {
+    const params = new URLSearchParams(location.search);
+    const installerCode = params.get("installer");
+    const customerHex   = (params.get("id") || "").trim().toLowerCase();
+    let dirty = false;
+
+    if (installerCode) {
+      switchTab("signup");
+      const codeInput = document.getElementById("signupInstallerCode");
+      if (codeInput) codeInput.value = installerCode;
+      // Hide the hex code field — installer doesn't need one
+      const acctField = document.getElementById("signupAccountField");
+      if (acctField) acctField.style.display = "none";
+      // Hide the installer-code disclosure entirely (we've already filled it)
+      const disclosure = codeInput && codeInput.closest("details");
+      if (disclosure) disclosure.style.display = "none";
+      // Banner so they know what mode they're in
+      const sub = document.querySelector("#authStage1 .login-tabs");
+      if (sub) {
+        const banner = document.createElement("div");
+        banner.style.cssText =
+          "background:linear-gradient(135deg,var(--accent),var(--accent-2));" +
+          "color:#041425;padding:8px 12px;border-radius:8px;font-size:12px;" +
+          "font-weight:600;letter-spacing:0.5px;margin-bottom:14px;text-align:center;";
+        banner.textContent = "🛠  INSTALLER SIGN-UP";
+        sub.parentNode.insertBefore(banner, sub);
+      }
+      dirty = true;
+    } else if (ACCT_RE.test(customerHex)) {
+      switchTab("signup");
+      const acctInput = document.getElementById("signupAccount");
+      if (acctInput) acctInput.value = customerHex;
+      dirty = true;
+    }
+
+    // Strip the params from the URL so the code/hex isn't sitting in
+    // the address bar or browser history.
+    if (dirty) {
+      const url = new URL(location.href);
+      url.searchParams.delete("installer");
+      url.searchParams.delete("id");
+      history.replaceState({}, "", url.toString());
+    }
+  };
+
+  // Decision tree:
+  //   no token                    → show stage 1 (sign in / sign up)
+  //   token + selected accountId  → reveal app
+  //   token + no accountId        → /auth/me to get the list, then stage 2
+  if (!token) {
+    showLogin();
+    applyMagicUrlParams();
+    setTimeout(() => {
+      const params = new URLSearchParams(location.search);
+      // After applyMagicUrlParams the params have been cleared, so we
+      // re-check by looking at whether the signup form is visible.
+      const signupVisible = document.getElementById("signupForm").style.display === "block";
+      const focusTarget = signupVisible ? "signupEmail" : "signinEmail";
+      document.getElementById(focusTarget).focus();
+    }, 50);
+    return;
+  }
+
+  if (!accountId) {
+    // Validate token + fetch accounts in the background, then route.
+    showLogin();
+    apiGet("/auth/me", token).then((r) => {
+      if (!r.ok) {
+        clearAuth();
+        document.getElementById("signinErr").textContent =
+          errMessage(r.status, r.data.error);
+        return;
+      }
+      sessionStorage.setItem(EMAIL_KEY, r.data.email);
+      sessionStorage.setItem(ROLE_KEY,  r.data.role || "customer");
+      sessionStorage.setItem(ACCOUNTS_KEY, JSON.stringify(r.data.accounts || []));
+      proceedAfterAuth(r.data.accounts || []);
+    }).catch(() => {
+      // Network blip — let user manually re-sign-in rather than spinning.
+      clearAuth();
+      document.getElementById("signinErr").textContent = errMessage(0, null);
+    });
+    return;
+  }
+
+  // We have token + selected accountId — proceed to dashboard.
+  showApp();
+  document.getElementById("acctLabel").textContent = accountId;
+
+  // ============================================================================
+  // Config + persistence
+  // ============================================================================
+  const LS = "solaire-intelligence.cfg";
+  const LS_LEGACY = "si-controller.cfg"; // migrate if present
+
+  const loadCfg = () => {
+    try {
+      const raw = localStorage.getItem(LS);
+      if (raw) return JSON.parse(raw);
+      const legacy = localStorage.getItem(LS_LEGACY);
+      return legacy ? JSON.parse(legacy) : {};
+    } catch { return {}; }
+  };
+  const saveCfg = (c) => localStorage.setItem(LS, JSON.stringify(c));
+
+  const originBias = () => {
+    try {
+      if (!location || !/^https?:/.test(location.origin)) return {};
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)/.test(location.origin)) return {};
+      const h = location.hostname;
+      if (h.startsWith("si-pool"))    return { pool:  location.origin };
+      if (h.startsWith("water-tank")) return { water: location.origin };
+      // si-gateway still serves this dashboard, but has no local tab —
+      // fall through so Pool/Water hosts keep their configured URLs.
+    } catch {}
+    return {};
+  };
+
+  const defaults = Object.assign({
+    pool:  "http://si-pool.local",
+    water: "http://water-tank.local",
+  }, originBias());
+
+  const stored = loadCfg();
+  const isFirstRun = !stored.pool && !stored.water;
+  const cfg = {
+    pool:      stored.pool      || defaults.pool,
+    poolUser:  stored.poolUser  || "",
+    poolPass:  stored.poolPass  || "",
+    water:     stored.water     || defaults.water,
+    waterUser: stored.waterUser || "",
+    waterPass: stored.waterPass || "",
+  };
+
+  // ============================================================================
+  // DOM + HTTP utilities
+  // ============================================================================
+  const $ = (sel) => document.querySelector(sel);
+  const encEntity = (name) => encodeURIComponent(name);
+
+  // ----------------------------------------------------------------------------
+  // Pending-write lock — kills the "field reverts after blur" race.
+  // When the user edits an input and we POST the new value, an in-flight state
+  // event from the device may arrive carrying the OLD value and overwrite the
+  // input via render() now that the activeElement guard has released. Lock the
+  // DOM id for a short window after a successful write so render() ignores it.
+  // ----------------------------------------------------------------------------
+  const pendingWrites = new Map(); // domId -> expiry epoch ms
+  const PENDING_TTL_MS = 3000;
+  const markPending = (domId) => pendingWrites.set(domId, Date.now() + PENDING_TTL_MS);
+  const isPending   = (domId) => {
+    const exp = pendingWrites.get(domId);
+    if (!exp) return false;
+    if (Date.now() > exp) { pendingWrites.delete(domId); return false; }
+    return true;
+  };
+  const clearPending = (domId) => pendingWrites.delete(domId);
+
+  const makeApi = ({ hostGetter, userGetter, passGetter }) => {
+    const authHeader = () => {
+      const u = userGetter(), p = passGetter();
+      if (!u && !p) return null;
+      return "Basic " + btoa(`${u}:${p}`);
+    };
+    const api = async (path, init = {}) => {
+      const url = hostGetter().replace(/\/+$/, "") + path;
+      const headers = Object.assign({}, init.headers || {});
+      const auth = authHeader();
+      if (auth) headers["Authorization"] = auth;
+      const r = await fetch(url, Object.assign({}, init, { headers, mode: "cors" }));
+      if (!r.ok) throw new Error(`${r.status} ${r.statusText} ← ${path}`);
+      const ct = r.headers.get("content-type") || "";
+      return ct.includes("application/json") ? r.json() : null;
+    };
+    return { api, authHeader, post: (p) => api(p, { method: "POST" }) };
+  };
+
+  // ============================================================================
+  // Connection pill
+  // ============================================================================
+  let activeModule = "pool";
+  const moduleStatus = {
+    pool:  { state: "warn", text: "connecting…" },
+    water: { state: "warn", text: "connecting…" },
+    solar: { state: "warn", text: "connecting…" },
+  };
+  const setConnFor = (mod, state, text) => {
+    moduleStatus[mod] = { state, text };
+    const dot = document.getElementById(mod + "TabDot");
+    if (dot) dot.className = "tab-dot " + state;
+    if (mod === activeModule) {
+      $("#connDot").className = "dot " + (state || "");
+      $("#connText").textContent = text || state || "";
+    }
+  };
+
+  const setActiveModule = (mod) => {
+    activeModule = mod;
+    for (const btn of document.querySelectorAll("#moduleTabs button")) {
+      btn.classList.toggle("active", btn.dataset.module === mod);
+    }
+    for (const v of document.querySelectorAll(".view")) {
+      v.classList.toggle("active", v.id === mod + "-view");
+    }
+    const s = moduleStatus[mod];
+    $("#connDot").className = "dot " + (s.state || "");
+    $("#connText").textContent = s.text || "";
+    $("#hostLabel").textContent =
+      mod === "pool"  ? cfg.pool  :
+      mod === "water" ? cfg.water :
+      mod === "solar" ? "SI Gateway (cloud)" : cfg.pool;
+  };
+
+  // ============================================================================
+  // Module factory — supports: switch, number, sensor, binary_sensor, text_sensor, select, button
+  // ============================================================================
+  const makeModule = ({ name, hostGetter, userGetter, passGetter, entities, state, parseEvent, render }) => {
+    const { api, authHeader, post } = makeApi({ hostGetter, userGetter, passGetter });
+
+    // Tiered poll. `tierFilter` may be:
+    //   null    → poll every entity (used for first load)
+    //   "fast"  → only entities with meta.tier === "fast"
+    //   "slow"  → only entities with meta.tier !== "fast" (default bucket)
+    //
+    // This is the whole reason SSE was removed: on a single-ESP gateway the
+    // UART Modbus task shares the loop with the web server, so a chatty SSE
+    // push flow (every sensor update → every client) starves Modbus reads.
+    // Polling at deterministic intervals keeps the web server idle ~95% of the
+    // time and lets the UART task get the CPU it needs.
+    const refresh = async (tierFilter = null) => {
+      const jobs = [];
+      for (const [id, meta] of Object.entries(entities)) {
+        const tier = meta.tier === "fast" ? "fast" : "slow";
+        if (tierFilter && tier !== tierFilter) continue;
+        const kind = meta.kind;
+        const n = meta.name;
+        if (kind === "switch") {
+          jobs.push(api(`/switch/${encEntity(n)}`)
+            .then(j => { state.switches[id] = !!j.value; }).catch(()=>{}));
+        } else if (kind === "number") {
+          jobs.push(api(`/number/${encEntity(n)}`)
+            .then(j => { state.numbers[id] = Number(j.value); }).catch(()=>{}));
+        } else if (kind === "sensor") {
+          jobs.push(api(`/sensor/${encEntity(n)}`)
+            .then(j => { state.sensors[id] = (j && j.value !== undefined) ? Number(j.value) : null; }).catch(()=>{}));
+        } else if (kind === "binary_sensor") {
+          jobs.push(api(`/binary_sensor/${encEntity(n)}`)
+            .then(j => { state.binary[id] = !!j.value; }).catch(()=>{}));
+        } else if (kind === "text_sensor") {
+          jobs.push(api(`/text_sensor/${encEntity(n)}`)
+            .then(j => { state.texts[id] = (j && (j.value !== undefined ? j.value : j.state)) || ""; }).catch(()=>{}));
+        } else if (kind === "select") {
+          jobs.push(api(`/select/${encEntity(n)}`)
+            .then(j => {
+              if (!state.selects[id]) state.selects[id] = { value: null, options: [] };
+              if (j) {
+                if (j.value  !== undefined) state.selects[id].value   = j.value;
+                if (Array.isArray(j.option)) state.selects[id].options = j.option;
+                else if (Array.isArray(j.options)) state.selects[id].options = j.options;
+              }
+            }).catch(()=>{}));
+        }
+      }
+      await Promise.all(jobs);
+      render(state);
+    };
+
+    // Cadence config — per-tier poll intervals.
+    //   fast: live telemetry (power, flow, level, temperature)
+    //   slow: settings, totals, labels — things that barely move
+    const FAST_INTERVAL_MS = 5000;
+    const SLOW_INTERVAL_MS = 60000;
+
+    let fastTimer = null, slowTimer = null;
+
+    const stopStream = () => {
+      if (fastTimer) { clearInterval(fastTimer); fastTimer = null; }
+      if (slowTimer) { clearInterval(slowTimer); slowTimer = null; }
+    };
+
+    const startStream = () => {
+      stopStream();
+      setConnFor(name, "ok", "live (5s/60s poll)");
+      fastTimer = setInterval(() => { refresh("fast").catch(()=>{}); }, FAST_INTERVAL_MS);
+      slowTimer = setInterval(() => { refresh("slow").catch(()=>{}); }, SLOW_INTERVAL_MS);
+    };
+
+    const tryConnect = () =>
+      refresh(null)
+        .then(() => { setConnFor(name, "ok", "connected"); startStream(); })
+        .catch((e) => {
+          console.warn(`[${name}]`, e);
+          setConnFor(name, "err", "unreachable");
+          setTimeout(() => tryConnect().catch(()=>{}), 5000);
+        });
+
+    // parseEvent retained for possible future use (e.g. optional SSE mode);
+    // intentionally not called anywhere so ESP never opens /events.
+    void parseEvent;
+
+    return { name, api, post, state, refresh, startStream, stopStream, tryConnect };
+  };
+
+  const makeParser = (entities) => (m, state) => {
+    // m.id looks like "switch-pump", "binary_sensor-low_tank_warning", "select-energy_pattern"
+    const firstDash = m.id.indexOf("-");
+    if (firstDash < 0) return false;
+    const kind = m.id.substring(0, firstDash);
+    const id   = m.id.substring(firstDash + 1);
+    const meta = entities[id];
+    if (!meta || meta.kind !== kind) return false;
+
+    const parseBool = () => m.value !== undefined ? !!m.value
+      : (typeof m.state === "string" && /^(on|true)$/i.test(m.state.trim()));
+    const parseNum  = () => m.value !== undefined ? Number(m.value)
+      : (typeof m.state === "string" ? parseFloat(m.state) : NaN);
+
+    if      (kind === "switch"        && id in state.switches) state.switches[id] = parseBool();
+    else if (kind === "number"        && id in state.numbers)  state.numbers[id]  = parseNum();
+    else if (kind === "sensor"        && id in state.sensors)  state.sensors[id]  = parseNum();
+    else if (kind === "binary_sensor" && id in state.binary)   state.binary[id]   = parseBool();
+    else if (kind === "text_sensor"   && id in state.texts)    state.texts[id]    =
+      (m.value !== undefined ? String(m.value) : (typeof m.state === "string" ? m.state : ""));
+    else if (kind === "select" && state.selects && id in state.selects) {
+      const cur = state.selects[id];
+      if (m.value !== undefined) cur.value = m.value;
+      else if (typeof m.state === "string") cur.value = m.state;
+      if (Array.isArray(m.option))  cur.options = m.option;
+      else if (Array.isArray(m.options)) cur.options = m.options;
+    }
+    else return false;
+    return true;
+  };
+
+  // ============================================================================
+  // MQTT module factory — used by Pool. Same outward shape as makeModule
+  // (tryConnect/stopStream/state) plus publishSwitch/publishNumber/publish.
+  // Subscribes to <prefix>/# and routes incoming messages by topic into state,
+  // then calls render(state). Writes go via client.publish() to the entity's
+  // /command topic.
+  //
+  // Entity definitions need a `mqttId` field (the on-device entity ID, snake_case)
+  // because dashboard internal IDs (e.g. "target_temp") differ from device IDs
+  // (e.g. "pool_target_temperature").
+  // ============================================================================
+  const makeMqttModule = ({ name, broker, username, password, prefix, entities, state, render }) => {
+    let client = null;
+    let connected = false;
+
+    // ESPHome quirk: text_sensor entities publish under the `sensor/` topic
+    // path (not `text_sensor/`). Translate when building the routing map.
+    const kindToTopicPath = (kind) => kind === "text_sensor" ? "sensor" : kind;
+
+    // topic → { id, kind } reverse map for fast routing on incoming messages
+    const topicToEntity = {};
+    for (const [id, meta] of Object.entries(entities)) {
+      if (!meta.mqttId) continue;
+      topicToEntity[`${prefix}/${kindToTopicPath(meta.kind)}/${meta.mqttId}/state`] = { id, kind: meta.kind };
+    }
+    const statusTopic = `${prefix}/status`;
+
+    const isOn = (s) => /^(on|true|1)$/i.test(String(s).trim());
+
+    const onMessage = (topic, payloadBuf) => {
+      const payload = payloadBuf.toString();
+      if (topic === statusTopic) {
+        if (payload === "online")       setConnFor(name, "ok",   "live (mqtt)");
+        else if (payload === "offline") setConnFor(name, "warn", "device offline");
+        return;
+      }
+      const ent = topicToEntity[topic];
+      if (!ent) return;
+      const { id, kind } = ent;
+      if      (kind === "switch")        state.switches[id] = isOn(payload);
+      else if (kind === "number")        state.numbers[id]  = Number(payload);
+      else if (kind === "sensor")        state.sensors[id]  = Number(payload);
+      else if (kind === "binary_sensor") state.binary[id]   = isOn(payload);
+      else if (kind === "text_sensor")   state.texts[id]    = payload;
+      render(state);
+    };
+
+    const tryConnect = () => {
+      setConnFor(name, "warn", "connecting…");
+      try {
+        client = mqtt.connect(broker, {
+          username, password,
+          clientId: `dash-${name}-${Math.random().toString(16).slice(2, 10)}`,
+          reconnectPeriod: 5000,
+          connectTimeout: 8000,
+          clean: true,
+        });
+      } catch (e) {
+        console.warn(`[${name}] mqtt.connect threw`, e);
+        setConnFor(name, "err", "broker unreachable");
+        return Promise.reject(e);
+      }
+
+      client.on("connect", () => {
+        connected = true;
+        setConnFor(name, "ok", "live (mqtt)");
+        client.subscribe(`${prefix}/#`, { qos: 0 });
+      });
+      client.on("message", onMessage);
+      client.on("close",   () => {
+        connected = false;
+        setConnFor(name, "warn", "reconnecting…");
+      });
+      client.on("error", (err) => {
+        console.warn(`[${name}] mqtt error`, err);
+        setConnFor(name, "err", "broker error");
+      });
+
+      return Promise.resolve();
+    };
+
+    const stopStream = () => {
+      if (client) {
+        try { client.end(true); } catch {}
+        client = null;
+        connected = false;
+      }
+    };
+
+    const publish = (topic, payload) => {
+      if (!client || !connected) return Promise.reject(new Error("mqtt not connected"));
+      return new Promise((resolve, reject) => {
+        client.publish(topic, payload, { qos: 0, retain: false }, (err) => {
+          if (err) reject(err); else resolve();
+        });
+      });
+    };
+
+    const publishSwitch = (id, on) => {
+      const meta = entities[id];
+      if (!meta || meta.kind !== "switch") return Promise.reject(new Error(`not a switch: ${id}`));
+      return publish(`${prefix}/switch/${meta.mqttId}/command`, on ? "ON" : "OFF");
+    };
+
+    const publishNumber = (id, value) => {
+      const meta = entities[id];
+      if (!meta || meta.kind !== "number") return Promise.reject(new Error(`not a number: ${id}`));
+      return publish(`${prefix}/number/${meta.mqttId}/command`, String(value));
+    };
+
+    // Buttons in ESPHome MQTT are command-only entities (no /state). Pressing
+    // a button = publish "PRESS" to its /command topic.
+    const publishButton = (id) => {
+      const meta = entities[id];
+      if (!meta || meta.kind !== "button") return Promise.reject(new Error(`not a button: ${id}`));
+      return publish(`${prefix}/button/${meta.mqttId}/command`, "PRESS");
+    };
+
+    return { name, state, tryConnect, stopStream, publish, publishSwitch, publishNumber, publishButton };
+  };
+
+  // ============================================================================
+  // POOL MODULE
+  // ============================================================================
+  // mqttId: on-device entity ID (snake_case, what ESPHome publishes under).
+  //         For most entities it matches the dashboard ID; some are renamed
+  //         (e.g. dashboard "target_temp" → device "pool_target_temperature").
+  const POOL_ENT = {
+    pump:                    { kind: "switch", name: "Pump",                    mqttId: "pump" },
+    light:                   { kind: "switch", name: "Light",                   mqttId: "light" },
+    heat_pump:               { kind: "switch", name: "Heat Pump",               mqttId: "heat_pump" },
+    hp_enable:               { kind: "switch", name: "Heat Pump Enable",        mqttId: "heat_pump_enable" },
+    pump_timer_enable:       { kind: "switch", name: "Pump Timer Enable",       mqttId: "pump_timer_enable" },
+    target_temp:             { kind: "number", name: "Pool Target Temperature", mqttId: "pool_target_temperature" },
+    pump_start:              { kind: "number", name: "Pump Start Hour",         mqttId: "pump_start_hour" },
+    pump_stop:               { kind: "number", name: "Pump Stop Hour",          mqttId: "pump_stop_hour" },
+    pump2_start:             { kind: "number", name: "Pump 2 Start Hour",       mqttId: "pump_2_start_hour" },
+    pump2_stop:              { kind: "number", name: "Pump 2 Stop Hour",        mqttId: "pump_2_stop_hour" },
+    pool_temp:               { kind: "sensor", name: "Pool Temperature",        mqttId: "pool_temperature",        tier: "fast" },
+    // IAMMeter WEM3080 single-phase power meter via Modbus RTU.
+    // Exposes V, A, W, PF (and energy/Hz on the meter itself, but those
+    // registers were unreliable on RTU and aren't published).
+    pool_meter_current:      { kind: "sensor", name: "Pool Meter Current",      mqttId: "pool_meter_current" },
+    pool_meter_power:        { kind: "sensor", name: "Pool Meter Power",        mqttId: "pool_meter_power",        tier: "fast" },
+    pool_meter_voltage:      { kind: "sensor", name: "Pool Meter Voltage",      mqttId: "pool_meter_voltage" },
+    pool_meter_pf:           { kind: "sensor", name: "Pool Meter Power Factor", mqttId: "pool_meter_power_factor" },
+    // Filter health — single clean baseline + derived status. The "needs
+    // backwash" floor is computed as 55% of clean inside the firmware
+    // (see filter_status lambda) and the dashboard, so there's no
+    // separate dirty-threshold entity anymore.
+    filter_clean_threshold:  { kind: "number", name: "Filter Clean Threshold",  mqttId: "filter_clean_threshold" },
+    filter_status:           { kind: "text_sensor",   name: "Filter Status",           mqttId: "filter_status" },
+    filter_needs_attention:  { kind: "binary_sensor", name: "Filter Needs Attention",  mqttId: "filter_needs_attention" },
+    // Dry-run protection: enable switch, grace period, latched trip, reset
+    // button. The wattage threshold itself is no longer exposed — it's
+    // auto-derived as 65% of filter_clean_threshold inside the firmware.
+    dry_run_enable:          { kind: "switch",        name: "Dry Run Protection Enable", mqttId: "dry_run_protection_enable" },
+    dry_run_grace_seconds:   { kind: "number",        name: "Dry Run Grace Seconds",     mqttId: "dry_run_grace_seconds" },
+    // Maintenance Mode: 20-minute service window. Forces pump on, heater
+    // off, schedule + dry-run paused. Triggerable from the dashboard or
+    // the physical button on the controller.
+    maintenance_mode:        { kind: "switch",        name: "Maintenance Mode",            mqttId: "maintenance_mode" },
+    maintenance_active:      { kind: "binary_sensor", name: "Maintenance Mode Active",     mqttId: "maintenance_mode_active" },
+    maintenance_remaining:   { kind: "sensor",        name: "Maintenance Mode Remaining",  mqttId: "maintenance_mode_remaining" },
+    dry_run_tripped:         { kind: "binary_sensor", name: "Dry Run Tripped",           mqttId: "dry_run_tripped" },
+    dry_run_reset:           { kind: "button",        name: "Dry Run Reset",             mqttId: "dry_run_reset" },
+  };
+
+  const poolState = {
+    switches: {
+      pump:false, light:false, heat_pump:false, hp_enable:false, pump_timer_enable:false,
+      dry_run_enable:true,
+      maintenance_mode:false,
+    },
+    numbers:  {
+      target_temp:null, pump_start:null, pump_stop:null, pump2_start:null, pump2_stop:null,
+      filter_clean_threshold:null,
+      dry_run_grace_seconds:null,
+    },
+    sensors:  {
+      pool_temp:null,
+      pool_meter_current:null, pool_meter_power:null,
+      pool_meter_voltage:null, pool_meter_pf:null,
+      maintenance_remaining:null,
+    },
+    binary:   { filter_needs_attention:false, dry_run_tripped:false, maintenance_active:false },
+    texts:    { filter_status:"" },
+    selects:  {},
+  };
+
+  const poolCurrentMode = () => {
+    if (poolState.switches.pump_timer_enable) return "auto";
+    return poolState.switches.pump ? "on" : "off";
+  };
+
+  const inWindow = (h, start, stop) => {
+    if (start === stop) return false;
+    if (start < stop)  return h >= start && h < stop;
+    return h >= start || h < stop;
+  };
+
+  const drawOvernightTail = (mainId, start, stop) => {
+    const tail = document.getElementById(mainId + "_tail") || (() => {
+      const el = document.createElement("div");
+      el.id = mainId + "_tail";
+      el.className = document.getElementById(mainId).className;
+      el.style.position = "absolute";
+      el.style.top = "0"; el.style.bottom = "0";
+      document.getElementById("tlTrack").appendChild(el);
+      return el;
+    })();
+    if (start === null || stop === null || start === stop || start < stop) {
+      tail.style.display = "none"; return;
+    }
+    tail.style.display = "block";
+    tail.style.left = "0%";
+    tail.style.width = ((stop / 24) * 100) + "%";
+  };
+
+  const renderPumpMode = () => {
+    const mode = poolCurrentMode();
+    for (const btn of document.querySelectorAll("#pumpModeSeg button")) {
+      btn.classList.toggle("active", btn.dataset.mode === mode);
+    }
+    const status = document.getElementById("pumpStatusText");
+    const h = (new Date()).getHours();
+    const s1 = poolState.numbers.pump_start,  e1 = poolState.numbers.pump_stop;
+    const s2 = poolState.numbers.pump2_start, e2 = poolState.numbers.pump2_stop;
+
+    if (mode === "on") status.innerHTML = `<span class="big">Running now</span> · manual override`;
+    else if (mode === "off") status.innerHTML = `<span class="big">Off</span> · manual override`;
+    else {
+      const in1 = s1 !== null && e1 !== null && inWindow(h, s1, e1);
+      const in2 = s2 !== null && e2 !== null && inWindow(h, s2, e2);
+      const fmt = (x) => (x === null ? "--" : String(x).padStart(2, "0") + ":00");
+      if (in1) status.innerHTML = `<span class="big">Running</span> · window 1 ends at ${fmt(e1)}`;
+      else if (in2) status.innerHTML = `<span class="big">Running</span> · window 2 ends at ${fmt(e2)}`;
+      else {
+        const cand = [];
+        if (s1 !== null && e1 !== null && s1 !== e1) cand.push({ label: "window 1", at: s1 });
+        if (s2 !== null && e2 !== null && s2 !== e2) cand.push({ label: "window 2", at: s2 });
+        if (!cand.length) status.innerHTML = `<span class="big">Idle</span> · no windows configured`;
+        else {
+          cand.sort((a,b) => ((a.at - h + 24) % 24) - ((b.at - h + 24) % 24));
+          const nxt = cand[0];
+          const hours = (nxt.at - h + 24) % 24;
+          status.innerHTML = `<span class="big">Idle</span> · ${nxt.label} starts at ${fmt(nxt.at)} (in ${hours}h)`;
+        }
+      }
+    }
+
+    const pct = (hr) => (hr / 24) * 100;
+    const drawWin = (el, start, stop) => {
+      if (start === null || stop === null || start === stop) { el.style.display = "none"; return; }
+      el.style.display = "block";
+      if (start < stop) {
+        el.style.left = pct(start) + "%";
+        el.style.width = pct(stop - start) + "%";
+      } else {
+        el.style.left = pct(start) + "%";
+        el.style.width = pct(24 - start) + "%";
+      }
+    };
+    drawWin(document.getElementById("tlWin1"), s1, e1);
+    drawWin(document.getElementById("tlWin2"), s2, e2);
+    drawOvernightTail("tlWin1", s1, e1);
+    drawOvernightTail("tlWin2", s2, e2);
+    const now = new Date();
+    document.getElementById("tlNow").style.left =
+      (((now.getHours() + now.getMinutes() / 60) / 24) * 100) + "%";
+
+    const pumpCb = document.getElementById("sw-pump");
+    const pumpLabel = pumpCb && pumpCb.closest(".row")?.querySelector(".label");
+    if (pumpCb) {
+      pumpCb.disabled = (mode === "auto");
+      if (pumpLabel) {
+        let hint = pumpLabel.querySelector(".locked-hint");
+        if (mode === "auto") {
+          if (!hint) {
+            hint = document.createElement("span");
+            hint.className = "locked-hint";
+            hint.textContent = "(auto)";
+            pumpLabel.appendChild(hint);
+          }
+        } else if (hint) hint.remove();
+      }
+    }
+  };
+
+  const renderPool = (s) => {
+    for (const id of Object.keys(s.switches)) {
+      const cb = document.getElementById("sw-" + id);
+      if (cb && !isPending("sw-" + id)) cb.checked = !!s.switches[id];
+      const chip = document.getElementById(id + "-chip");
+      if (chip && !isPending("sw-" + id)) {
+        chip.textContent = s.switches[id] ? "ON" : "OFF";
+        chip.className = "chip " + (s.switches[id] ? "on" : "off");
+      }
+    }
+    for (const id of Object.keys(s.numbers)) {
+      const el = document.getElementById("input-" + id);
+      if (el && document.activeElement !== el && !isPending("input-" + id) && s.numbers[id] !== null) {
+        el.value = s.numbers[id];
+      }
+    }
+    const t = s.sensors.pool_temp;
+    $("#poolTemp").textContent = (t === null || isNaN(t)) ? "--.-" : Number(t).toFixed(1);
+    const target = s.numbers.target_temp;
+    $("#targetTempLabel").textContent = (target === null) ? "--.-" : Number(target).toFixed(1);
+    if (t !== null && !isNaN(t)) {
+      const pct = Math.max(0, Math.min(100, ((t - 15) / (35 - 15)) * 100));
+      $("#tempBar").style.width = pct + "%";
+    }
+    const heatEl = $("#heatPill");
+    heatEl.textContent = s.switches.heat_pump ? "on" : "off";
+    heatEl.className = "pill " + (s.switches.heat_pump ? "on" : "off");
+    const ilEl = $("#pumpInterlock");
+    ilEl.textContent = s.switches.pump ? "pump running" : "pump idle";
+    ilEl.className = "pill " + (s.switches.pump ? "on" : "off");
+
+    // PZEM power meter — separate fmt helpers so each unit looks right
+    const pzFmt0 = (n) => (n === null || isNaN(n)) ? "--"   : Math.round(Number(n)).toString();
+    const pzFmt1 = (n) => (n === null || isNaN(n)) ? "--.-" : Number(n).toFixed(1);
+    const pzFmt2 = (n) => (n === null || isNaN(n)) ? "--.--": Number(n).toFixed(2);
+    // ESPHome's pzemac reports energy in Wh; show kWh for human readability
+    const pzKwh  = (wh) => (wh === null || isNaN(wh)) ? "--" : (Number(wh) / 1000).toFixed(2);
+    const set    = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    // IAMMeter Modbus RTU occasionally returns garbage on bus contention —
+    // 24kW power readings, voltage data leaking into current, PF values
+    // way outside 0-1, etc. Apply physical-bounds filters here so the
+    // dashboard never displays nonsense numbers, even if the ESP-side
+    // filter on a single bad sample slips through.
+    const sanePower = (w) =>
+      (w === null || isNaN(w) || w < 0 || w > 5000) ? null : Number(w);
+    const saneAmps = (a) =>
+      (a === null || isNaN(a) || a < 0 || a > 30) ? null : Number(a);
+    const saneVolt = (v) =>
+      (v === null || isNaN(v) || v < 100 || v > 300) ? null : Number(v);
+    const sanePF = (pf) =>
+      (pf === null || isNaN(pf) || pf < 0 || pf > 1) ? null : Number(pf);
+
+    const cleanPower = sanePower(s.sensors.pool_meter_power);
+    const cleanAmps  = saneAmps(s.sensors.pool_meter_current);
+    const cleanVolt  = saneVolt(s.sensors.pool_meter_voltage);
+    const cleanPF    = sanePF(s.sensors.pool_meter_pf);
+
+    set("pzemPower",   pzFmt0(cleanPower));
+    set("pzemCurrent", pzFmt2(cleanAmps));
+    set("pzemVoltage", pzFmt1(cleanVolt));
+    set("pzemPF",      cleanPF === null ? "--" : cleanPF.toFixed(2));
+
+    // Filter health pill — colour-coded from the device's filter_status text
+    const fsPill = document.getElementById("filterStatusPill");
+    if (fsPill) {
+      const fs = (s.texts.filter_status || "").trim();
+      const map = {
+        paused:        { text: "paused",        cls: "pill filter-status-pill" },
+        clean:         { text: "✓ clean",       cls: "pill on filter-status-pill" },
+        getting_dirty: { text: "getting dirty", cls: "pill warn filter-status-pill" },
+        dirty:         { text: "⚠ backwash needed", cls: "pill warn filter-status-pill" },
+      };
+      const view = map[fs] || { text: "—", cls: "pill filter-status-pill" };
+      fsPill.textContent = view.text;
+      fsPill.className   = view.cls;
+    }
+
+    // Filter health visual bar — pool-pump physics model, bench-tuned.
+    // Field testing on the demo bench (ball valve restricting flow into a
+    // drum) showed real pool filters only drop ~20% from fresh-clean to
+    // backwash-needed (≈ 0.5 bar pressure rise). Tightened from initial
+    // 30% envelope so alerts fire at realistic clogging levels.
+    //
+    // The bar represents progress through the 20% useful range:
+    //   watts at 100% baseline → 100% bar width (full green)
+    //   watts at  80% baseline →   0% bar width (full red, backwash floor)
+    //   anything below 80%     →   0% width, deep red (past backwash)
+    //
+    // Status zones (matched to firmware filter_status lambda):
+    //   ≥ 94% baseline (drop < 30% of envelope) → clean
+    //   88-94%         (drop 30-60% of envelope) → getting dirty
+    //   < 88%          (drop > 60% of envelope) → backwash needed
+    //
+    // Uses sanitized power so a Modbus glitch doesn't fill the bar to 100%.
+    const fsState   = (s.texts.filter_status || "").trim();
+    const watts     = cleanPower;
+    const cleanT    = Number(s.numbers.filter_clean_threshold) || 0;
+    // Backwash floor = 80% of baseline (the 20% drop limit, derived).
+    // Shown in the legend so customers see the alert wattage at a glance.
+    const dirtyT    = cleanT > 0 ? Math.round(cleanT * 0.80) : 0;
+    const fillEl    = document.getElementById("filterBarFill");
+    const powerNow  = document.getElementById("filterPowerNow");
+    const dirtyLab  = document.getElementById("filterBarDirtyLabel");
+    const cleanLab  = document.getElementById("filterBarCleanLabel");
+    if (powerNow) powerNow.textContent = (watts == null || isNaN(watts)) ? "--" : Math.round(watts);
+    if (dirtyLab) dirtyLab.textContent = dirtyT || "--";
+    if (cleanLab) cleanLab.textContent = cleanT || "--";
+    if (fillEl) {
+      if (fsState === "paused" || watts == null || isNaN(watts) || cleanT <= 0) {
+        // Paused (pump off, no signal, or no baseline set) → empty gray bar
+        fillEl.style.width = "0%";
+        fillEl.style.background = "var(--panel-2)";
+      } else {
+        // Bar width = position within the 80%-100% useful range
+        const floorW    = 0.80 * cleanT;
+        const range     = 0.20 * cleanT;
+        const above     = watts - floorW;
+        const pctOfRange = (above / range) * 100;  // 0% = floor, 100% = baseline
+        const width      = Math.max(0, Math.min(100, pctOfRange));
+        // Hue: red (0) at floor → green (120) at baseline, linear lerp.
+        let hue;
+        if (pctOfRange >= 100) hue = 120;
+        else if (pctOfRange <= 0) hue = 0;
+        else hue = (pctOfRange / 100) * 120;
+        fillEl.style.width = width + "%";
+        fillEl.style.background = `hsl(${hue}, 75%, 48%)`;
+      }
+    }
+
+    // Pump safety / dry-run state — three states: disabled, armed, tripped.
+    // Reset button is only clickable when actually tripped.
+    const drPill   = document.getElementById("dryRunStatusPill");
+    const drReset  = document.getElementById("btnDryRunReset");
+    const drEnable = !!s.switches.dry_run_enable;
+    const drTripped = !!s.binary.dry_run_tripped;
+    if (drPill) {
+      let view;
+      if (!drEnable)      view = { text: "disabled — bypassed", cls: "pill" };
+      else if (drTripped) view = { text: "⚠ TRIPPED — pump cut", cls: "pill warn" };
+      else                view = { text: "✓ armed",                cls: "pill on" };
+      drPill.textContent = view.text;
+      drPill.className   = view.cls;
+    }
+    if (drReset) {
+      drReset.disabled = !drTripped;
+      drReset.style.opacity = drTripped ? "1" : "0.5";
+    }
+    // Dry-run trip threshold is derived from clean baseline (65%).
+    // Display it read-only so the customer knows what the alert level is,
+    // even though they can't set it directly.
+    const drThreshEl = document.getElementById("dryRunTripThresholdLabel");
+    if (drThreshEl) {
+      drThreshEl.textContent = cleanT > 0 ? Math.round(cleanT * 0.65) : "--";
+    }
+
+    // Maintenance Mode card: reflect active state + countdown.
+    // We trust both the switch state and the binary sensor (firmware
+    // sets both) — use OR so the pill matches the moment the firmware
+    // engages, even if the switch state hasn't been re-published yet.
+    const maintActive = !!s.switches.maintenance_mode || !!s.binary.maintenance_active;
+    const maintRem    = Number(s.sensors.maintenance_remaining);
+    const maintPill   = document.getElementById("maintenancePill");
+    const maintRow    = document.getElementById("maintenanceRemainingRow");
+    const maintRemEl  = document.getElementById("maintenanceRemaining");
+    const maintCard   = document.getElementById("maintenanceCard");
+    if (maintPill) {
+      if (maintActive) {
+        maintPill.textContent = "⚙ in progress";
+        maintPill.className   = "pill warn";
+      } else {
+        maintPill.textContent = "inactive";
+        maintPill.className   = "pill";
+      }
+    }
+    if (maintRow) maintRow.style.display = maintActive ? "" : "none";
+    if (maintRemEl) {
+      maintRemEl.textContent = (!isNaN(maintRem) && maintRem > 0) ? maintRem.toFixed(1) : "--";
+    }
+    if (maintCard) {
+      // Subtle outline when active so the whole card reads as "live"
+      maintCard.style.outline = maintActive ? "2px solid var(--warn)" : "none";
+    }
+
+    renderPumpMode();
+  };
+
+  // Pool talks to the self-hosted Mosquitto broker over WSS, not directly to
+  // the device. Broker creds below are public-by-design: ACL on the broker
+  // side restricts dashboard-rw to read-state-and-publish-commands only.
+  // Topic prefix is built from the signed-in Account ID so the same dashboard
+  // serves every customer — log in with a different Account ID, get a
+  // different customer's data, no per-customer page edits.
+  const POOL_BROKER_URL    = "wss://mqtt.solaire-intelligence.co.za:9001/mqtt";
+  const POOL_BROKER_USER   = "dashboard-rw";
+  const POOL_BROKER_PASS   = "2a4473fe2c108b123503333ca7fcef9b";
+
+  // ============================================================================
+  // MULTI-DEVICE PER PRODUCT — discovery + sub-switcher
+  // ============================================================================
+  // Customers can have more than one device of the same type per account
+  // (e.g. a pool AND a koi pond, both running SI Pool firmware). The MQTT
+  // topic structure already supports this: si/<acct>/<product>/<idx>/...
+  // where <idx> is "01", "02", etc.
+  //
+  // Discovery: a separate MQTT client subscribes to si/<acct>/<product>/+/info
+  // wildcards. Each device publishes a retained `info` JSON message on connect
+  // ({"name":"Pool","sn":"POOL-2026-05-0001","product":"pool","idx":"01"}).
+  // As messages arrive, we build up a map of devices per product and render
+  // a sub-switcher inside that product's tab. If only one device of a type is
+  // discovered, the switcher stays hidden — no extra UI for single-device
+  // customers.
+  //
+  // Naming follows option C from the design discussion: firmware-published
+  // default ("Pool") + per-customer override stored in localStorage. Customer
+  // clicks the pencil on a switcher pill to rename ("Pool" → "Koi Pond").
+  // ----------------------------------------------------------------------------
+  const DEVICES_LS_KEY = "si.devices";
+  const _loadDevPrefs = () => {
+    try { return JSON.parse(localStorage.getItem(DEVICES_LS_KEY)) || {}; } catch { return {}; }
+  };
+  const _saveDevPrefs = (p) => localStorage.setItem(DEVICES_LS_KEY, JSON.stringify(p));
+  const getSelectedDevice = (product) =>
+    ((_loadDevPrefs().selected || {})[product]) || "01";
+  const setSelectedDevice = (product, idx) => {
+    const p = _loadDevPrefs();
+    p.selected = p.selected || {};
+    p.selected[product] = idx;
+    _saveDevPrefs(p);
+  };
+  const getDeviceNameOverride = (product, idx) =>
+    ((_loadDevPrefs().names || {})[product] || {})[idx];
+  const setDeviceNameOverride = (product, idx, name) => {
+    const p = _loadDevPrefs();
+    p.names = p.names || {};
+    p.names[product] = p.names[product] || {};
+    if (name && name.trim()) p.names[product][idx] = name.trim();
+    else delete p.names[product][idx];
+    _saveDevPrefs(p);
+  };
+
+  // Tiny HTML escape — switcher pills include user-controlled rename strings.
+  const _esc = (s) => String(s).replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+  // discoveredDevices[product][idx] = { name, sn, ... } as info messages arrive
+  const discoveredDevices = { pool: {}, water: {}, gateway: {} };
+
+  const renderDeviceSwitcher = (product) => {
+    const devices = discoveredDevices[product] || {};
+    const indexes = Object.keys(devices).sort();
+    const container = document.getElementById(`${product}DeviceSwitcher`);
+    if (!container) return;
+
+    // Single device or none — hide the switcher entirely. No extra UI for
+    // the common case.
+    if (indexes.length <= 1) { container.style.display = "none"; return; }
+    container.style.display = "flex";
+
+    const selected = getSelectedDevice(product);
+    const lblText = product === "gateway" ? "solar" : product;
+    const lblHtml = `<span class="lbl">${_esc(lblText)}</span>`;
+    const btnHtml = indexes.map(idx => {
+      const isActive = idx === selected;
+      const name = getDeviceNameOverride(product, idx) ||
+                   (devices[idx] || {}).name ||
+                   `${product} ${idx}`;
+      return `<button type="button" class="dev ${isActive ? 'active' : ''}"
+                      data-product="${_esc(product)}" data-idx="${_esc(idx)}">
+                <span>${_esc(name)}</span>
+                <span class="rename" title="Rename">✎</span>
+              </button>`;
+    }).join("");
+    container.innerHTML = lblHtml + btnHtml;
+
+    container.querySelectorAll("button.dev").forEach(btn => {
+      btn.addEventListener("click", (ev) => {
+        const prd = btn.dataset.product;
+        const idx = btn.dataset.idx;
+        // Pencil clicked? Rename, don't switch.
+        if (ev.target.classList && ev.target.classList.contains("rename")) {
+          ev.stopPropagation();
+          const current = getDeviceNameOverride(prd, idx) ||
+                          (discoveredDevices[prd][idx] || {}).name ||
+                          `${prd} ${idx}`;
+          const next = prompt(`Rename this ${prd}:`, current);
+          if (next === null) return;            // cancelled
+          setDeviceNameOverride(prd, idx, next);
+          renderDeviceSwitcher(prd);
+          return;
+        }
+        // Otherwise switch device. Persist + reload so the rest of the
+        // dashboard re-initialises with the new prefix.
+        if (idx !== getSelectedDevice(prd)) {
+          setSelectedDevice(prd, idx);
+          location.reload();
+        }
+      });
+    });
+  };
+
+  // Start a dedicated MQTT discovery client. Lives independently of the
+  // product modules so it sees devices from all three products at once.
+  const startDeviceDiscovery = () => {
+    let dc;
+    try {
+      dc = mqtt.connect(POOL_BROKER_URL, {
+        username: POOL_BROKER_USER,
+        password: POOL_BROKER_PASS,
+        clientId: `dash-disc-${Math.random().toString(16).slice(2, 10)}`,
+        reconnectPeriod: 5000,
+        connectTimeout: 8000,
+        clean: true,
+      });
+    } catch (e) {
+      console.warn("[discovery] mqtt.connect threw", e);
+      return;
+    }
+    dc.on("connect", () => {
+      // Wildcard sub for retained device-info topics across all products.
+      dc.subscribe(`si/${accountId}/pool/+/info`,    { qos: 0 });
+      dc.subscribe(`si/${accountId}/water/+/info`,   { qos: 0 });
+      dc.subscribe(`si/${accountId}/gateway/+/info`, { qos: 0 });
+    });
+    dc.on("message", (topic, buf) => {
+      const m = topic.match(/^si\/[^\/]+\/(pool|water|gateway)\/([^\/]+)\/info$/);
+      if (!m) return;
+      const [, product, idx] = m;
+      const payload = buf.toString();
+      let info;
+      try { info = JSON.parse(payload); }
+      catch { info = { name: `${product} ${idx}` }; }
+      // Empty/blank retained = device retired. Clear it.
+      if (!payload || !payload.trim()) delete discoveredDevices[product][idx];
+      else discoveredDevices[product][idx] = info;
+      renderDeviceSwitcher(product);
+    });
+    dc.on("error", (err) => console.warn("[discovery] mqtt error", err));
+  };
+  // Kick off discovery in the background. The product modules connect
+  // independently and don't wait for it.
+  startDeviceDiscovery();
+  // ============================================================================
+
+  const POOL_DEVICE_INDEX  = getSelectedDevice("pool");
+  const POOL_BROKER_PREFIX = `si/${accountId}/pool/${POOL_DEVICE_INDEX}`;
+
+  const Pool = makeMqttModule({
+    name:     "pool",
+    broker:   POOL_BROKER_URL,
+    username: POOL_BROKER_USER,
+    password: POOL_BROKER_PASS,
+    prefix:   POOL_BROKER_PREFIX,
+    entities: POOL_ENT,
+    state:    poolState,
+    render:   renderPool,
+  });
+
+  // ============================================================================
+  // WATER MODULE
+  // ============================================================================
+  // mqttId values are the actual slugs ESPHome publishes. ESPHome's slugify
+  // replaces every non-alphanumeric (spaces, parens, %, etc.) with `_` and
+  // does not collapse or strip them — so names with parens produce slugs like
+  // `tank_total_volume_config__l_`. Ugly but deterministic. These were captured
+  // by subscribing to si/water/01/# after first flash.
+  const WATER_ENT = {
+    tank_total_volume_cfg:   { kind: "number", name: "Tank Total Volume Config (L)", mqttId: "tank_total_volume_config__l_" },
+    tank_height_cm_cfg:      { kind: "number", name: "Tank Height Config (cm)",      mqttId: "tank_height_config__cm_" },
+    low_level_pct_cfg:       { kind: "number", name: "Low Level Warning Config (%)", mqttId: "low_level_warning_config____" },
+    water_level_cm:          { kind: "sensor", name: "Water Level (cm)",             mqttId: "water_level__cm_",         tier: "fast" },
+    tank_level_pct:          { kind: "sensor", name: "Tank Level (%)",               mqttId: "tank_level____",           tier: "fast" },
+    tank_volume_l:           { kind: "sensor", name: "Tank Volume (L)",              mqttId: "tank_volume__l_",          tier: "fast" },
+    tank_delta_liters_esp:   { kind: "sensor", name: "Tank Delta Liters ESP",        mqttId: "tank_delta_liters_esp",    tier: "fast" },
+    water_flow_rate_esp:     { kind: "sensor", name: "Water Flow Rate ESP",          mqttId: "water_flow_rate_esp",      tier: "fast" },
+    water_inflow_rate_esp:   { kind: "sensor", name: "Water Inflow Rate ESP",        mqttId: "water_inflow_rate_esp",    tier: "fast" },
+    water_outflow_rate_esp:  { kind: "sensor", name: "Water Outflow Rate ESP",       mqttId: "water_outflow_rate_esp",   tier: "fast" },
+    water_inflow_total_esp:  { kind: "sensor", name: "Water Inflow Total ESP",       mqttId: "water_inflow_total_esp" },
+    water_outflow_total_esp: { kind: "sensor", name: "Water Outflow Total ESP",      mqttId: "water_outflow_total_esp" },
+    water_inflow_today_esp:  { kind: "sensor", name: "Water Inflow Today ESP",       mqttId: "water_inflow_today_esp" },
+    water_outflow_today_esp: { kind: "sensor", name: "Water Outflow Today ESP",      mqttId: "water_outflow_today_esp" },
+    water_inflow_month_esp:  { kind: "sensor", name: "Water Inflow Month ESP",       mqttId: "water_inflow_month_esp" },
+    water_outflow_month_esp: { kind: "sensor", name: "Water Outflow Month ESP",      mqttId: "water_outflow_month_esp" },
+    low_tank_warning:        { kind: "binary_sensor", name: "Low Tank Warning",      mqttId: "low_tank_warning" },
+    ip_address:              { kind: "text_sensor",   name: "IP Address",            mqttId: "ip_address" },
+    restart_device:          { kind: "button", name: "Restart Device",               mqttId: "restart_device" },
+    reset_water_totals:      { kind: "button", name: "Reset Water Totals",           mqttId: "reset_water_totals" },
+    // ---- Last-N water events ----
+    // Slugs are the slugified entity names from the YAML's text_sensor /
+    // sensor blocks. Names "Last Water Event" / "Previous Water Event" /
+    // "Earlier Water Event" / "Water Event Threshold" produce these.
+    last_event_1_sensor:     { kind: "sensor", name: "Last Water Event",      mqttId: "last_water_event" },
+    last_event_2_sensor:     { kind: "sensor", name: "Previous Water Event",  mqttId: "previous_water_event" },
+    last_event_3_sensor:     { kind: "sensor", name: "Earlier Water Event",   mqttId: "earlier_water_event" },
+    event_threshold_cfg:     { kind: "number", name: "Water Event Threshold", mqttId: "water_event_threshold" },
+    reset_water_events:      { kind: "button", name: "Reset Water Events",    mqttId: "reset_water_events" },
+  };
+
+  const waterState = {
+    switches: {},
+    numbers: {
+      tank_total_volume_cfg: null,
+      tank_height_cm_cfg: null,
+      low_level_pct_cfg: null,
+      event_threshold_cfg: null,
+    },
+    sensors: {
+      water_level_cm: null, tank_level_pct: null, tank_volume_l: null,
+      tank_delta_liters_esp: null, water_flow_rate_esp: null,
+      water_inflow_rate_esp: null, water_outflow_rate_esp: null,
+      water_inflow_total_esp: null, water_outflow_total_esp: null,
+      water_inflow_today_esp: null, water_outflow_today_esp: null,
+      water_inflow_month_esp: null, water_outflow_month_esp: null,
+      last_event_1_sensor: null, last_event_2_sensor: null, last_event_3_sensor: null,
+    },
+    binary: { low_tank_warning: false },
+    texts:  { ip_address: "" },
+    selects: {},
+  };
+
+  const fmtL = (n) => (n === null || isNaN(n)) ? "--" : Math.round(Number(n)).toLocaleString();
+  const fmt1 = (n) => (n === null || isNaN(n)) ? "--.-" : Number(n).toFixed(1);
+  const fmt2 = (n) => (n === null || isNaN(n)) ? "--.-" : Number(n).toFixed(2);
+
+  const renderWater = (s) => {
+    for (const id of Object.keys(s.numbers)) {
+      const el = document.getElementById("input-" + id);
+      if (el && document.activeElement !== el && !isPending("input-" + id) && s.numbers[id] !== null) {
+        el.value = s.numbers[id];
+      }
+    }
+    const pct = s.sensors.tank_level_pct;
+    const vol = s.sensors.tank_volume_l;
+    const cm  = s.sensors.water_level_cm;
+    const hMax = s.numbers.tank_height_cm_cfg;
+    const vMax = s.numbers.tank_total_volume_cfg;
+
+    $("#tankPct").textContent = fmt1(pct);
+    $("#tankVol").textContent = fmtL(vol);
+    $("#tankLevelCm").textContent = fmt1(cm);
+    $("#tankHeightMax").textContent = (hMax === null || isNaN(hMax)) ? "---" : Math.round(hMax);
+    $("#tankVolMax").textContent    = (vMax === null || isNaN(vMax)) ? "----" : Math.round(vMax).toLocaleString();
+
+    if (pct !== null && !isNaN(pct)) $("#tankFill").style.height = Math.max(0, Math.min(100, pct)) + "%";
+
+    $("#flowRate").textContent    = fmt1(s.sensors.water_flow_rate_esp);
+    $("#inflowRate").textContent  = fmt1(s.sensors.water_inflow_rate_esp);
+    $("#outflowRate").textContent = fmt1(s.sensors.water_outflow_rate_esp);
+    $("#deltaL").textContent      = fmt2(s.sensors.tank_delta_liters_esp);
+
+    $("#inToday").textContent  = fmtL(s.sensors.water_inflow_today_esp);
+    $("#outToday").textContent = fmtL(s.sensors.water_outflow_today_esp);
+    $("#inMonth").textContent  = fmtL(s.sensors.water_inflow_month_esp);
+    $("#outMonth").textContent = fmtL(s.sensors.water_outflow_month_esp);
+    $("#inTotal").textContent  = fmtL(s.sensors.water_inflow_total_esp);
+    $("#outTotal").textContent = fmtL(s.sensors.water_outflow_total_esp);
+
+    const low = !!s.binary.low_tank_warning;
+    const pill = $("#lowTankPill");
+    if (low) { pill.textContent = "⚠ low tank"; pill.className = "pill warn"; }
+    else     { pill.textContent = "low-level ok"; pill.className = "pill on"; }
+
+    $("#waterIp").textContent = s.texts.ip_address || "—";
+
+    // Recent water events. fmt1 returns "--.-" for null, but for the
+    // events we want plain "--" until the first event lands so the empty
+    // slots don't read like a measurement of zero.
+    const fmtEvent = (n) => (n === null || isNaN(n) || Number(n) === 0)
+                            ? "--"
+                            : Number(n).toFixed(1);
+    $("#lastEvent1").textContent = fmtEvent(s.sensors.last_event_1_sensor);
+    $("#lastEvent2").textContent = fmtEvent(s.sensors.last_event_2_sensor);
+    $("#lastEvent3").textContent = fmtEvent(s.sensors.last_event_3_sensor);
+  };
+
+  // Water also talks via the broker. Same dashboard-rw user as Pool — the
+  // user's ACL covers all si/+/+/+/+/state and si/+/+/+/+/command paths so
+  // adding more devices doesn't require new credentials.
+  // Built from the signed-in Account ID, same as Pool above.
+  const WATER_DEVICE_INDEX  = getSelectedDevice("water");
+  const WATER_BROKER_PREFIX = `si/${accountId}/water/${WATER_DEVICE_INDEX}`;
+
+  const Water = makeMqttModule({
+    name:     "water",
+    broker:   POOL_BROKER_URL,    // same broker URL
+    username: POOL_BROKER_USER,   // same dashboard-rw user
+    password: POOL_BROKER_PASS,
+    prefix:   WATER_BROKER_PREFIX,
+    entities: WATER_ENT,
+    state:    waterState,
+    render:   renderWater,
+  });
+
+  // ============================================================================
+  // GATEWAY MODULE (Sunsynk inverter — read-only)
+  // ============================================================================
+  // Read-only view onto the SI Gateway. The dashboard subscribes to inverter
+  // state topics, never publishes commands. The mqttId values below MUST
+  // match the sensor IDs that the sunsynk_modbus.yaml package exposes — if
+  // they don't, the matching gauge/stat will read "--" forever even though
+  // the broker is happily delivering values for the actually-named topics.
+  //
+  // VERIFICATION AFTER FIRST FLASH:
+  //   On the VPS, run:
+  //     mosquitto_sub -h localhost -p 1883 -t 'si/<ACCT>/gateway/01/sensor/+/state' -v
+  //   That'll show every sensor topic the gateway publishes. Match the slugs
+  //   against the mqttId values below; tweak any that don't line up.
+  // ============================================================================
+  const GATEWAY_ENT = {
+    // ---- Power gauges (instantaneous W) ----
+    // Slugs corrected from live broker log on 2026-05-03 — sunsynk_modbus
+    // package uses plain `inverter_*` not `inverter_esphome_*`.
+    pv_power:          { kind: "sensor", name: "Solar Power",     mqttId: "inverter_solar_power",   tier: "fast" },
+    battery_power:     { kind: "sensor", name: "Battery Power",   mqttId: "inverter_battery_power", tier: "fast" },
+    grid_power:        { kind: "sensor", name: "Grid Power",      mqttId: "inverter_grid_power",    tier: "fast" },
+    load_power:        { kind: "sensor", name: "Load Power",      mqttId: "inverter_load_power",    tier: "fast" },
+    // Battery SOC slug not seen yet in the broker log — pending verification.
+    // If gauge stays at "--", run `mosquitto_sub` and look for the right slug.
+    battery_soc:       { kind: "sensor", name: "Battery SOC",     mqttId: "inverter_battery_soc",   tier: "fast" },
+    // ---- Daily totals (kWh) ----
+    pv_today:          { kind: "sensor", name: "Solar Today",       mqttId: "inverter_day_pv_energy" },
+    grid_import_today: { kind: "sensor", name: "Grid Import Today", mqttId: "inverter_day_grid_import" },
+    load_today:        { kind: "sensor", name: "Load Today",        mqttId: "inverter_day_load_energy_local" },
+    // ---- Time-of-use SOC targets (one per slot, 0–100 %) ----
+    // Slot start times are baked into the UI labels (matches Merv's HA dashboard).
+    // If slot times ever need to change, add `inverter_prog<N>_time` entries.
+    prog1_capacity:    { kind: "number", name: "Slot 1 SOC",  mqttId: "inverter_prog1_capacity" },
+    prog2_capacity:    { kind: "number", name: "Slot 2 SOC",  mqttId: "inverter_prog2_capacity" },
+    prog3_capacity:    { kind: "number", name: "Slot 3 SOC",  mqttId: "inverter_prog3_capacity" },
+    prog4_capacity:    { kind: "number", name: "Slot 4 SOC",  mqttId: "inverter_prog4_capacity" },
+    prog5_capacity:    { kind: "number", name: "Slot 5 SOC",  mqttId: "inverter_prog5_capacity" },
+    prog6_capacity:    { kind: "number", name: "Slot 6 SOC",  mqttId: "inverter_prog6_capacity" },
+    // ---- Inverter mode selects (string-valued) ----
+    // Common Sunsynk option sets — verify against what the inverter actually
+    // publishes on MQTT, adjust the <option> lists in the HTML if the
+    // strings don't match.
+    energy_pattern:    { kind: "select", name: "Priority",   mqttId: "inverter_energy_pattern" },
+    work_mode:         { kind: "select", name: "Work Mode",  mqttId: "inverter_work_mode" },
+    // ---- Inverter mode switches ----
+    toggle_grid_charge:    { kind: "switch", name: "Grid Charge",     mqttId: "inverter_toggle_grid_charge" },
+    toggle_priority_load:  { kind: "switch", name: "Priority Load",   mqttId: "inverter_toggle_priority_load" },
+    toggle_solar_sell:     { kind: "switch", name: "Solar Sell",      mqttId: "inverter_toggle_solar_sell" },
+    toggle_system_timer:   { kind: "switch", name: "Use Timer",       mqttId: "inverter_toggle_system_timer" },
+    // ---- Grid charge current setpoint (amps) ----
+    grid_charge_amps:  { kind: "number", name: "Grid Charge Amps", mqttId: "inverter_grid_charge_battery_current" },
+  };
+
+  const gatewayState = {
+    switches: {
+      toggle_grid_charge:   false,
+      toggle_priority_load: false,
+      toggle_solar_sell:    false,
+      toggle_system_timer:  false,
+    },
+    numbers: {
+      prog1_capacity: null, prog2_capacity: null, prog3_capacity: null,
+      prog4_capacity: null, prog5_capacity: null, prog6_capacity: null,
+      grid_charge_amps: null,
+    },
+    sensors: {
+      pv_power: null, battery_power: null, grid_power: null, load_power: null,
+      battery_soc: null,
+      pv_today: null, grid_import_today: null, load_today: null,
+    },
+    binary: {},
+    texts:  {},
+    selects: {
+      energy_pattern: "",
+      work_mode:      "",
+    },
+  };
+
+  // Display scales for the unipolar / bipolar bars. These don't need to match
+  // your actual inverter capacity exactly — they're just the bar's full-width
+  // value so 50% fill = 50% of this. Tweak if your inverter is bigger/smaller.
+  const SOLAR_PV_MAX_W   = 8000;
+  const SOLAR_LOAD_MAX_W = 8000;
+  const SOLAR_GRID_MAX_W = 8000;   // half-width = 8kW import OR 8kW export
+  const SOLAR_BATT_MAX_W = 5000;   // half-width = 5kW charge OR 5kW discharge
+
+  const fmtW   = (n) => (n === null || isNaN(n)) ? "--" : Math.round(Number(n)).toLocaleString();
+  const fmtKWh = (n) => (n === null || isNaN(n)) ? "--.-" : Number(n).toFixed(1);
+
+  // Apply a bipolar bar update — center-anchored fill. Positive value fills
+  // right of center (50% → 50%+x). Negative fills left (50%-x → 50%).
+  const setBipolar = (barEl, value, maxAbs) => {
+    if (barEl === null) return;
+    if (value === null || isNaN(value)) {
+      barEl.style.left  = "50%";
+      barEl.style.width = "0%";
+      barEl.classList.remove("pos", "neg");
+      return;
+    }
+    const v = Math.max(-maxAbs, Math.min(maxAbs, Number(value)));
+    const pct = (Math.abs(v) / maxAbs) * 50; // 0..50% of bar width
+    if (v >= 0) {
+      barEl.style.left  = "50%";
+      barEl.style.width = pct + "%";
+      barEl.classList.add("pos");    barEl.classList.remove("neg");
+    } else {
+      barEl.style.left  = (50 - pct) + "%";
+      barEl.style.width = pct + "%";
+      barEl.classList.add("neg");    barEl.classList.remove("pos");
+    }
+  };
+
+  const renderGateway = (s) => {
+    // Power gauges
+    // Sunsynk publishes battery_power with INVERTED sign vs solar-dashboard
+    // convention: their POSITIVE means discharging, NEGATIVE means charging.
+    // Flip once at render and the rest of the bipolar-bar / label / chip
+    // logic (which assumes the standard "positive = charging") works
+    // correctly. Verified against Merv's home setup 2026-05-03 where a
+    // visibly discharging battery was being shown as +charging.
+    const battPower = (s.sensors.battery_power === null || isNaN(s.sensors.battery_power))
+                      ? null : -Number(s.sensors.battery_power);
+
+    $("#solarPv").textContent       = fmtW(s.sensors.pv_power);
+    $("#solarLoad").textContent     = fmtW(s.sensors.load_power);
+    $("#solarGrid").textContent     = (s.sensors.grid_power === null || isNaN(s.sensors.grid_power))
+                                      ? "--"
+                                      : ((s.sensors.grid_power >= 0 ? "+" : "") + fmtW(s.sensors.grid_power));
+    $("#solarBattPwr").textContent  = (battPower === null)
+                                      ? "--"
+                                      : ((battPower >= 0 ? "+" : "") + fmtW(battPower));
+
+    // Unipolar bars
+    const pv   = s.sensors.pv_power;
+    const load = s.sensors.load_power;
+    if (pv   !== null && !isNaN(pv))   $("#solarPvBar").style.width   = Math.max(0, Math.min(100, (pv   / SOLAR_PV_MAX_W)   * 100)) + "%";
+    if (load !== null && !isNaN(load)) $("#solarLoadBar").style.width = Math.max(0, Math.min(100, (load / SOLAR_LOAD_MAX_W) * 100)) + "%";
+
+    // Bipolar bars
+    setBipolar($("#solarGridBar"),    s.sensors.grid_power, SOLAR_GRID_MAX_W);
+    setBipolar($("#solarBattPwrBar"), battPower,            SOLAR_BATT_MAX_W);
+
+    // Direction labels for the bipolar gauges
+    const gridDir = $("#solarGridDir");
+    if (s.sensors.grid_power === null || isNaN(s.sensors.grid_power)) gridDir.textContent = "—";
+    else if (s.sensors.grid_power >  10) gridDir.textContent = "importing";
+    else if (s.sensors.grid_power < -10) gridDir.textContent = "exporting";
+    else                                  gridDir.textContent = "balanced";
+
+    const battDir = $("#solarBattDir");
+    if (battPower === null) battDir.textContent = "—";
+    else if (battPower >  10) battDir.textContent = "charging";
+    else if (battPower < -10) battDir.textContent = "discharging";
+    else                      battDir.textContent = "idle";
+
+    // SOC — color-band the bar (low <30%, mid 30-60%, high >60%)
+    const soc = s.sensors.battery_soc;
+    if (soc !== null && !isNaN(soc)) {
+      const socClamp = Math.max(0, Math.min(100, Number(soc)));
+      $("#solarSoc").textContent = Math.round(socClamp);
+      const socBar = $("#solarSocBar");
+      socBar.style.width = socClamp + "%";
+      socBar.classList.remove("low", "mid", "high");
+      if      (socClamp < 30) socBar.classList.add("low");
+      else if (socClamp < 60) socBar.classList.add("mid");
+      else                    socBar.classList.add("high");
+    } else {
+      $("#solarSoc").textContent = "--";
+    }
+
+    // Daily totals
+    $("#solarPvToday").textContent           = fmtKWh(s.sensors.pv_today);
+    $("#solarGridImportToday").textContent   = fmtKWh(s.sensors.grid_import_today);
+    $("#solarLoadToday").textContent         = fmtKWh(s.sensors.load_today);
+
+    // ---- Controls: SOC targets ----
+    for (const slot of [1, 2, 3, 4, 5, 6]) {
+      const el = document.getElementById("input-prog" + slot + "_capacity");
+      const key = "prog" + slot + "_capacity";
+      if (el && document.activeElement !== el && !isPending("input-" + key) && s.numbers[key] !== null) {
+        el.value = s.numbers[key];
+      }
+    }
+    // Grid charge amps
+    const ampsEl = document.getElementById("input-grid_charge_amps");
+    if (ampsEl && document.activeElement !== ampsEl && !isPending("input-grid_charge_amps") && s.numbers.grid_charge_amps !== null) {
+      ampsEl.value = s.numbers.grid_charge_amps;
+    }
+    // Switches
+    for (const id of ["toggle_grid_charge", "toggle_priority_load", "toggle_solar_sell", "toggle_system_timer"]) {
+      const el = document.getElementById("sw-" + id);
+      const chip = document.getElementById(id + "-chip");
+      if (el && !isPending("sw-" + id)) el.checked = !!s.switches[id];
+      if (chip) {
+        chip.textContent = s.switches[id] ? "ON" : "OFF";
+        chip.className = "chip " + (s.switches[id] ? "on" : "off");
+      }
+    }
+    // Selects — text readouts. Until we know the option strings the inverter
+    // accepts, the input is a free text field; once we see live values, we
+    // can convert to a proper <select>.
+    for (const id of ["energy_pattern", "work_mode"]) {
+      const el = document.getElementById("sel-" + id);
+      if (el && document.activeElement !== el && !isPending("sel-" + id) && s.selects[id]) {
+        el.value = s.selects[id];
+      }
+    }
+  };
+
+  // Subscribe under si/<acct>/gateway/01 — same broker, same dashboard-rw
+  // user. Read-only on this side — we never call publishX from this module.
+  const GATEWAY_DEVICE_INDEX  = getSelectedDevice("gateway");
+  const GATEWAY_BROKER_PREFIX = `si/${accountId}/gateway/${GATEWAY_DEVICE_INDEX}`;
+
+  const Gateway = makeMqttModule({
+    name:     "solar",  // matches the data-module attribute on the tab
+    broker:   POOL_BROKER_URL,
+    username: POOL_BROKER_USER,
+    password: POOL_BROKER_PASS,
+    prefix:   GATEWAY_BROKER_PREFIX,
+    entities: GATEWAY_ENT,
+    state:    gatewayState,
+    render:   renderGateway,
+  });
+
+  // ============================================================================
+  // Bindings — Pool
+  // ============================================================================
+  const bindPoolSwitch = (id, readOnly=false) => {
+    const el = document.getElementById("sw-" + id);
+    if (!el) return;
+    if (readOnly) { el.disabled = true; return; }
+    el.addEventListener("change", async () => {
+      const want = el.checked;
+      const domId = "sw-" + id;
+      markPending(domId);
+      // Optimistic local-state update so the chip and any cross-bindings stay in sync.
+      poolState.switches[id] = want;
+      try {
+        await Pool.publishSwitch(id, want);
+      } catch (e) {
+        console.warn(e);
+        clearPending(domId);
+        poolState.switches[id] = !want;
+        el.checked = !want;
+      }
+    });
+  };
+  const bindPoolNumber = (id) => {
+    const el = document.getElementById("input-" + id);
+    if (!el) return;
+    const send = async () => {
+      const v = Number(el.value);
+      if (isNaN(v)) return;
+      const domId = "input-" + id;
+      markPending(domId);
+      try {
+        await Pool.publishNumber(id, v);
+        // Optimistic local update — keeps state in sync until the device echoes back.
+        poolState.numbers[id] = v;
+      } catch (e) {
+        console.warn(e);
+        clearPending(domId);
+      }
+    };
+    el.addEventListener("change", send);
+    el.addEventListener("blur", send);
+  };
+  const bindPoolStepButtons = () => {
+    document.querySelectorAll("button[data-pool-for]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-pool-for");
+        const step = parseFloat(btn.getAttribute("data-step"));
+        const el = document.getElementById("input-" + id);
+        if (!el) return;
+        const cur = parseFloat(el.value || "0");
+        const min = parseFloat(el.min || "-Infinity");
+        const max = parseFloat(el.max || "Infinity");
+        const next = Math.min(max, Math.max(min, cur + step));
+        el.value = (Math.round(next * 10) / 10).toString();
+        const domId = "input-" + id;
+        markPending(domId);
+        try {
+          await Pool.publishNumber(id, next);
+          poolState.numbers[id] = next;
+        } catch (e) {
+          console.warn(e);
+          clearPending(domId);
+        }
+      });
+    });
+  };
+  const bindPoolButton = (id, elId, confirmMsg) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.addEventListener("click", async () => {
+      if (confirmMsg && !confirm(confirmMsg)) return;
+      try { await Pool.publishButton(id); }
+      catch (e) { console.warn(e); alert(`Action failed: ${e.message}`); }
+    });
+  };
+  const poolSetMode = async (mode) => {
+    if (mode === "auto") {
+      poolState.switches.pump_timer_enable = true;
+      markPending("sw-pump_timer_enable");
+      renderPool(poolState);
+      try { await Pool.publishSwitch("pump_timer_enable", true); }
+      catch (e) { console.warn(e); clearPending("sw-pump_timer_enable"); }
+    } else {
+      poolState.switches.pump_timer_enable = false;
+      poolState.switches.pump = (mode === "on");
+      markPending("sw-pump_timer_enable");
+      markPending("sw-pump");
+      renderPool(poolState);
+      try {
+        await Pool.publishSwitch("pump_timer_enable", false);
+        await Pool.publishSwitch("pump", mode === "on");
+      } catch (e) {
+        console.warn(e);
+        clearPending("sw-pump_timer_enable");
+        clearPending("sw-pump");
+      }
+    }
+  };
+
+  // ============================================================================
+  // Bindings — Water
+  // ============================================================================
+  const bindWaterNumber = (id) => {
+    const el = document.getElementById("input-" + id);
+    if (!el) return;
+    const send = async () => {
+      const v = Number(el.value);
+      if (isNaN(v)) return;
+      const domId = "input-" + id;
+      markPending(domId);
+      try {
+        await Water.publishNumber(id, v);
+        waterState.numbers[id] = v;
+      } catch (e) {
+        console.warn(e);
+        clearPending(domId);
+      }
+    };
+    el.addEventListener("change", send);
+    el.addEventListener("blur", send);
+  };
+  const bindWaterStepButtons = () => {
+    document.querySelectorAll("button[data-water-for]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-water-for");
+        const step = parseFloat(btn.getAttribute("data-step"));
+        const el = document.getElementById("input-" + id);
+        if (!el) return;
+        const cur = parseFloat(el.value || "0");
+        const min = parseFloat(el.min || "-Infinity");
+        const max = parseFloat(el.max || "Infinity");
+        const next = Math.min(max, Math.max(min, cur + step));
+        el.value = next.toString();
+        const domId = "input-" + id;
+        markPending(domId);
+        try {
+          await Water.publishNumber(id, next);
+          waterState.numbers[id] = next;
+        } catch (e) {
+          console.warn(e);
+          clearPending(domId);
+        }
+      });
+    });
+  };
+  const bindWaterButton = (id, elId, confirmMsg) => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.addEventListener("click", async () => {
+      if (confirmMsg && !confirm(confirmMsg)) return;
+      try { await Water.publishButton(id); }
+      catch (e) { console.warn(e); alert(`Action failed: ${e.message}`); }
+    });
+  };
+
+  // ============================================================================
+  // Bindings — Gateway (Solar)
+  // ============================================================================
+  // The gateway publishes to /command topics for each writable entity. Same
+  // optimistic-update pattern as Pool/Water: write local state immediately,
+  // mark the DOM id pending so render() doesn't bounce the input back, fall
+  // back if the publish fails. Selects are free-text in V1 since we don't
+  // know the inverter's accepted option strings yet.
+
+  const bindGatewayNumber = (id) => {
+    const el = document.getElementById("input-" + id);
+    if (!el) return;
+    const send = async () => {
+      const v = Number(el.value);
+      if (isNaN(v)) return;
+      const domId = "input-" + id;
+      markPending(domId);
+      try {
+        await Gateway.publishNumber(id, v);
+        gatewayState.numbers[id] = v;
+      } catch (e) {
+        console.warn(e);
+        clearPending(domId);
+      }
+    };
+    el.addEventListener("change", send);
+    el.addEventListener("blur", send);
+  };
+
+  const bindGatewayStepButtons = () => {
+    document.querySelectorAll("button[data-gateway-for]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-gateway-for");
+        const step = parseFloat(btn.getAttribute("data-step"));
+        const el = document.getElementById("input-" + id);
+        if (!el) return;
+        const cur = parseFloat(el.value || "0");
+        const min = parseFloat(el.min || "-Infinity");
+        const max = parseFloat(el.max || "Infinity");
+        const next = Math.min(max, Math.max(min, cur + step));
+        el.value = next.toString();
+        const domId = "input-" + id;
+        markPending(domId);
+        try {
+          await Gateway.publishNumber(id, next);
+          gatewayState.numbers[id] = next;
+        } catch (e) {
+          console.warn(e);
+          clearPending(domId);
+        }
+      });
+    });
+  };
+
+  const bindGatewaySwitch = (id) => {
+    const el = document.getElementById("sw-" + id);
+    if (!el) return;
+    el.addEventListener("change", async () => {
+      const want = el.checked;
+      const domId = "sw-" + id;
+      markPending(domId);
+      gatewayState.switches[id] = want;
+      // Update chip immediately
+      const chip = document.getElementById(id + "-chip");
+      if (chip) {
+        chip.textContent = want ? "ON" : "OFF";
+        chip.className = "chip " + (want ? "on" : "off");
+      }
+      try {
+        await Gateway.publishSwitch(id, want);
+      } catch (e) {
+        console.warn(e);
+        clearPending(domId);
+        gatewayState.switches[id] = !want;
+        el.checked = !want;
+        if (chip) {
+          chip.textContent = !want ? "ON" : "OFF";
+          chip.className = "chip " + (!want ? "on" : "off");
+        }
+      }
+    });
+  };
+
+  const bindGatewaySelect = (id) => {
+    const el = document.getElementById("sel-" + id);
+    if (!el) return;
+    const send = async () => {
+      const v = el.value.trim();
+      if (!v) return;
+      const domId = "sel-" + id;
+      markPending(domId);
+      gatewayState.selects[id] = v;
+      try {
+        // Sunsynk inverter accepts /command writes as the literal option
+        // string. We piggy-back on publishNumber here because the underlying
+        // mqtt.publish doesn't care about types — just sends the string.
+        // If makeMqttModule gets a proper publishSelect later, swap to that.
+        await Gateway.publishNumber(id, v);
+      } catch (e) {
+        console.warn(e);
+        clearPending(domId);
+      }
+    };
+    el.addEventListener("change", send);
+    el.addEventListener("blur", send);
+  };
+
+  // ============================================================================
+  // Settings dialog
+  // ============================================================================
+  const dlg = $("#settingsDlg");
+  $("#settingsBtn").addEventListener("click", () => {
+    $("#inpPoolHost").value   = cfg.pool;
+    $("#inpPoolUser").value   = cfg.poolUser  || "";
+    $("#inpPoolPass").value   = cfg.poolPass  || "";
+    $("#inpWaterHost").value  = cfg.water;
+    $("#inpWaterUser").value  = cfg.waterUser || "";
+    $("#inpWaterPass").value  = cfg.waterPass || "";
+    dlg.showModal();
+  });
+  $("#dlgCancel").addEventListener("click", () => dlg.close());
+  $("#dlgSave").addEventListener("click", (ev) => {
+    ev.preventDefault();
+    cfg.pool      = ($("#inpPoolHost").value  || defaults.pool ).trim();
+    cfg.poolUser  = $("#inpPoolUser").value.trim();
+    cfg.poolPass  = $("#inpPoolPass").value;
+    cfg.water     = ($("#inpWaterHost").value || defaults.water).trim();
+    cfg.waterUser = $("#inpWaterUser").value.trim();
+    cfg.waterPass = $("#inpWaterPass").value;
+    saveCfg(cfg);
+    dlg.close();
+    $("#hostLabel").textContent =
+      activeModule === "pool"  ? cfg.pool  :
+      activeModule === "water" ? cfg.water : cfg.pool;
+    Pool.stopStream();  Pool.tryConnect();
+    Water.stopStream(); Water.tryConnect();
+  });
+
+  // ============================================================================
+  // Wire up
+  // ============================================================================
+  for (const btn of document.querySelectorAll("#moduleTabs button")) {
+    btn.addEventListener("click", () => setActiveModule(btn.dataset.module));
+  }
+
+  // pool
+  bindPoolSwitch("pump");
+  bindPoolSwitch("light");
+  bindPoolSwitch("heat_pump", true);
+  bindPoolSwitch("hp_enable");
+  bindPoolNumber("target_temp");
+  bindPoolNumber("pump_start");
+  bindPoolNumber("pump_stop");
+  bindPoolNumber("pump2_start");
+  bindPoolNumber("pump2_stop");
+  bindPoolNumber("filter_clean_threshold");
+  bindPoolSwitch("dry_run_enable");
+  bindPoolSwitch("maintenance_mode");
+  bindPoolNumber("dry_run_grace_seconds");
+  bindPoolButton("dry_run_reset", "btnDryRunReset",
+    "Reset the dry-run trip? Make sure you've fixed the cause first (lost prime, suction leak, drained pool).");
+  bindPoolStepButtons();
+  for (const btn of document.querySelectorAll("#pumpModeSeg button")) {
+    btn.addEventListener("click", () => poolSetMode(btn.dataset.mode));
+  }
+  setInterval(() => renderPumpMode(), 60 * 1000);
+
+  // water
+  bindWaterNumber("tank_total_volume_cfg");
+  bindWaterNumber("tank_height_cm_cfg");
+  bindWaterNumber("low_level_pct_cfg");
+  bindWaterNumber("event_threshold_cfg");   // configurable min size for "events"
+  bindWaterStepButtons();
+  bindWaterButton("reset_water_totals", "btnResetTotals",  "Reset all water-flow totals to zero?");
+  bindWaterButton("restart_device",     "btnRestartWater", "Restart the water-tank device?");
+
+  // gateway / solar
+  for (const slot of [1, 2, 3, 4, 5, 6]) {
+    bindGatewayNumber("prog" + slot + "_capacity");
+  }
+  bindGatewayNumber("grid_charge_amps");
+  bindGatewayStepButtons();
+  bindGatewaySwitch("toggle_grid_charge");
+  bindGatewaySwitch("toggle_priority_load");
+  bindGatewaySwitch("toggle_solar_sell");
+  bindGatewaySwitch("toggle_system_timer");
+  bindGatewaySelect("energy_pattern");
+  bindGatewaySelect("work_mode");
+
+  // initial UI state
+  setActiveModule("pool");
+  setConnFor("pool",  "warn", "connecting…");
+  setConnFor("water", "warn", "connecting…");
+  setConnFor("solar", "warn", "connecting…");
+
+  Pool.tryConnect().catch(() => {
+    if (isFirstRun) {
+      $("#inpPoolHost").value  = cfg.pool;
+      $("#inpWaterHost").value = cfg.water;
+      dlg.showModal();
+    }
+  });
+  Water.tryConnect().catch(() => {});
+  Gateway.tryConnect().catch(() => {});
+})();
 </script>
 </body>
 </html>
