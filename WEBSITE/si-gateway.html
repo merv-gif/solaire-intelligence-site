@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SI Gateway — Inverter Monitoring & Control · Solaire Intelligence</title>
+  <meta name="description" content="Local-first Sunsynk inverter monitoring and control. Real-time solar, battery, grid and load telemetry. Remote access included. Home Assistant native." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="portal.html">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero hero-gateway">
+  <div class="wrap">
+    <div style="margin-bottom:16px;">
+      <span class="chip chip-gateway">SI Gateway · Energy &amp; Orchestration</span>
+    </div>
+    <h1>Know what your inverter is doing.<br><em style="color:var(--gateway)">Control it from anywhere.</em></h1>
+    <p class="hero-sub">
+      SI Gateway connects to your Sunsynk inverter over RS485 and turns raw data into a
+      clean local dashboard — with remote access, Home Assistant integration, historical
+      analytics and no cloud dependency for local control. It is the backbone of the SI ecosystem.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" style="background:linear-gradient(135deg,var(--gateway),var(--gateway-2));color:#041425;" href="index.html#contact">Talk to an installer</a>
+      <a class="btn btn-ghost" href="portal.html">Portal Login →</a>
+    </div>
+
+    <!-- Dashboard preview -->
+    <div style="margin-top:48px;max-width:620px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Live Dashboard · homeassistant.local</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px;">
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">☀️ Solar PV</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--gateway);line-height:1;">3.2<span style="font-size:14px;color:var(--muted);margin-left:4px;">kW</span></div>
+          <div style="margin-top:8px;height:6px;background:var(--line);border-radius:999px;overflow:hidden;"><div style="width:40%;height:100%;background:linear-gradient(90deg,var(--gateway),var(--gateway-2));border-radius:999px;"></div></div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">🔋 Battery SOC</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ok);line-height:1;">84<span style="font-size:14px;color:var(--muted);margin-left:4px;">%</span></div>
+          <div style="margin-top:8px;height:6px;background:var(--line);border-radius:999px;overflow:hidden;"><div style="width:84%;height:100%;background:linear-gradient(90deg,var(--ok),var(--accent-2));border-radius:999px;"></div></div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">⚡ Grid</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ok);line-height:1;">0.0<span style="font-size:14px;color:var(--muted);margin-left:4px;">W</span></div>
+          <div style="font-size:11px;color:var(--ok);margin-top:6px;">Off-grid</div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">🏠 Load</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--text);line-height:1;">1.8<span style="font-size:14px;color:var(--muted);margin-left:4px;">kW</span></div>
+          <div style="margin-top:8px;height:6px;background:var(--line);border-radius:999px;overflow:hidden;"><div style="width:22%;height:100%;background:linear-gradient(90deg,#ff8a4d,var(--warn));border-radius:999px;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Architecture ────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">How it fits together</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+      Two components. One seamless system.
+    </h2>
+    <p style="color:var(--muted);max-width:560px;margin-bottom:36px;font-size:15px;line-height:1.65;">
+      SI Gateway is not a single device — it is a two-part system. The Gateway bridges
+      your inverter to your network. The Core is the brain that orchestrates everything.
+    </p>
+
+    <!-- Flow diagram -->
+    <div class="arch-diagram" style="margin-bottom:36px;">
+      <div class="arch-node" style="border-color:rgba(255,181,71,0.3);">
+        <small>Inverter</small>
+        Sunsynk
+      </div>
+      <div class="arch-arrow">→ RS485 →</div>
+      <div class="arch-node" style="border-color:rgba(255,181,71,0.5);color:var(--gateway);">
+        <small>Bridge</small>
+        SI Gateway
+      </div>
+      <div class="arch-arrow">→ Wi-Fi →</div>
+      <div class="arch-node accent" style="border-color:var(--accent);">
+        <small>Brain</small>
+        SI Core
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <small>Dashboard</small>
+        Browser
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div class="card" style="border-color:rgba(255,181,71,0.25);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,181,71,0.1);border:1px solid rgba(255,181,71,0.3);display:grid;place-items:center;font-size:16px;">🔌</div>
+          <div>
+            <div style="font-size:12px;color:var(--gateway);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">SI Gateway</div>
+            <div style="font-size:13px;font-weight:600;">The bridge — one per inverter</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.65;">RS485 to Wi-Fi bridge. Sits in the DB or next to the inverter. Reads Modbus data and relays it to the SI Core over your local network. Pairs in minutes.</p>
+      </div>
+      <div class="card" style="border-color:rgba(47,181,255,0.25);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(47,181,255,0.1);border:1px solid rgba(47,181,255,0.3);display:grid;place-items:center;font-size:16px;">🧠</div>
+          <div>
+            <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">SI Core</div>
+            <div style="font-size:13px;font-weight:600;">The brain — one per site</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--muted);line-height:1.65;">Raspberry Pi pre-flashed with the SI platform. Runs Home Assistant, aggregates all gateway data, hosts the local dashboard and handles automation logic. One Core manages multiple Gateways.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ───────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="section-label">Capabilities</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:36px;">
+      Not just a data logger.
+    </h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">☀️</div>
+        <h3>Real-Time Inverter Telemetry</h3>
+        <p>Solar PV output, battery SOC, grid import/export and load — live on your dashboard. Every value that matters, always current.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Local-First Architecture</h3>
+        <p>Runs on a Raspberry Pi on your LAN. Dashboard available at homeassistant.local — no cloud account required, no internet dependency for local monitoring and control.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Remote Access Without Port-Forwarding</h3>
+        <p>View your system from anywhere via an encrypted managed tunnel. First 12 months included. No router configuration. No third-party tunnel service.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏠</div>
+        <h3>Home Assistant Native</h3>
+        <p>Every inverter entity exposed via MQTT auto-discovery. No YAML required. Solar, battery, grid and load appear in HA the moment a broker is configured.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3>Multi-Inverter Support</h3>
+        <p>One SI Core, multiple SI Gateways — for larger sites, multi-phase systems or properties with more than one inverter. Each Gateway pairs independently.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Historical Analytics</h3>
+        <p>Log inverter performance over time. Review daily solar yield, battery cycles, grid dependency and load patterns. Identify inefficiencies and anomalies across weeks and months.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛠️</div>
+        <h3>Remote Support Layer</h3>
+        <p>Installers can access the system remotely for configuration, diagnostics and troubleshooting — with customer permission. Reduces callout costs for both parties.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Ecosystem Orchestration</h3>
+        <p>SI Gateway is the coordination layer for the whole SI platform. It aggregates telemetry from SI Pool, SI Water and future products — enabling cross-domain automations like battery-aware heating and solar-surplus pool heating.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Callout ─────────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="callout gateway">
+      <p>
+        <strong>SI Gateway is not a data logger.</strong> It is the supervisory brain of a distributed
+        residential utility intelligence system — aggregating telemetry, coordinating automations, and
+        providing the operational visibility that lets the whole ecosystem think across energy, water and pool.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Specs ───────────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">Technical Specifications</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:28px;">
+      Everything the installer needs to know.
+    </h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:860px;">
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gateway);margin-bottom:12px;">SI Gateway — Bridge</div>
+        <div class="card">
+          <table class="spec-table">
+            <tr><td>Function</td><td>RS485 → Wi-Fi bridge (one per inverter)</td></tr>
+            <tr><td>Protocol</td><td>Modbus RTU over RS485</td></tr>
+            <tr><td>Connectivity</td><td>Wi-Fi 2.4 GHz</td></tr>
+            <tr><td>Power</td><td>External power supply (included)</td></tr>
+            <tr><td>Cable</td><td>RS485 → RJ45 (included)</td></tr>
+            <tr><td>Inverter</td><td>Sunsynk (current); architecture inverter-agnostic</td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">SI Core — Supervisory Brain</div>
+        <div class="card">
+          <table class="spec-table">
+            <tr><td>Hardware</td><td>Raspberry Pi (pre-configured)</td></tr>
+            <tr><td>Storage</td><td>SSD pre-loaded with SI software</td></tr>
+            <tr><td>Platform</td><td>Home Assistant + SI stack</td></tr>
+            <tr><td>Connection</td><td>Ethernet to router / switch</td></tr>
+            <tr><td>Dashboard</td><td>homeassistant.local</td></tr>
+            <tr><td>Remote access</td><td>Encrypted tunnel — first 12 months</td></tr>
+            <tr><td>Multi-gateway</td><td>Yes — one Core, multiple Gateways</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Compatible with ────────────────────────────────────────────────────── -->
+<section style="padding-top:40px;padding-bottom:40px;">
+  <div class="wrap">
+    <p class="section-label" style="margin-bottom:12px;">Compatible With</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span class="chip chip-gateway">Sunsynk Inverters</span>
+      <span class="chip chip-neutral">Home Assistant</span>
+      <span class="chip chip-pool">SI Pool</span>
+      <span class="chip chip-water">SI Water</span>
+      <span class="chip chip-neutral">MQTT Brokers</span>
+      <span class="chip chip-neutral">ESPHome Devices</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Bottom CTA ──────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;">
+      <div>
+        <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+          Ready to monitor your inverter?
+        </h2>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:24px;line-height:1.65;">
+          SI Gateway is installer-deployed. Talk to us and we'll connect you with an
+          approved installer in your area.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a class="btn btn-primary" style="background:linear-gradient(135deg,var(--gateway),var(--gateway-2));color:#041425;" href="index.html#contact">Talk to an installer</a>
+          <a class="btn btn-ghost" href="portal.html">Already installed? Portal →</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--gateway);">SI Core Quick-Start Guide (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--gateway);">SI Gateway Integration Overview (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          🔐 <a href="portal.html" style="color:var(--accent);">Access your system portal →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="portal.html">Portal Login</a></li>
+        <li><a href="mailto:info@si-sa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#trade">Installers</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span>solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

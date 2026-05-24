@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solaire Intelligence — Infrastructure intelligence for South African homes</title>
+  <meta name="description" content="Local-first monitoring, control and automation for energy, water and pool systems. Built for South African infrastructure realities." />
+  <meta property="og:title" content="Solaire Intelligence" />
+  <meta property="og:description" content="Infrastructure intelligence for South African homes." />
+  <meta property="og:url" content="https://solaire-intelligence.co.za" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ── Navigation ─────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="/">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="#trade">Installers</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="portal.html">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="wrap">
+    <p class="hero-eyebrow">Local-first infrastructure intelligence</p>
+    <h1>Your infrastructure,<br>under <em>intelligent</em> control.</h1>
+    <p class="hero-sub">
+      Solaire Intelligence builds monitoring, control and automation systems for energy,
+      water and pool infrastructure — designed for the real conditions of South African
+      homes and deployed by qualified installers.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#products">See the Products</a>
+      <a class="btn btn-ghost" href="portal.html">Portal Login →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Trust bar ──────────────────────────────────────────────────────────── -->
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="trust-item">
+      <div class="trust-dot"></div>
+      <div>
+        <strong>Local-first</strong>
+        <span>No cloud required for control</span>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-dot"></div>
+      <div>
+        <strong>Made in South Africa</strong>
+        <span>Built for SA conditions</span>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-dot"></div>
+      <div>
+        <strong>Home Assistant native</strong>
+        <span>MQTT auto-discovery, zero YAML</span>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-dot"></div>
+      <div>
+        <strong>Installer-deployed</strong>
+        <span>Professionally wired and configured</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Products ───────────────────────────────────────────────────────────── -->
+<section id="products">
+  <div class="wrap">
+    <p class="section-label">The Platform</p>
+    <h2 style="font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+      Three systems. One coherent ecosystem.
+    </h2>
+    <p style="color:var(--muted);max-width:560px;margin-bottom:40px;font-size:15px;line-height:1.65;">
+      Each SI product solves a specific, real problem independently — and becomes more
+      powerful as the ecosystem grows. All are local-first, installer-deployed and
+      designed for South African infrastructure realities.
+    </p>
+    <div class="product-cards">
+
+      <a class="product-card gateway" href="si-gateway.html">
+        <div class="product-card-icon" style="background:rgba(255,181,71,0.1);border-color:rgba(255,181,71,0.25);">☀️</div>
+        <div>
+          <div class="product-tag">Energy</div>
+          <h3 style="color:var(--gateway)">SI Gateway</h3>
+        </div>
+        <p>Inverter monitoring and control. Connects to your Sunsynk inverter over RS485 and turns raw data into a live local dashboard — with remote access, HA integration and no cloud dependency for local control.</p>
+        <span class="card-link">Monitor your inverter →</span>
+      </a>
+
+      <a class="product-card pool" href="si-pool.html">
+        <div class="product-card-icon" style="background:rgba(47,181,255,0.1);border-color:rgba(47,181,255,0.25);">🌊</div>
+        <div>
+          <div class="product-tag">Pool</div>
+          <h3>SI Pool</h3>
+        </div>
+        <p>Intelligent pool automation. Scheduling, temperature control, filter health monitoring and dry-run protection — in one IP65 unit. The serious upgrade from a timer and a float.</p>
+        <span class="card-link">Automate your pool →</span>
+      </a>
+
+      <a class="product-card water" href="si-water.html">
+        <div class="product-card-icon" style="background:rgba(74,168,255,0.1);border-color:rgba(74,168,255,0.25);">💧</div>
+        <div>
+          <div class="product-tag">Water</div>
+          <h3 style="color:var(--water)">SI Water</h3>
+        </div>
+        <p>Intelligent tank and borehole monitoring. Real-time volume in litres, daily usage totals, leak detection and pump protection — all on your Home Assistant dashboard. No subscription.</p>
+        <span class="card-link">Monitor your tank →</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">Architecture</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+      One platform. Distributed intelligence.
+    </h2>
+    <p style="color:var(--muted);max-width:600px;margin-bottom:40px;font-size:15px;line-height:1.65;">
+      Each SI product is an autonomous edge device. It runs its own control logic,
+      protects the equipment it's connected to, and operates independently of the
+      internet. The SI Gateway ties the ecosystem together.
+    </p>
+
+    <div class="arch-diagram" style="margin-bottom:32px;">
+      <div class="arch-node">
+        <small>Edge Devices</small>
+        SI Pool<br>SI Water
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <small>Protocol</small>
+        MQTT / RS485
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node accent">
+        <small>Supervisory</small>
+        SI Gateway
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <small>Local UI</small>
+        Dashboard
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node" style="border-style:dashed;color:var(--muted);">
+        <small>Optional</small>
+        Remote Access
+      </div>
+    </div>
+
+    <div class="callout">
+      <p>
+        <strong>Cloud and remote access are additive — never load-bearing.</strong>
+        If the internet drops, your pool pump still runs on schedule. Your tank still
+        gets monitored. Your inverter data still logs locally. We call this local-first.
+        In South Africa, we consider it non-negotiable.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Local-first ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <div style="display:grid;gap:48px;grid-template-columns:1fr 1fr;align-items:center;">
+      <div>
+        <p class="section-label">Philosophy</p>
+        <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;">
+          Your systems should work whether the cloud does or not.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:16px;">
+          Most "smart home" products stop being smart the moment the internet drops or
+          the company's server goes down. SI products don't. Every edge device retains
+          autonomous control — locally, without phoning home.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;">
+          Remote access is available and easy. But it is never required for your
+          systems to function. In South Africa, with unreliable connectivity and
+          rolling load shedding, that is the only responsible design choice.
+        </p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="font-size:20px;flex-shrink:0;">🔒</div>
+          <div>
+            <strong style="font-size:14px;">No cloud dependency</strong>
+            <p style="font-size:13px;color:var(--muted);margin-top:3px;">Dashboard and control logic run on the device itself, on your local network.</p>
+          </div>
+        </div>
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="font-size:20px;flex-shrink:0;">⚡</div>
+          <div>
+            <strong style="font-size:14px;">Load-shedding resilient</strong>
+            <p style="font-size:13px;color:var(--muted);margin-top:3px;">Edge devices retain autonomous control through power and connectivity interruptions.</p>
+          </div>
+        </div>
+        <div class="card" style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="font-size:20px;flex-shrink:0;">🔭</div>
+          <div>
+            <strong style="font-size:14px;">Remote access when you want it</strong>
+            <p style="font-size:13px;color:var(--muted);margin-top:3px;">Encrypted tunnel — no port-forwarding. View your systems from anywhere. First year included.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Installer callout ───────────────────────────────────────────────────── -->
+<section id="trade" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;gap:48px;grid-template-columns:1fr 1fr;align-items:center;">
+      <div>
+        <p class="section-label">Trade & Installers</p>
+        <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;">
+          Built for professional deployment.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:16px;">
+          SI products are installer-first by design. Standardised wiring, sane defaults,
+          documented enclosures and a quick-start guide in every box.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
+          If you're a solar installer, pool specialist or smart-home integrator,
+          SI gives you a single SKU that solves real problems and adds genuine
+          value to every job.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a class="btn btn-primary btn-sm" href="#contact">Trade enquiry</a>
+          <a class="btn btn-ghost btn-sm" href="docs.html">Installer documents</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+          <span style="color:var(--ok);font-size:16px;">✓</span>
+          <span style="font-size:14px;">Documented wiring diagrams in every box</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+          <span style="color:var(--ok);font-size:16px;">✓</span>
+          <span style="font-size:14px;">Sane defaults — configured for residential use</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+          <span style="color:var(--ok);font-size:16px;">✓</span>
+          <span style="font-size:14px;">Remote support access for troubleshooting</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+          <span style="color:var(--ok);font-size:16px;">✓</span>
+          <span style="font-size:14px;">Clean upsell on every solar or pool job</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;padding:14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+          <span style="color:var(--ok);font-size:16px;">✓</span>
+          <span style="font-size:14px;">Reseller pricing available for volume orders</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Portal teaser ───────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap" style="text-align:center;">
+    <p class="section-label" style="justify-content:center;display:flex;">Live Platform</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+      This is a living platform. Not a brochure.
+    </h2>
+    <p style="color:var(--muted);max-width:520px;margin:0 auto 32px;font-size:15px;line-height:1.65;">
+      Existing SI customers log into their portal to view live system data, manage
+      device settings and access remote dashboards for all installed products.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn btn-primary" href="portal.html">⬡ Portal Login</a>
+      <a class="btn btn-ghost" href="#contact">Request a demo</a>
+    </div>
+    <!-- Dashboard preview mockup -->
+    <div style="margin-top:48px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;max-width:700px;margin-left:auto;margin-right:auto;text-align:left;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);">
+        <div class="nav-logo" style="width:28px;height:28px;font-size:10px;">SI</div>
+        <span style="font-size:13px;font-weight:600;">Solaire Intelligence</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ok);">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);"></div>
+          Connected
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Pool Temp</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--pool);">28.4<span style="font-size:13px;color:var(--muted);margin-left:3px;">°C</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Target 28.5°C · Heating</div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Tank Level</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--water);">69<span style="font-size:13px;color:var(--muted);margin-left:3px;">%</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">1,563 L · No flow</div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Battery SOC</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ok);">84<span style="font-size:13px;color:var(--muted);margin-left:3px;">%</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Solar · 2.4 kW</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Contact ─────────────────────────────────────────────────────────────── -->
+<section id="contact" style="background:var(--panel);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;gap:48px;grid-template-columns:1fr 1fr;align-items:start;">
+      <div>
+        <p class="section-label">Get in Touch</p>
+        <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;">
+          Interested in SI for your home or your jobs?
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
+          Whether you're a homeowner wanting to see SI in action, or an installer
+          looking to add SI products to your offering, we'd like to hear from you.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="mailto:info@si-sa.co.za" style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);text-decoration:none;">
+            <span style="font-size:16px;">✉</span>info@si-sa.co.za
+          </a>
+          <a href="docs.html" style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);text-decoration:none;">
+            <span style="font-size:16px;">📄</span>Download product documents
+          </a>
+        </div>
+      </div>
+      <form style="display:flex;flex-direction:column;gap:14px;" onsubmit="handleContact(event)">
+        <div class="field">
+          <label for="c-name">Your Name</label>
+          <input id="c-name" type="text" class="sans" placeholder="Jane Smith" required />
+        </div>
+        <div class="field">
+          <label for="c-email">Email Address</label>
+          <input id="c-email" type="email" class="sans" placeholder="jane@example.co.za" required />
+        </div>
+        <div class="field">
+          <label for="c-type">Enquiry Type</label>
+          <select id="c-type" style="width:100%;padding:11px 14px;font-size:14px;background:var(--panel-2);color:var(--text);border:1px solid var(--line);border-radius:var(--radius-sm);font-family:var(--sans);outline:none;">
+            <option>Homeowner — request a demo</option>
+            <option>Installer / Trade enquiry</option>
+            <option>Reseller / Distributor</option>
+            <option>General enquiry</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="c-msg">Message</label>
+          <textarea id="c-msg" rows="4" style="width:100%;padding:11px 14px;font-size:14px;background:var(--panel-2);color:var(--text);border:1px solid var(--line);border-radius:var(--radius-sm);font-family:var(--sans);resize:vertical;outline:none;" placeholder="Tell us about your setup or what you're looking for..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-content:center;">Send Enquiry</button>
+        <p id="c-confirm" style="font-size:13px;color:var(--ok);display:none;text-align:center;">✓ Message sent — we'll be in touch shortly.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ──────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="/" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="portal.html">Portal Login</a></li>
+        <li><a href="mailto:info@si-sa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#trade">Installers</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span>solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  // Contact form (mailto fallback — replace with actual backend)
+  function handleContact(e) {
+    e.preventDefault();
+    const name  = document.getElementById('c-name').value;
+    const email = document.getElementById('c-email').value;
+    const type  = document.getElementById('c-type').value;
+    const msg   = document.getElementById('c-msg').value;
+    const body  = encodeURIComponent(`Name: ${name}\nType: ${type}\n\n${msg}`);
+    window.open(`mailto:info@si-sa.co.za?subject=SI Enquiry — ${type}&body=${body}`);
+    document.getElementById('c-confirm').style.display = 'block';
+  }
+</script>
+</body>
+</html>

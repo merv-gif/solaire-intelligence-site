@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portal Login · Solaire Intelligence</title>
+  <meta name="description" content="Access your Solaire Intelligence monitoring dashboard — live telemetry, device controls and remote access for your installed products." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Force dark for portal regardless of system theme */
+    :root {
+      --bg:      #0b1220;
+      --panel:   #111a2e;
+      --panel-2: #162241;
+      --line:    #1f2d51;
+      --text:    #e6edf7;
+      --muted:   #8ea1c2;
+    }
+    body { background: var(--bg); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav (minimal) ──────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <div class="nav-spacer"></div>
+    <a href="index.html" style="font-size:13px;color:var(--muted);padding:8px 12px;">← Back to site</a>
+  </div>
+</nav>
+
+<!-- ── Login ──────────────────────────────────────────────────────────────── -->
+<div class="login-page">
+  <div style="width:100%;max-width:460px;">
+
+    <!-- Status bar -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px;font-size:12px;color:var(--muted);">
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);"></div>
+      Platform operational
+    </div>
+
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="nav-logo" style="width:40px;height:40px;font-size:14px;">SI</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;">Solaire Intelligence</div>
+          <div style="font-size:12px;color:var(--muted);">Portal</div>
+        </div>
+      </div>
+
+      <h2>Your installed systems, live.</h2>
+      <p class="login-sub">Enter your account ID to access your monitoring dashboard — live telemetry, device controls and remote access for all installed SI products.</p>
+
+      <!-- Tab switcher -->
+      <div style="display:flex;gap:4px;padding:4px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;margin-bottom:20px;">
+        <button onclick="showTab('signin')" id="tab-signin" style="flex:1;padding:8px 10px;font-size:13px;background:var(--accent);color:#041425;border:0;border-radius:7px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:background .15s;">Sign In</button>
+        <button onclick="showTab('create')" id="tab-create" style="flex:1;padding:8px 10px;font-size:13px;background:transparent;color:var(--muted);border:0;border-radius:7px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:background .15s;">New Account</button>
+      </div>
+
+      <!-- Sign in form -->
+      <form id="form-signin" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label for="account-id">Account ID</label>
+          <input id="account-id" type="text" placeholder="your-account-id" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" class="sans" placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div id="login-err" style="color:var(--danger);font-size:12px;margin-top:4px;min-height:16px;"></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;">Access Dashboard</button>
+      </form>
+
+      <!-- New account form -->
+      <form id="form-create" style="display:none;" onsubmit="handleCreate(event)">
+        <div class="field">
+          <label for="new-name">Full Name</label>
+          <input id="new-name" type="text" class="sans" placeholder="Jane Smith" />
+        </div>
+        <div class="field">
+          <label for="new-email">Email Address</label>
+          <input id="new-email" type="email" class="sans" placeholder="jane@example.co.za" />
+        </div>
+        <div class="field">
+          <label for="new-installer">Installed by (Installer Name / Company)</label>
+          <input id="new-installer" type="text" class="sans" placeholder="Your installer's name or company" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:10px;">Request Account</button>
+        <p id="create-confirm" style="font-size:12px;color:var(--ok);margin-top:10px;display:none;text-align:center;">✓ Request sent — your installer will activate your account shortly.</p>
+      </form>
+
+      <p class="login-note">
+        New to Solaire Intelligence?
+        <a href="index.html#contact">Request a demo</a> or
+        <a href="index.html#trade">talk to an installer</a>.
+      </p>
+    </div>
+
+    <!-- Product quick-links -->
+    <div style="margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <a href="si-gateway.html" style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 12px;text-align:center;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='rgba(255,181,71,0.5)'" onmouseout="this.style.borderColor='var(--line)'">
+        <div style="font-size:18px;margin-bottom:4px;">☀️</div>
+        <div style="font-size:11px;font-weight:600;color:var(--gateway);">SI Gateway</div>
+      </a>
+      <a href="si-pool.html" style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 12px;text-align:center;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='rgba(47,181,255,0.5)'" onmouseout="this.style.borderColor='var(--line)'">
+        <div style="font-size:18px;margin-bottom:4px;">🌊</div>
+        <div style="font-size:11px;font-weight:600;color:var(--pool);">SI Pool</div>
+      </a>
+      <a href="si-water.html" style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 12px;text-align:center;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='rgba(74,168,255,0.5)'" onmouseout="this.style.borderColor='var(--line)'">
+        <div style="font-size:18px;margin-bottom:4px;">💧</div>
+        <div style="font-size:11px;font-weight:600;color:var(--water);">SI Water</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTab(tab) {
+    const signin = document.getElementById('form-signin');
+    const create = document.getElementById('form-create');
+    const tSign  = document.getElementById('tab-signin');
+    const tCreate = document.getElementById('tab-create');
+    if (tab === 'signin') {
+      signin.style.display = 'block';
+      create.style.display = 'none';
+      tSign.style.background  = 'var(--accent)';
+      tSign.style.color       = '#041425';
+      tCreate.style.background = 'transparent';
+      tCreate.style.color      = 'var(--muted)';
+    } else {
+      signin.style.display = 'none';
+      create.style.display = 'block';
+      tSign.style.background  = 'transparent';
+      tSign.style.color       = 'var(--muted)';
+      tCreate.style.background = 'var(--accent)';
+      tCreate.style.color      = '#041425';
+    }
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const id  = document.getElementById('account-id').value.trim();
+    const pwd = document.getElementById('password').value;
+    const err = document.getElementById('login-err');
+    if (!id || !pwd) { err.textContent = 'Please enter your account ID and password.'; return; }
+    // TODO: replace with real auth endpoint
+    err.textContent = '';
+    // Redirect to the live dashboard (update URL as needed)
+    window.location.href = 'https://solaire-intelligence.co.za/dashboard?account=' + encodeURIComponent(id);
+  }
+
+  function handleCreate(e) {
+    e.preventDefault();
+    const name      = document.getElementById('new-name').value;
+    const email     = document.getElementById('new-email').value;
+    const installer = document.getElementById('new-installer').value;
+    const body = encodeURIComponent(`New account request:\nName: ${name}\nEmail: ${email}\nInstaller: ${installer}`);
+    window.open(`mailto:info@si-sa.co.za?subject=SI Portal — New Account Request&body=${body}`);
+    document.getElementById('create-confirm').style.display = 'block';
+  }
+</script>
+</body>
+</html>

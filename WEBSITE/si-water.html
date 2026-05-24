@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SI Water — Intelligent Tank & Borehole Monitoring · Solaire Intelligence</title>
+  <meta name="description" content="Real-time tank level monitoring, leak detection, flow intelligence and pump protection. Local-first. No cloud. No subscription." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="portal.html">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero hero-water">
+  <div class="wrap">
+    <div style="margin-bottom:16px;">
+      <span class="chip chip-water">SI Water · Tank &amp; Borehole Monitoring</span>
+    </div>
+    <h1>Never wonder<br><em style="color:var(--water)">how much water is left.</em></h1>
+    <p class="hero-sub">
+      SI Water watches your tank so you don't have to. Real-time volume in litres,
+      daily usage totals, leak detection and pump protection — all on your Home
+      Assistant dashboard. Local-first. No cloud. No subscription.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="index.html#contact">Get SI Water</a>
+      <a class="btn btn-ghost" href="docs.html">Download datasheet →</a>
+    </div>
+
+    <!-- Dashboard preview -->
+    <div style="margin-top:48px;max-width:580px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Live Dashboard · Home Assistant</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <!-- Tank hero -->
+        <div style="grid-column:1/-1;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;align-items:center;gap:20px;">
+          <!-- Tank visual -->
+          <div style="width:60px;min-height:80px;border:2px solid var(--line);border-radius:8px;position:relative;overflow:hidden;flex-shrink:0;">
+            <div style="position:absolute;bottom:0;left:0;right:0;height:69%;background:linear-gradient(180deg,var(--water),var(--water-2));"></div>
+          </div>
+          <div>
+            <div style="font-family:var(--mono);font-size:42px;font-weight:700;line-height:1;color:var(--water);">69<span style="font-size:18px;color:var(--muted);margin-left:4px;">%</span></div>
+            <div style="font-family:var(--mono);font-size:18px;color:var(--text);margin-top:4px;">1,563 <span style="font-size:12px;color:var(--muted);">L</span></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">No flow · Stable</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Inflow</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ok);margin-top:4px;">0.0 <span style="font-size:10px;color:var(--muted);">L/min</span></div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Used Today</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">48 <span style="font-size:10px;color:var(--muted);">L</span></div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:center;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Status</div>
+          <div style="font-size:16px;font-weight:700;color:var(--ok);margin-top:4px;">OK</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ───────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">What SI Water does</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:36px;">
+      Stop guessing. Start knowing.
+    </h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💧</div>
+        <h3>Precise Tank Level</h3>
+        <p>A stainless-steel submersible pressure transducer sits inside your tank. It knows the exact water level — in litres and percentage — at all times. No floats. No guesswork.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Real-Time Flow Intelligence</h3>
+        <p>Derived inflow and outflow rate in L/min, with idle-state detection. Know when your borehole pump is filling, when you're drawing water, and when something unexpected is flowing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Leak Detection</h3>
+        <p>A dripping ball-valve or a burst pipe can waste thousands of litres before you notice. SI Water spots the anomaly and tells you the same day — often before the next water bill.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Usage Accounting</h3>
+        <p>Daily, monthly and lifetime fill and usage totals, exposed as Home Assistant entities. Know your consumption patterns. Catch the slow drain that costs a fortune over a year.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚙️</div>
+        <h3>Pump &amp; Valve Control</h3>
+        <p>Automate your borehole pump, transfer pump or solenoid valves based on tank level or flow state — via Home Assistant automations that SI Water enables natively.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Pump Protection</h3>
+        <p>If the pump is running when it shouldn't, or not running when it should — you'll know immediately. That early warning can easily save the cost of a replacement pump.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏠</div>
+        <h3>Home Assistant Native</h3>
+        <p>All data lives in Home Assistant via ESPHome. Level, flow, daily totals, alerts — all native HA entities. No custom integrations. No cloud bridge. No subscription.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🇿🇦</div>
+        <h3>Built for SA Conditions</h3>
+        <p>Designed for South African tank infrastructure: boreholes, JoJo tanks, rainwater harvesting, municipal backup. Not a re-labelled European product.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Callout ─────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <div class="callout water">
+      <p>
+        <strong>Running out of water is stressful. A slow leak is expensive. A burnt-out pump is a weekend ruined.</strong>
+        SI Water quietly keeps an eye on all three and reports back to your Home Assistant dashboard —
+        so you only hear from it when something actually needs your attention.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Specs ───────────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label">Technical Specifications</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:24px;">
+      Simple to install. Clever where it counts.
+    </h2>
+    <div class="card" style="max-width:680px;">
+      <table class="spec-table">
+        <tr><td>Sensor</td><td>Stainless-steel submersible pressure transducer</td></tr>
+        <tr><td>Tank compatibility</td><td>Any volume, up to ~3 m depth (deeper on request)</td></tr>
+        <tr><td>Connectivity</td><td>Wi-Fi 2.4 GHz via ESPHome</td></tr>
+        <tr><td>Integration</td><td>Home Assistant — all entities auto-exposed</td></tr>
+        <tr><td>Entities</td><td>Level %, volume (L), inflow, outflow, daily/monthly totals, alerts</td></tr>
+        <tr><td>Power supply</td><td>220 V plug, ~2–3 W</td></tr>
+        <tr><td>Enclosure</td><td>IP65 weatherproof, tank-side mount</td></tr>
+        <tr><td>Privacy</td><td>Local-first — no cloud, no subscription</td></tr>
+        <tr><td>Warranty</td><td>12-month limited warranty</td></tr>
+        <tr><td>Origin</td><td>Made in South Africa</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ideal for ───────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label" style="margin-bottom:12px;">Ideal For</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span class="chip chip-water">Homes on borehole</span>
+      <span class="chip chip-water">Rainwater tanks</span>
+      <span class="chip chip-water">Farms &amp; smallholdings</span>
+      <span class="chip chip-water">Holiday homes</span>
+      <span class="chip chip-water">Off-grid &amp; solar homes</span>
+      <span class="chip chip-neutral">Guest houses</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Bottom CTA ──────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;">
+      <div>
+        <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+          Ready to monitor your tank?
+        </h2>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:24px;line-height:1.65;">
+          If you rely on a tank, SI Water pays for itself the first time it catches a problem.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="index.html#contact">Get SI Water</a>
+          <a class="btn btn-ghost" href="docs.html">Installer documents →</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--water);">SI Water Datasheet — End User (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--water);">SI Water Installer Brochure (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--water);">SI Water Quick-Start Guide (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="portal.html">Portal Login</a></li>
+        <li><a href="mailto:info@si-sa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#trade">Installers</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span>solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

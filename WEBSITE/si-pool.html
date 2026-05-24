@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SI Pool — Intelligent Pool Automation · Solaire Intelligence</title>
+  <meta name="description" content="Pool automation with dry-run protection, filter health monitoring, temperature control and remote access. The serious upgrade from a timer and a float." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="portal.html">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero hero-pool">
+  <div class="wrap">
+    <div style="margin-bottom:16px;">
+      <span class="chip chip-pool">SI Pool · Pool Automation</span>
+    </div>
+    <h1>Pool, sorted.<br><em style="color:var(--pool)">The serious upgrade from a timer and a float.</em></h1>
+    <p class="hero-sub">
+      SI Pool is a locally-controlled pool automation unit with pump-current sensing,
+      scheduling, dry-run protection and a self-hosted web app — plus automatic Home
+      Assistant discovery. One IP65 unit. Properly installed. Reliably deployed.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="index.html#contact">Get SI Pool</a>
+      <a class="btn btn-ghost" href="docs.html">Download installer spec →</a>
+    </div>
+
+    <!-- Dashboard preview -->
+    <div style="margin-top:48px;max-width:600px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;">Live Dashboard · si-pool.local</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Pool Temperature</div>
+          <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--pool);line-height:1;">28.4<span style="font-size:16px;color:var(--muted);margin-left:4px;">°C</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Target 28.5°C · Heating</div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Pump Status</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);"></div>
+            <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ok);">Running</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Schedule window 1 · 312 W</div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Filter Health</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok);"></div>
+            <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--ok);">OK</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Clean · 312 W draw</div>
+        </div>
+        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:16px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Heat Pump</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--pool);box-shadow:0 0 8px var(--pool);"></div>
+            <span style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--pool);">Active</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Heating to target</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ───────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">What SI Pool does</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:36px;">
+      Precision you can bill for.
+    </h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔁</div>
+        <h3>Dry-Run Protection</h3>
+        <p>On-board current transformer watches the pump draw continuously. If it falls below threshold for the configured grace period, SI Pool trips the circuit before the seal burns. That one catch can save the cost of a replacement pump.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌡️</div>
+        <h3>Precise Temperature Control</h3>
+        <p>Set a target temperature and walk away. SI Pool brings the heat pump on and off to hold it — with hysteresis to prevent short-cycling, and a pump-running interlock to keep things safe.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Filter Health Monitoring</h3>
+        <p>A clogged filter pulls less wattage. Set your clean and dirty thresholds in the UI and SI Pool alerts you when it's time to backwash — long before the water starts looking sad.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⏱️</div>
+        <h3>Intelligent Scheduling</h3>
+        <p>Two configurable daily run-windows handle filtration on autopilot. Run-now and off overrides are one tap away whenever you want them.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h3>Self-Hosted Dashboard</h3>
+        <p>The control panel runs on the device itself at http://si-pool.local — no app store, no cloud account required for local control. Always accessible on your home network.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Remote Access Included</h3>
+        <p>The same dashboard, reachable from anywhere via a managed encrypted tunnel. No port-forwarding. No fuss. First 12 months on us.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏠</div>
+        <h3>Home Assistant Native</h3>
+        <p>Auto MQTT discovery — every entity appears in HA the moment a broker is configured. Pool temperature, pump status, filter health — all as native HA entities. No YAML to write.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏗️</div>
+        <h3>IP65 Enclosure</h3>
+        <p>Wall-mounted in your plant room. 220 V supply. The IP65-rated enclosure is installer-friendly with enough internal clearance for clean cable management.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Callout ─────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <div class="callout pool">
+      <p>
+        <strong>SI Pool replaces the old timer-and-floats world</strong> with a calibrated controller,
+        an on-board energy meter and a dry-run protection circuit — giving installers a single SKU that
+        solves filtration scheduling, pump protection, filter health, heater control and remote
+        visibility in one package.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Specs ───────────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label">Technical Specifications</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:24px;">
+      Everything the installer needs to know.
+    </h2>
+    <div class="card" style="max-width:680px;">
+      <table class="spec-table">
+        <tr><td>Controller</td><td>Wi-Fi MCU, on-device firmware</td></tr>
+        <tr><td>Pump monitor</td><td>AC current transformer — derived W &amp; kWh</td></tr>
+        <tr><td>Connectivity</td><td>Wi-Fi 2.4 GHz · MQTT auto-discovery</td></tr>
+        <tr><td>Temp sensor</td><td>316 SS thermowell + waterproof probe</td></tr>
+        <tr><td>Protection</td><td>Dry-run trip + filter-health alert</td></tr>
+        <tr><td>Power supply</td><td>220 V AC, ~2–3 W idle</td></tr>
+        <tr><td>Enclosure</td><td>IP65 wall-mount, 220 × 170 × 90 mm</td></tr>
+        <tr><td>Remote access</td><td>Encrypted tunnel — first 12 months included</td></tr>
+        <tr><td>Dashboard</td><td>Self-hosted at http://si-pool.local</td></tr>
+        <tr><td>HA integration</td><td>Auto MQTT discovery, no YAML</td></tr>
+        <tr><td>Origin</td><td>Made in South Africa</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ideal for ───────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label" style="margin-bottom:12px;">Ideal For</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span class="chip chip-pool">Family pools</span>
+      <span class="chip chip-pool">Holiday homes</span>
+      <span class="chip chip-pool">Estate &amp; cluster pools</span>
+      <span class="chip chip-pool">Solar-heated pools</span>
+      <span class="chip chip-pool">Home Assistant setups</span>
+      <span class="chip chip-neutral">Existing pump installations</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Bottom CTA ──────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;">
+      <div>
+        <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+          Ready to automate your pool?
+        </h2>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:24px;line-height:1.65;">
+          Whether you're a homeowner or an installer, get in touch and we'll guide you through.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="index.html#contact">Get SI Pool</a>
+          <a class="btn btn-ghost" href="docs.html">Installer documents →</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--pool);">SI Pool Datasheet — End User (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--pool);">SI Pool Installer Brochure (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--pool);">SI Pool Quick-Start Guide (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="portal.html">Portal Login</a></li>
+        <li><a href="mailto:info@si-sa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#trade">Installers</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span>solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+</body>
+</html>
