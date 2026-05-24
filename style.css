@@ -117,10 +117,12 @@ nav {
 
 /* Dropdown */
 .nav-dropdown {
-  position: absolute; top: calc(100% + 8px); left: 0;
+  position: absolute; top: 100%; left: 0;
   min-width: 200px;
   background: var(--panel); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 6px;
+  padding-top: 12px; /* extra top padding so hover zone bridges gap to button */
+  margin-top: -4px;  /* pull up slightly so it visually looks close */
   box-shadow: var(--shadow);
   opacity: 0; pointer-events: none; transform: translateY(-6px);
   transition: opacity .18s, transform .18s;
