@@ -474,10 +474,81 @@ footer {
 .text-gateway { color: var(--gateway); }
 .text-water   { color: var(--water); }
 
+/* ── Phone mockup frame ─────────────────────────────────────────────────── */
+.phone-frame {
+  position: relative;
+  border-radius: 38px;
+  border: 2px solid rgba(255,255,255,0.10);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 24px 64px rgba(0,0,0,0.55),
+    0 4px 16px rgba(0,0,0,0.3);
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+}
+.phone-frame img {
+  width: 100%;
+  display: block;
+  border-radius: 36px;
+}
+
+/* ── App screenshot gallery ─────────────────────────────────────────────── */
+.app-gallery {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 12px 4px 28px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.app-gallery::-webkit-scrollbar { height: 3px; }
+.app-gallery::-webkit-scrollbar-track { background: var(--line); border-radius: 2px; }
+.app-gallery::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+.app-gallery-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+.app-gallery-item .cap {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  max-width: 155px;
+  line-height: 1.4;
+}
+
+/* ── ECM score scale ────────────────────────────────────────────────────── */
+.ecm-scale {
+  margin: 20px 0;
+  border-radius: var(--radius-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  padding: 16px 18px;
+}
+.ecm-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #ff3b30, #ff6b00, #ffd60a, #34c759, #1a7a3c);
+  margin-bottom: 10px;
+}
+.ecm-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
 /* ── Responsive utilities ────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   section { padding: 56px 0; }
   .hero { padding: 72px 0 56px; }
+  .phone-frame { border-radius: 28px; }
+  .phone-frame img { border-radius: 26px; }
 }
 @media (max-width: 480px) {
   .hero-actions { flex-direction: column; align-items: stretch; }

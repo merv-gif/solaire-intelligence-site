@@ -255,6 +255,82 @@
   </div>
 </section>
 
+<!-- ── ECM ─────────────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+
+      <!-- Text -->
+      <div>
+        <p class="section-label">Energy Intelligence</p>
+        <h2 style="font-size:clamp(22px,3.5vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;line-height:1.15;">
+          Meet ECM —<br>Energy Comfort Model
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:16px;">
+          Most solar systems flood you with raw numbers — watts, SOC percentages,
+          import/export figures. ECM distills all of that into a single live score
+          that answers the only question that matters:
+        </p>
+        <p style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px;font-style:italic;padding-left:14px;border-left:3px solid var(--gateway);">
+          "How energetically comfortable is my property right now?"
+        </p>
+
+        <!-- Scale bar -->
+        <div class="ecm-scale">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+            <span style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;">ECM Score</span>
+            <span style="font-size:11px;color:var(--muted);">0 — 20</span>
+          </div>
+          <div class="ecm-bar"></div>
+          <div class="ecm-labels">
+            <span>Critical</span>
+            <span>Cautious</span>
+            <span style="color:var(--gateway);font-weight:600;">Moderate</span>
+            <span>Comfortable</span>
+            <span>Excellent</span>
+          </div>
+        </div>
+
+        <!-- Bullets -->
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,181,71,0.12);border:1px solid rgba(255,181,71,0.2);display:grid;place-items:center;font-size:14px;flex-shrink:0;">⚡</div>
+            <div>
+              <strong style="font-size:13px;font-weight:600;">Combines six live signals</strong>
+              <p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Solar surplus, battery state, grid dependence, load demand, stability and system headroom — weighted into one score.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(47,181,255,0.12);border:1px solid rgba(47,181,255,0.2);display:grid;place-items:center;font-size:14px;flex-shrink:0;">🤖</div>
+            <div>
+              <strong style="font-size:13px;font-weight:600;">Drives smart automation</strong>
+              <p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">SI Core uses ECM to decide when to run discretionary loads — pool heating, geysers, EV charging — without you lifting a finger.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(60,224,143,0.12);border:1px solid rgba(60,224,143,0.2);display:grid;place-items:center;font-size:14px;flex-shrink:0;">📡</div>
+            <div>
+              <strong style="font-size:13px;font-weight:600;">Available everywhere</strong>
+              <p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Exposed via MQTT, Home Assistant and the SI app — so your dashboards and automations always have a single source of truth.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone screenshots -->
+      <div style="display:flex;align-items:flex-start;justify-content:center;gap:16px;">
+        <div class="phone-frame" style="width:220px;margin-top:0;">
+          <img src="/screenshots/resized/IMG_4973.PNG" alt="ECM Score — Moderate 10/20, Solar/Energy live view" />
+        </div>
+        <div class="phone-frame" style="width:130px;margin-top:48px;">
+          <img src="/screenshots/resized/IMG_4969.PNG" alt="ECM Score — Cautious 9/20" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ── Installer callout ───────────────────────────────────────────────────── -->
 <section id="trade" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
   <div class="wrap">
@@ -304,49 +380,69 @@
   </div>
 </section>
 
-<!-- ── Portal teaser ───────────────────────────────────────────────────────── -->
+<!-- ── App gallery ──────────────────────────────────────────────────────────── -->
 <section>
   <div class="wrap" style="text-align:center;">
-    <p class="section-label" style="justify-content:center;display:flex;">Live Platform</p>
+    <p class="section-label" style="justify-content:center;display:flex;">The App</p>
     <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
-      This is a living platform. Not a brochure.
+      A real platform. Built for your property.
     </h2>
-    <p style="color:var(--muted);max-width:520px;margin:0 auto 32px;font-size:15px;line-height:1.65;">
-      Existing SI customers log into their portal to view live system data, manage
-      device settings and access remote dashboards for all installed products.
+    <p style="color:var(--muted);max-width:560px;margin:0 auto 32px;font-size:15px;line-height:1.65;">
+      Sign in, pick your devices, and get live telemetry, controls and intelligent
+      energy insight — all in one place. Available on iOS and Android.
     </p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a class="btn btn-primary" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;">
+      <a class="btn btn-primary" href="/portal">⬡ Sign In</a>
       <a class="btn btn-ghost" href="#contact">Request a demo</a>
     </div>
-    <!-- Dashboard preview mockup -->
-    <div style="margin-top:48px;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;max-width:700px;margin-left:auto;margin-right:auto;text-align:left;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);">
-        <div class="nav-logo" style="width:28px;height:28px;font-size:10px;">SI</div>
-        <span style="font-size:13px;font-weight:600;">Solaire Intelligence</span>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ok);">
-          <div style="width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);"></div>
-          Connected
+
+    <!-- Scrollable phone gallery -->
+    <div class="app-gallery" style="justify-content:center;">
+
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:168px;">
+          <img src="/screenshots/resized/IMG_4959.PNG" alt="Sign in to your Solaire Intelligence account" />
         </div>
+        <span class="cap">Secure sign-in<br>Customer &amp; Installer portals</span>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;">
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Pool Temp</div>
-          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--pool);">28.4<span style="font-size:13px;color:var(--muted);margin-left:3px;">°C</span></div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Target 28.5°C · Heating</div>
+
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:168px;">
+          <img src="/screenshots/resized/IMG_4961.PNG" alt="Installer Dashboard showing multiple client sites" />
         </div>
-        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;">
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Tank Level</div>
-          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--water);">69<span style="font-size:13px;color:var(--muted);margin-left:3px;">%</span></div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">1,563 L · No flow</div>
-        </div>
-        <div style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;">
-          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Battery SOC</div>
-          <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:var(--ok);">84<span style="font-size:13px;color:var(--muted);margin-left:3px;">%</span></div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Solar · 2.4 kW</div>
-        </div>
+        <span class="cap">Installer Dashboard<br>Manage all your client sites</span>
       </div>
+
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:168px;">
+          <img src="/screenshots/resized/IMG_4968.PNG" alt="Device picker showing registered SI devices" />
+        </div>
+        <span class="cap">Device picker<br>All your SI hardware, registered</span>
+      </div>
+
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:168px;">
+          <img src="/screenshots/resized/IMG_4973.PNG" alt="ECM Score and live Solar/Energy data" />
+        </div>
+        <span class="cap">ECM Score &amp; Solar<br>Live energy comfort at a glance</span>
+      </div>
+
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:168px;">
+          <img src="/screenshots/resized/IMG_4971.PNG" alt="Water Management — live tank level and flow data" />
+        </div>
+        <span class="cap">Water Management<br>Tank level, flow totals, events</span>
+      </div>
+
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:168px;">
+          <img src="/screenshots/resized/IMG_4960.PNG" alt="Push notification preferences" />
+        </div>
+        <span class="cap">Push notifications<br>Alerts that matter to you</span>
+      </div>
+
     </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;">← scroll to see more →</p>
   </div>
 </section>
 
