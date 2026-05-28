@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Learning Centre · Solaire Intelligence</title>
+  <meta name="description" content="Learn how SI Pool, SI Water and SI Gateway work — feature overviews, key capabilities and links to product documents and downloads." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="learn.html" class="active">Learn</a></li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="portal.html">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section style="padding:60px 0 40px;">
+  <div class="wrap">
+    <p class="section-label">Learning Centre</p>
+    <h1 style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;">
+      Understand your SI system.
+    </h1>
+    <p style="color:var(--muted);font-size:16px;max-width:580px;line-height:1.7;margin-bottom:28px;">
+      Each Solaire Intelligence product is an autonomous edge device. Here's what each one
+      does, what it monitors or controls, and where to find the full technical documentation.
+    </p>
+    <a class="btn btn-ghost" href="docs.html">Browse all documents →</a>
+  </div>
+</section>
+
+<!-- ── SI Gateway ─────────────────────────────────────────────────────────── -->
+<section id="gateway" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;">
+
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,181,71,0.12);border:1px solid rgba(255,181,71,0.3);display:grid;place-items:center;font-size:20px;">⚡</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gateway);">SI Gateway</div>
+            <div style="font-size:13px;color:var(--muted);">The inverter bridge — one per site</div>
+          </div>
+        </div>
+
+        <h2 style="font-size:clamp(20px,2.5vw,26px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
+          Connects your inverter to your intelligence layer.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
+          SI Gateway is a compact RS485-to-Wi-Fi bridge that sits in your distribution board or
+          next to the inverter. It reads live Modbus data from your Sunsynk inverter and relays it
+          to SI Core over your local network — giving you real-time solar, battery, grid and load
+          data without any cloud dependency.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
+          SI Gateway also hosts the <strong style="color:var(--text);">ECM (Energy Comfort Model)</strong> —
+          a derived score that combines solar surplus, battery state, grid dependence and load demand
+          into a single live number that tells you how energetically comfortable your property is
+          right now.
+        </p>
+
+        <!-- Features -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Live inverter telemetry</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Solar PV, load, grid import/export, battery SOC and charge/discharge — polled every few seconds via Modbus RS485.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">ECM Score</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">A live 0–20 energy comfort score that drives SI Core automations — no manual rules needed.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Inverter controls</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Set SOC targets per time slot, configure work mode, grid charge and solar sell — all from the app.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Pairs in minutes</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Installer provisions via QR code. No port forwarding, no cloud account required for local operation.</p></div>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="si-gateway.html" style="font-size:13px;padding:9px 18px;">View product page</a>
+          <a class="btn btn-ghost" href="docs.html#gateway" style="font-size:13px;padding:9px 18px;">Download docs</a>
+        </div>
+      </div>
+
+      <!-- Screenshots -->
+      <div style="display:flex;justify-content:center;gap:16px;align-items:flex-start;padding-top:8px;">
+        <div class="phone-frame" style="width:200px;">
+          <img src="/screenshots/resized/gateway-1.PNG" alt="SI Gateway — ECM Score and live solar energy" />
+        </div>
+        <div class="phone-frame" style="width:140px;margin-top:40px;">
+          <img src="/screenshots/resized/gateway-2.PNG" alt="SI Gateway — Battery SOC and inverter controls" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── SI Pool ─────────────────────────────────────────────────────────────── -->
+<section id="pool">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;">
+
+      <!-- Screenshots -->
+      <div style="display:flex;justify-content:center;gap:16px;align-items:flex-start;padding-top:8px;">
+        <div class="phone-frame" style="width:200px;">
+          <img src="/screenshots/resized/pool-1.PNG" alt="SI Pool — pool temperature and pump status" />
+        </div>
+        <div class="phone-frame" style="width:140px;margin-top:40px;">
+          <img src="/screenshots/resized/pool-2.PNG" alt="SI Pool — schedule and protection settings" />
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(47,181,255,0.1);border:1px solid rgba(47,181,255,0.25);display:grid;place-items:center;font-size:20px;">🏊</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pool);">SI Pool</div>
+            <div style="font-size:13px;color:var(--muted);">Smart pool controller — one per pool</div>
+          </div>
+        </div>
+
+        <h2 style="font-size:clamp(20px,2.5vw,26px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
+          Intelligent pool control, from filtration to heating.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
+          SI Pool replaces the old timer-and-floats world with a calibrated controller that combines
+          temperature sensing, pump control, energy metering, filter health tracking and dry-run
+          protection in a single installer-friendly unit.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
+          When paired with SI Core and the ECM score, SI Pool can automatically run filtration
+          and heating during periods of solar surplus — reducing grid consumption without any
+          manual scheduling.
+        </p>
+
+        <!-- Features -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--pool);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Temperature monitoring &amp; control</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Live pool temp with configurable target — SI Pool manages heating automatically to hit your setpoint.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--pool);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Pump scheduling &amp; energy metering</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Two independent timer windows, live power draw in watts, voltage and current — full visibility of pump energy use.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--pool);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Filter health &amp; dry-run protection</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Filter clean threshold configurable in watts. Dry-run detection with grace period protects the pump from running without water.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--pool);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Remote control</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Turn the pump, light and heat pump on or off from the app — whether you're at home or away.</p></div>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="si-pool.html" style="font-size:13px;padding:9px 18px;">View product page</a>
+          <a class="btn btn-ghost" href="docs.html#pool" style="font-size:13px;padding:9px 18px;">Download docs</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── SI Water ────────────────────────────────────────────────────────────── -->
+<section id="water" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;">
+
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(74,168,255,0.1);border:1px solid rgba(74,168,255,0.25);display:grid;place-items:center;font-size:20px;">💧</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--water);">SI Water</div>
+            <div style="font-size:13px;color:var(--muted);">Tank &amp; borehole monitor — one per tank</div>
+          </div>
+        </div>
+
+        <h2 style="font-size:clamp(20px,2.5vw,26px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
+          Know exactly what's in your tank, right now.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
+          SI Water uses an ultrasonic sensor to measure your tank level continuously and reports
+          volume in litres, height in centimetres and percentage fill — live to the app, with no
+          float switches, no mechanical parts and no guessing.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
+          Flow meters track inflow and outflow in real time, log usage events and calculate
+          daily, monthly and all-time totals. Useful for spotting leaks, understanding consumption
+          patterns or simply knowing if your borehole is keeping up.
+        </p>
+
+        <!-- Features -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Ultrasonic level sensing</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Continuous measurement in litres, cm and % — calibrated to your specific tank dimensions.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Live flow monitoring</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Net flow, inflow and outflow in litres per minute — updated live. Spot a leak the moment it starts.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Usage totals &amp; event log</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Today, this month and all-time in/out totals. Recent water events log every fill and draw cycle with volume.</p></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
+            <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
+            <div><strong style="font-size:13px;">Low-level alerts</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Push notification when tank drops below 20% — so you're never caught without water.</p></div>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a class="btn btn-primary" href="si-water.html" style="font-size:13px;padding:9px 18px;">View product page</a>
+          <a class="btn btn-ghost" href="docs.html#water" style="font-size:13px;padding:9px 18px;">Download docs</a>
+        </div>
+      </div>
+
+      <!-- Screenshot -->
+      <div style="display:flex;justify-content:center;align-items:flex-start;padding-top:8px;">
+        <div class="phone-frame" style="width:220px;">
+          <img src="/screenshots/resized/water-1.PNG" alt="SI Water — live tank level and flow data" />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Docs CTA ────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap" style="text-align:center;">
+    <p class="section-label" style="justify-content:center;display:flex;">Documentation</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+      Ready to go deeper?
+    </h2>
+    <p style="color:var(--muted);max-width:500px;margin:0 auto 28px;font-size:15px;line-height:1.65;">
+      Download datasheets, installer brochures, quick-start guides and technical schematics
+      for every SI product.
+    </p>
+    <a class="btn btn-primary" href="docs.html">Browse all documents →</a>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first energy, water and pool intelligence — built for South African homes.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="learn.html">Learning Centre</a></li>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="index.html#trade">Installers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="portal.html">Customer Portal</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence. All rights reserved.</span>
+    <span>solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  // Nav burger
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+  // Dropdown hover
+  document.querySelectorAll('.nav-links > li').forEach(li => {
+    li.addEventListener('mouseenter', () => li.classList.add('open'));
+    li.addEventListener('mouseleave', () => li.classList.remove('open'));
+  });
+</script>
+</body>
+</html>
