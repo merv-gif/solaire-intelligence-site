@@ -555,3 +555,70 @@ footer {
   .hero-actions { flex-direction: column; align-items: stretch; }
   .hero-actions .btn { justify-content: center; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mobile layout fixes — ONLY affects ≤ 768px, desktop unchanged
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Stop horizontal scroll caused by overflowing content */
+  html, body { overflow-x: hidden; }
+  .wrap { overflow-x: hidden; }
+
+  /* ── Collapse ALL two-column inline grids to single column ── */
+  /* These selectors target inline style attributes so !important is required */
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr auto"],
+  [style*="grid-template-columns: 1fr auto"],
+  [style*="grid-template-columns:repeat(2,1fr)"],
+  [style*="grid-template-columns: repeat(2, 1fr)"] {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+
+  /* Three-column stats (SI Water hero) → two columns */
+  [style*="grid-template-columns:repeat(3,1fr)"],
+  [style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Hero: collapse grid, hide phone, centre text */
+  .hero .wrap > div { display: block !important; }
+  .hero-phone { display: none !important; }
+
+  /* ECM section: put phone below text on mobile */
+  .ecm-scale { margin: 16px 0; }
+  .ecm-labels { font-size: 10px; }
+
+  /* App screenshot gallery: scroll left/right is intentional — just ensure padding */
+  .app-gallery { padding-left: 0; padding-right: 0; }
+  .app-gallery-item .phone-frame { width: 160px !important; }
+
+  /* Arch diagram nodes: shrink slightly so they wrap cleanly */
+  .arch-node { min-width: 88px !important; font-size: 13px; }
+
+  /* Phone frames in ECM section: full width, centred */
+  [style*="display:flex;align-items:flex-start;justify-content:center"] {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  /* Stacked ECM phones: both same size */
+  [style*="display:flex;align-items:flex-start;justify-content:center"] .phone-frame {
+    width: 220px !important;
+    margin-top: 0 !important;
+  }
+
+  /* Trust bar: wrap to two columns */
+  .trust-bar-inner { flex-wrap: wrap; gap: 12px; }
+  .trust-item { flex: 1 1 calc(50% - 8px); min-width: 140px; }
+
+  /* Section headings: a bit smaller on small screens */
+  h2 { font-size: clamp(20px, 5vw, 28px) !important; }
+
+  /* Contact form grid: stack */
+  [style*="grid-template-columns:1fr 1fr"][style*="align-items:start"] {
+    grid-template-columns: 1fr !important;
+  }
+}
