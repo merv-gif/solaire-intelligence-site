@@ -212,25 +212,26 @@
           Know exactly what's in your tank, right now.
         </h2>
         <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
-          SI Water uses an ultrasonic sensor to measure your tank level continuously and reports
-          volume in litres, height in centimetres and percentage fill — live to the app, with no
-          float switches, no mechanical parts and no guessing.
+          SI Water uses a digital RS485 pressure sensor to measure the water column depth
+          continuously. Pressure readings are converted live into volume in litres, height in
+          centimetres and percentage fill — accurate, instant and with no float switches,
+          no moving parts and no guessing.
         </p>
         <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
-          Flow meters track inflow and outflow in real time, log usage events and calculate
-          daily, monthly and all-time totals. Useful for spotting leaks, understanding consumption
-          patterns or simply knowing if your borehole is keeping up.
+          There are no physical flow sensors. Inflow and outflow are derived in real time from
+          changes in the pressure reading — giving you reliable flow data, usage totals and
+          leak detection without any additional hardware.
         </p>
 
         <!-- Features -->
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
-            <div><strong style="font-size:13px;">Ultrasonic level sensing</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Continuous measurement in litres, cm and % — calibrated to your specific tank dimensions.</p></div>
+            <div><strong style="font-size:13px;">Pressure-based level sensing</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Digital RS485 pressure sensor measures water column depth — converted live to litres, cm and %, calibrated to your tank dimensions.</p></div>
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
-            <div><strong style="font-size:13px;">Live flow monitoring</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Net flow, inflow and outflow in litres per minute — updated live. Spot a leak the moment it starts.</p></div>
+            <div><strong style="font-size:13px;">Derived flow monitoring</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Inflow and outflow calculated live from pressure changes — no flow sensors required. Reliable, accurate and instant.</p></div>
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--water);font-size:15px;flex-shrink:0;">✦</span>
