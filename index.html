@@ -167,17 +167,17 @@
     <div style="margin-bottom:32px;">
 
       <!-- Inverter branch -->
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+      <div class="arch-branch" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
         <div class="arch-node" style="min-width:110px;">
           <small>Inverter</small>
           Sunsynk
         </div>
-        <div class="arch-arrow"><span style="font-size:11px;color:var(--muted);">RS485 →</span></div>
+        <div class="arch-arrow arch-label">RS485</div>
         <div class="arch-node" style="min-width:110px;border-color:var(--gateway);color:var(--gateway);">
           <small style="color:var(--muted);">Bridge</small>
           SI Gateway
         </div>
-        <div class="arch-arrow"><span style="font-size:11px;color:var(--muted);">Wi-Fi →</span></div>
+        <div class="arch-arrow arch-label">Wi-Fi</div>
         <div class="arch-node accent" style="min-width:110px;">
           <small>Supervisory</small>
           SI Core
@@ -195,12 +195,12 @@
       </div>
 
       <!-- Pool / Water branch -->
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      <div class="arch-branch" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
         <div class="arch-node" style="min-width:110px;">
           <small>Edge Devices</small>
           SI Pool · SI Water
         </div>
-        <div class="arch-arrow"><span style="font-size:11px;color:var(--muted);">MQTT →</span></div>
+        <div class="arch-arrow arch-label">MQTT</div>
         <div style="font-size:12px;color:var(--muted);font-style:italic;">feeds into SI Core above</div>
       </div>
 

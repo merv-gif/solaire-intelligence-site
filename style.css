@@ -352,7 +352,56 @@ nav {
 .arch-node small { display: block; font-size: 10px; color: var(--muted); font-weight: 500; margin-top: 2px; }
 .arch-node.accent { border-color: var(--accent); color: var(--accent); }
 .arch-arrow { color: var(--muted); font-size: 18px; }
-@media (max-width: 600px) { .arch-arrow { transform: rotate(90deg); } }
+/* arch-label: protocol badge (RS485, Wi-Fi, MQTT) on desktop shows as "label →" */
+.arch-label { font-size: 11px; color: var(--muted); }
+.arch-label::after { content: ' →'; }
+
+@media (max-width: 600px) {
+  /* Switch each branch to a vertical column */
+  .arch-branch {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    flex-wrap: nowrap !important;
+  }
+  /* Each node fills full width */
+  .arch-branch .arch-node {
+    width: 100% !important;
+    min-width: unset !important;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  /* Regular → arrows: hide character, show ↓ via ::before */
+  .arch-branch .arch-arrow:not(.arch-label) {
+    transform: none;
+    font-size: 0;
+    padding: 2px 16px;
+    display: block;
+  }
+  .arch-branch .arch-arrow:not(.arch-label)::before {
+    content: '↓';
+    font-size: 16px;
+    color: var(--muted);
+  }
+  /* Protocol labels (RS485, Wi-Fi, MQTT): show as ↓ badge */
+  .arch-branch .arch-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .arch-branch .arch-label::before {
+    content: '↓';
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .arch-branch .arch-label::after { content: ''; } /* remove desktop → suffix */
+}
 
 /* ── Callout / highlight block ───────────────────────────────────────────── */
 .callout {

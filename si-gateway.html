@@ -96,17 +96,17 @@
     </p>
 
     <!-- Flow diagram -->
-    <div class="arch-diagram" style="margin-bottom:36px;">
+    <div class="arch-diagram arch-branch" style="margin-bottom:36px;">
       <div class="arch-node" style="border-color:rgba(255,181,71,0.3);">
         <small>Inverter</small>
         Sunsynk
       </div>
-      <div class="arch-arrow">→ RS485 →</div>
+      <div class="arch-arrow arch-label">RS485</div>
       <div class="arch-node" style="border-color:rgba(255,181,71,0.5);color:var(--gateway);">
         <small>Bridge</small>
         SI Gateway
       </div>
-      <div class="arch-arrow">→ Wi-Fi →</div>
+      <div class="arch-arrow arch-label">Wi-Fi</div>
       <div class="arch-node accent" style="border-color:var(--accent);">
         <small>Brain</small>
         SI Core
