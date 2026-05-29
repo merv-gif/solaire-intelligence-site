@@ -159,32 +159,46 @@
       One platform. Distributed intelligence.
     </h2>
     <p style="color:var(--muted);max-width:600px;margin-bottom:40px;font-size:15px;line-height:1.65;">
-      Each SI product is an autonomous edge device that runs its own control logic and
-      protects the equipment it's connected to. SI Core ties the ecosystem together —
-      receiving live solar data from the inverter via SI Gateway, and pool and water
-      telemetry via MQTT, all on your local network.
+      Each SI product is an autonomous edge device that runs its own control logic.
+      SI Gateway reads your inverter and publishes the ECM score. Every connected device
+      subscribes to that score and makes its own decisions — all on your local network,
+      no central controller required.
     </p>
 
-    <!-- Two-branch architecture diagram -->
+    <!-- Architecture diagram -->
     <div style="margin-bottom:32px;">
 
-      <!-- Inverter branch -->
+      <!-- Inverter → Gateway → ECM → SI devices -->
       <div class="arch-branch" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
         <div class="arch-node" style="min-width:110px;">
           <small>Inverter</small>
           Sunsynk
         </div>
         <div class="arch-arrow arch-label">RS485</div>
-        <div class="arch-node" style="min-width:110px;border-color:var(--gateway);color:var(--gateway);">
-          <small style="color:var(--muted);">Bridge</small>
+        <div class="arch-node" style="min-width:130px;border-color:var(--gateway);color:var(--gateway);">
+          <small style="color:var(--muted);">Calculates ECM</small>
           SI Gateway
         </div>
-        <div class="arch-arrow arch-label">Wi-Fi</div>
-        <div class="arch-node accent" style="min-width:110px;">
-          <small>Supervisory</small>
-          SI Core
+        <div class="arch-arrow" style="display:flex;flex-direction:column;align-items:center;font-size:11px;gap:2px;">
+          <span style="font-weight:700;color:var(--gateway);">ECM</span>
+          <span style="color:var(--muted);">via MQTT →</span>
         </div>
-        <div class="arch-arrow">→</div>
+        <div class="arch-node" style="min-width:160px;border-color:var(--pool);color:var(--pool);">
+          <small style="color:var(--muted);">Read score, decide</small>
+          SI Pool · SI Water
+        </div>
+      </div>
+
+      <!-- Gateway → Dashboard -->
+      <div class="arch-branch" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <div class="arch-node" style="min-width:130px;border-color:var(--gateway);color:var(--gateway);opacity:0.35;">
+          <small style="color:var(--muted);">SI Gateway</small>
+          &nbsp;
+        </div>
+        <div class="arch-arrow" style="display:flex;flex-direction:column;align-items:center;font-size:11px;gap:2px;">
+          <span style="font-weight:700;color:var(--gateway);">ECM</span>
+          <span style="color:var(--muted);">via MQTT →</span>
+        </div>
         <div class="arch-node" style="min-width:110px;">
           <small>Local UI</small>
           Dashboard
@@ -194,16 +208,6 @@
           <small>Optional</small>
           Remote Access
         </div>
-      </div>
-
-      <!-- Pool / Water branch -->
-      <div class="arch-branch" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-        <div class="arch-node" style="min-width:110px;">
-          <small>Edge Devices</small>
-          SI Pool · SI Water
-        </div>
-        <div class="arch-arrow arch-label">MQTT</div>
-        <div style="font-size:12px;color:var(--muted);font-style:italic;">feeds into SI Core above</div>
       </div>
 
     </div>

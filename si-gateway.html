@@ -93,8 +93,7 @@
       Two components. One seamless system.
     </h2>
     <p style="color:var(--muted);max-width:560px;margin-bottom:36px;font-size:15px;line-height:1.65;">
-      SI Gateway is not a single device — it is a two-part system. The Gateway bridges
-      your inverter to your network. The Core is the brain that orchestrates everything.
+      SI Gateway bridges your inverter to the rest of the SI ecosystem. It reads raw inverter data via RS485, calculates the ECM score, and publishes everything to the MQTT broker — where the dashboard and every connected SI device can consume it.
     </p>
 
     <!-- Flow diagram -->
@@ -105,41 +104,21 @@
       </div>
       <div class="arch-arrow arch-label">RS485</div>
       <div class="arch-node" style="border-color:rgba(255,181,71,0.5);color:var(--gateway);">
-        <small>Bridge</small>
+        <small>Calculates ECM</small>
         SI Gateway
       </div>
-      <div class="arch-arrow arch-label">Wi-Fi</div>
-      <div class="arch-node accent" style="border-color:var(--accent);">
-        <small>Brain</small>
-        SI Core
+      <div class="arch-arrow" style="display:flex;flex-direction:column;align-items:center;font-size:11px;gap:2px;">
+        <span style="font-weight:700;color:var(--gateway);">ECM</span>
+        <span style="color:var(--muted);">via MQTT →</span>
+      </div>
+      <div class="arch-node" style="border-color:rgba(47,181,255,0.4);color:var(--pool);">
+        <small>Read score, decide</small>
+        SI Pool · SI Water
       </div>
       <div class="arch-arrow">→</div>
       <div class="arch-node">
         <small>Dashboard</small>
         Browser
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-      <div class="card" style="border-color:rgba(255,181,71,0.25);">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,181,71,0.1);border:1px solid rgba(255,181,71,0.3);display:grid;place-items:center;font-size:16px;">🔌</div>
-          <div>
-            <div style="font-size:12px;color:var(--gateway);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">SI Gateway</div>
-            <div style="font-size:13px;font-weight:600;">The bridge — one per inverter</div>
-          </div>
-        </div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.65;">RS485 to Wi-Fi bridge. Sits in the DB or next to the inverter. Reads Modbus data and relays it to the SI Core over your local network. Pairs in minutes.</p>
-      </div>
-      <div class="card" style="border-color:rgba(47,181,255,0.25);">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-          <div style="width:36px;height:36px;border-radius:8px;background:rgba(47,181,255,0.1);border:1px solid rgba(47,181,255,0.3);display:grid;place-items:center;font-size:16px;">🧠</div>
-          <div>
-            <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">SI Core</div>
-            <div style="font-size:13px;font-weight:600;">The brain — one per site</div>
-          </div>
-        </div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.65;">Raspberry Pi pre-flashed with the SI platform. Runs Home Assistant, aggregates all gateway data, hosts the local dashboard and handles automation logic. One Core manages multiple Gateways.</p>
       </div>
     </div>
   </div>
@@ -161,7 +140,7 @@
       <div class="feature-card">
         <div class="feature-icon">🔒</div>
         <h3>Local-First Architecture</h3>
-        <p>Runs on a Raspberry Pi on your LAN. Dashboard available at homeassistant.local — no cloud account required, no internet dependency for local monitoring and control.</p>
+        <p>Dashboard and device logic run on your local network. No cloud account required, no internet dependency for monitoring, control or automation.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🌐</div>
@@ -170,13 +149,13 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon">🏠</div>
-        <h3>Home Assistant Native</h3>
-        <p>Every inverter entity exposed via MQTT auto-discovery. No YAML required. Solar, battery, grid and load appear in HA the moment a broker is configured.</p>
+        <h3>Home Assistant Compatible</h3>
+        <p>Every inverter entity exposed via MQTT. Solar, battery, grid and load available in HA the moment a broker is configured — no custom integration required.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🔗</div>
-        <h3>Multi-Inverter Support</h3>
-        <p>One SI Core, multiple SI Gateways — for larger sites, multi-phase systems or properties with more than one inverter. Each Gateway pairs independently.</p>
+        <h3>Multi-Gateway Support</h3>
+        <p>Multiple SI Gateways per account — for larger sites, multi-phase systems or properties with more than one inverter. Each Gateway pairs independently.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">📈</div>
@@ -259,16 +238,14 @@
         </div>
       </div>
       <div>
-        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">SI Core — Supervisory Brain</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gateway);margin-bottom:12px;">Dashboard &amp; Remote Access</div>
         <div class="card">
           <table class="spec-table">
-            <tr><td>Hardware</td><td>Raspberry Pi (pre-configured)</td></tr>
-            <tr><td>Storage</td><td>SSD pre-loaded with SI software</td></tr>
-            <tr><td>Platform</td><td>Home Assistant + SI stack</td></tr>
-            <tr><td>Connection</td><td>Ethernet to router / switch</td></tr>
-            <tr><td>Dashboard</td><td>homeassistant.local</td></tr>
+            <tr><td>Dashboard</td><td>Web app — any browser, any device</td></tr>
+            <tr><td>Connection</td><td>MQTT over WSS — local or remote</td></tr>
             <tr><td>Remote access</td><td>Encrypted tunnel — first 12 months</td></tr>
-            <tr><td>Multi-gateway</td><td>Yes — one Core, multiple Gateways</td></tr>
+            <tr><td>Multi-gateway</td><td>Yes — multiple gateways per account</td></tr>
+            <tr><td>Cloud required</td><td>No — local-first, cloud additive</td></tr>
           </table>
         </div>
       </div>

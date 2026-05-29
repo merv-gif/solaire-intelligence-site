@@ -78,9 +78,9 @@
         </h2>
         <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
           SI Gateway is a compact RS485-to-Wi-Fi bridge that sits in your distribution board or
-          next to the inverter. It reads live Modbus data from your Sunsynk inverter and relays it
-          to SI Core over your local network — giving you real-time solar, battery, grid and load
-          data without any cloud dependency.
+          next to the inverter. It reads live Modbus data from your Sunsynk inverter and publishes it
+          to the MQTT broker — giving every connected SI device and the dashboard real-time solar,
+          battery, grid and load data without any cloud dependency.
         </p>
         <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
           SI Gateway also hosts the <strong style="color:var(--text);">ECM (Energy Comfort Model)</strong> —
@@ -97,7 +97,7 @@
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
-            <div><strong style="font-size:13px;">ECM Score</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">A live 0–20 energy comfort score that drives SI Core automations — no manual rules needed.</p></div>
+            <div><strong style="font-size:13px;">ECM Score</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">A live 0–20 energy comfort score published to MQTT — every connected SI device reads it and makes its own decisions. No manual rules needed.</p></div>
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
