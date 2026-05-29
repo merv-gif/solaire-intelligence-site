@@ -270,6 +270,86 @@
   </div>
 </section>
 
+<!-- ── Built differently ──────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+
+      <div>
+        <p class="section-label">A different architecture</p>
+        <h2 style="font-size:clamp(22px,3.5vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:20px;line-height:1.15;">
+          Not another automation platform.<br>A smarter way to build one.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          Most energy automation works the same way — a central brain collects data, runs rules, and pushes commands to dumb endpoints. When the brain is offline, so is your automation. When the cloud is unreachable, your pool pump doesn't know what to do.
+        </p>
+        <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;">
+          SI is built differently.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          The SI Gateway calculates the ECM score locally and publishes it. Every connected device — SI Pool, SI Water, and whatever comes next — reads that score and makes its own decision. No central controller. No cloud round-trip. No rules to write or maintain.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
+          You set the intent. The devices implement it. Even at 2am during load shedding with no internet.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span style="color:var(--gateway);font-weight:700;font-size:14px;">✓</span>
+            <span style="font-size:14px;color:var(--muted);">Your data stays on your property.</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span style="color:var(--gateway);font-weight:700;font-size:14px;">✓</span>
+            <span style="font-size:14px;color:var(--muted);">Your devices keep running when the cloud doesn't.</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span style="color:var(--gateway);font-weight:700;font-size:14px;">✓</span>
+            <span style="font-size:14px;color:var(--muted);">And if you run Home Assistant — SI speaks MQTT natively.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contrast cards -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="padding:20px 24px;border-radius:var(--radius);border:1px solid var(--line);background:var(--panel);">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Centralised cloud automation</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);">
+              <span style="flex-shrink:0;margin-top:1px;">→</span><span>Central brain collects all data</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);">
+              <span style="flex-shrink:0;margin-top:1px;">→</span><span>Pushes commands to dumb endpoints</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);">
+              <span style="flex-shrink:0;margin-top:1px;">→</span><span>Cloud offline = automation stops</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);">
+              <span style="flex-shrink:0;margin-top:1px;">→</span><span>Rules and flows to write and maintain</span>
+            </div>
+          </div>
+        </div>
+        <div style="padding:20px 24px;border-radius:var(--radius);border:1px solid var(--gateway);background:rgba(255,181,71,0.04);">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gateway);margin-bottom:12px;">Solaire Intelligence</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text);">
+              <span style="flex-shrink:0;margin-top:1px;color:var(--gateway);">✓</span><span>Gateway publishes one ECM score</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text);">
+              <span style="flex-shrink:0;margin-top:1px;color:var(--gateway);">✓</span><span>Each device reads it and decides autonomously</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text);">
+              <span style="flex-shrink:0;margin-top:1px;color:var(--gateway);">✓</span><span>Local-first — works through load shedding</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text);">
+              <span style="flex-shrink:0;margin-top:1px;color:var(--gateway);">✓</span><span>Set intent once — no rules to maintain</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ── ECM ─────────────────────────────────────────────────────────────────── -->
 <section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
   <div class="wrap">
