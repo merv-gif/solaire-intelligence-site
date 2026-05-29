@@ -269,21 +269,24 @@
 <!-- ── ECM ─────────────────────────────────────────────────────────────────── -->
 <section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
   <div class="wrap">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+
+    <!-- Part 1: The concept -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:72px;">
 
       <!-- Text -->
       <div>
         <p class="section-label">Energy Intelligence</p>
-        <h2 style="font-size:clamp(22px,3.5vw,34px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;line-height:1.15;">
-          Meet ECM —<br>Energy Comfort Model
+        <h2 style="font-size:clamp(22px,3.5vw,36px);font-weight:800;letter-spacing:-0.02em;margin-bottom:20px;line-height:1.15;">
+          What if your appliances could automatically use surplus solar energy?
         </h2>
-        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:16px;">
-          Most solar systems flood you with raw numbers — watts, SOC percentages,
-          import/export figures. ECM distills all of that into a single live score
-          that answers the only question that matters:
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          That's exactly what Solaire Intelligence does. At the heart of the system is the <strong style="color:var(--text);">Energy Comfort Model</strong> — ECM.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          ECM gathers multiple data points from your energy system — solar production, battery state, charging activity, grid usage and more — and combines them into a single, easy-to-understand score that represents how comfortable your energy system is right now.
         </p>
         <p style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px;font-style:italic;padding-left:14px;border-left:3px solid var(--gateway);">
-          "How energetically comfortable is my property right now?"
+          Instead of every appliance needing to understand solar panels, batteries and inverters — they simply look at the ECM score.
         </p>
 
         <!-- Scale bar -->
@@ -301,37 +304,12 @@
             <span>Excellent</span>
           </div>
         </div>
-
-        <!-- Bullets -->
-        <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,181,71,0.12);border:1px solid rgba(255,181,71,0.2);display:grid;place-items:center;font-size:14px;flex-shrink:0;">⚡</div>
-            <div>
-              <strong style="font-size:13px;font-weight:600;">Combines six live signals</strong>
-              <p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Solar surplus, battery state, grid dependence, load demand, stability and system headroom — weighted into one score.</p>
-            </div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="width:28px;height:28px;border-radius:8px;background:rgba(47,181,255,0.12);border:1px solid rgba(47,181,255,0.2);display:grid;place-items:center;font-size:14px;flex-shrink:0;">🤖</div>
-            <div>
-              <strong style="font-size:13px;font-weight:600;">Drives smart automation</strong>
-              <p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">SI Core uses ECM to decide when to run discretionary loads — pool heating, geysers, EV charging — without you lifting a finger.</p>
-            </div>
-          </div>
-          <div style="display:flex;gap:12px;align-items:flex-start;">
-            <div style="width:28px;height:28px;border-radius:8px;background:rgba(60,224,143,0.12);border:1px solid rgba(60,224,143,0.2);display:grid;place-items:center;font-size:14px;flex-shrink:0;">📡</div>
-            <div>
-              <strong style="font-size:13px;font-weight:600;">Available everywhere</strong>
-              <p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">Exposed via MQTT, Home Assistant and the SI app — so your dashboards and automations always have a single source of truth.</p>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Phone screenshots -->
-      <div style="display:flex;align-items:flex-start;justify-content:center;gap:16px;">
-        <div class="phone-frame" style="width:220px;margin-top:0;">
-          <img src="/screenshots/resized/IMG_4973.PNG" alt="ECM Score — Moderate 10/20, Solar/Energy live view" />
+      <!-- Gateway screenshot -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;">
+        <div class="phone-frame" style="width:220px;">
+          <img src="/screenshots/resized/ecm-gateway.PNG" alt="SI Gateway — live ECM score and energy data" />
         </div>
         <div class="phone-frame" style="width:130px;margin-top:48px;">
           <img src="/screenshots/resized/IMG_4969.PNG" alt="ECM Score — Cautious 9/20" />
@@ -339,6 +317,64 @@
       </div>
 
     </div>
+
+    <!-- Part 2: In action — Pool as the example -->
+    <div style="border-top:1px solid var(--line);padding-top:56px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;">
+
+        <!-- Pool screenshots -->
+        <div style="display:flex;align-items:flex-start;justify-content:center;gap:12px;flex-wrap:wrap;">
+          <div class="phone-frame" style="width:150px;margin-top:0;">
+            <img src="/screenshots/resized/ecm-status.PNG" alt="SI Pool — ECM status, score and tier badge live" />
+          </div>
+          <div class="phone-frame" style="width:150px;margin-top:32px;">
+            <img src="/screenshots/resized/ecm-decision.PNG" alt="SI Pool — live ECM decision: pump and heater reason" />
+          </div>
+          <div class="phone-frame" style="width:150px;margin-top:64px;">
+            <img src="/screenshots/resized/ecm-settings.PNG" alt="SI Pool — ECM threshold and control settings" />
+          </div>
+        </div>
+
+        <!-- Text -->
+        <div>
+          <p class="section-label" style="color:var(--pool);">ECM in action — SI Pool</p>
+          <h2 style="font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;line-height:1.2;">
+            The pool controller doesn't need inverter data.<br>It just reads the score.
+          </h2>
+          <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:20px;">
+            SI Pool reads the ECM score and knows whether enough surplus energy exists to run the pool pump or heat pump — without needing to understand solar panels, batteries or inverters.
+          </p>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="font-size:18px;">☀️</span>
+              <span style="font-size:15px;color:var(--text);font-weight:500;">More solar self-consumption</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="font-size:18px;">📉</span>
+              <span style="font-size:15px;color:var(--text);font-weight:500;">Less wasted surplus energy</span>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <span style="font-size:18px;">🔌</span>
+              <span style="font-size:15px;color:var(--text);font-weight:500;">Less grid usage</span>
+            </div>
+          </div>
+
+          <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:8px;">
+            And you're still in control. You set the thresholds. You set the priorities. Solaire Intelligence simply implements your decisions.
+          </p>
+
+          <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px;padding:14px;background:var(--panel-2);border-radius:var(--radius-sm);border:1px solid var(--line);">
+            Today it's a pool. Tomorrow it could be your geyser, borehole pump, floor heating, air conditioning, or EV charger.<br><br>
+            <strong style="color:var(--text);">One energy language. One score. Unlimited possibilities.</strong>
+          </p>
+
+          <a class="btn btn-ghost" href="learn.html#gateway" style="font-size:14px;">Learn how ECM works →</a>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </section>
 
