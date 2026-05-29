@@ -871,9 +871,6 @@
         <button id="btnDryRunReset" type="button" disabled>Reset trip</button>
       </div>
     </div>
-    <!-- ECM card group injected here by buildEcmCardGroup() -->
-    <div id="pool-ecm-container"></div>
-
     <div style="height:14px;"></div>
     <div class="card" id="maintenanceCard">
       <h2>Maintenance mode</h2>
@@ -1814,259 +1811,6 @@
   // because dashboard internal IDs (e.g. "target_temp") differ from device IDs
   // (e.g. "pool_target_temperature").
   // ============================================================================
-  // ============================================================================
-  // ECM (Energy Comfort Model) — reusable card group
-  // ============================================================================
-  // buildEcmCardGroup(containerId) injects the three ECM cards into a container
-  // element already present in the HTML. The render function (renderEcm) is
-  // parameterised so future devices (Water, Geyser, EV) can reuse it by passing
-  // their own state and entity-id config.
-  //
-  // Current usage: Pool tab only (2026-05-29). To add ECM to Water:
-  //   1. Add ECM entities to WATER_ENT (same mqttId slugs, different prefix)
-  //   2. Add ECM fields to waterState
-  //   3. Add <div id="water-ecm-container"></div> to the Water HTML section
-  //   4. Call buildEcmCardGroup("water-ecm-container") at startup
-  //   5. Call renderEcm(waterState, gatewayState) from renderWater()
-  // ============================================================================
-
-  const ECM_TIER_STYLE = {
-    Critical:    { bg: "#ff3b30", color: "#fff" },
-    Cautious:    { bg: "#ff9f0a", color: "#000" },
-    Moderate:    { bg: "#0a84ff", color: "#fff" },
-    Comfortable: { bg: "#32d74b", color: "#000" },  // teal-ish green
-    Excellent:   { bg: "#30d158", color: "#000" },
-  };
-
-  const buildEcmCardGroup = (containerId) => {
-    const el = document.getElementById(containerId);
-    if (!el) return;
-    el.innerHTML = `
-      <div style="height:14px;"></div>
-
-      <!-- ECM Card 1: Status (hero, read-only) -->
-      <div class="card" id="ecmStatusCard">
-        <h2>Energy Comfort Model</h2>
-        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
-          <div style="display:flex;align-items:baseline;gap:6px;">
-            <span id="ecmValueHero" style="font-size:48px;font-weight:800;letter-spacing:-0.03em;line-height:1;">--</span>
-            <span style="font-size:18px;color:var(--muted);font-weight:600;">/ 20</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <span id="ecmTierBadge" style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:var(--panel-2);color:var(--muted);">—</span>
-            <span id="ecmAvailPill" class="pill">—</span>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:4px;" id="ecmLastUpdate">last update: —</div>
-      </div>
-
-      <div style="height:14px;"></div>
-
-      <!-- ECM Card 2: Controls (read/write) -->
-      <div class="card" id="ecmControlCard">
-        <h2>ECM Controls</h2>
-        <div class="row">
-          <div class="label">ECM enabled</div>
-          <label class="switch"><input type="checkbox" id="sw-ecm_enable"/><span class="slider"></span></label>
-        </div>
-        <div id="ecmControlsBody">
-          <div class="row" style="margin-top:10px;">
-            <div class="label">
-              Pump threshold
-              <span class="pill" style="font-size:11px;margin-left:6px;" title="Pump only runs when ECM ≥ this value">pump runs when ECM ≥ this</span>
-            </div>
-            <div class="num">
-              <button data-step="-1" data-pool-for="pump_ecm_threshold" type="button">−</button>
-              <input type="number" id="input-pump_ecm_threshold" step="1" min="0" max="20" />
-              <button data-step="1" data-pool-for="pump_ecm_threshold" type="button">+</button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="label">
-              Heater threshold
-              <span class="pill" style="font-size:11px;margin-left:6px;" title="Heater only runs when ECM ≥ this value">heater runs when ECM ≥ this</span>
-            </div>
-            <div class="num">
-              <button data-step="-1" data-pool-for="heater_ecm_threshold" type="button">−</button>
-              <input type="number" id="input-heater_ecm_threshold" step="1" min="0" max="20" />
-              <button data-step="1" data-pool-for="heater_ecm_threshold" type="button">+</button>
-            </div>
-          </div>
-          <!-- Advanced settings — collapsed by default -->
-          <div style="margin-top:12px;">
-            <button type="button" id="ecmAdvancedToggle" style="background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:0;">▶ Advanced settings</button>
-          </div>
-          <div id="ecmAdvancedBody" style="display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:10px;">
-            <div class="row">
-              <div class="label">Hysteresis <span class="muted">(0–5)</span></div>
-              <div class="num">
-                <button data-step="-1" data-pool-for="ecm_hysteresis" type="button">−</button>
-                <input type="number" id="input-ecm_hysteresis" step="1" min="0" max="5" />
-                <button data-step="1" data-pool-for="ecm_hysteresis" type="button">+</button>
-              </div>
-            </div>
-            <div class="row">
-              <div class="label">Pump min runtime</div>
-              <div class="num">
-                <button data-step="-5" data-pool-for="pump_ecm_min_runtime_min" type="button">−</button>
-                <input type="number" id="input-pump_ecm_min_runtime_min" step="5" min="0" max="120" />
-                <button data-step="5" data-pool-for="pump_ecm_min_runtime_min" type="button">+</button>
-                <span class="unit">min</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="label">Heater min runtime</div>
-              <div class="num">
-                <button data-step="-5" data-pool-for="heater_ecm_min_runtime_min" type="button">−</button>
-                <input type="number" id="input-heater_ecm_min_runtime_min" step="5" min="0" max="120" />
-                <button data-step="5" data-pool-for="heater_ecm_min_runtime_min" type="button">+</button>
-                <span class="unit">min</span>
-              </div>
-            </div>
-            <div class="row">
-              <div class="label">Stale timeout</div>
-              <div class="num">
-                <button data-step="-5" data-pool-for="ecm_stale_timeout_min" type="button">−</button>
-                <input type="number" id="input-ecm_stale_timeout_min" step="5" min="1" max="60" />
-                <button data-step="5" data-pool-for="ecm_stale_timeout_min" type="button">+</button>
-                <span class="unit">min</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style="height:14px;"></div>
-
-      <!-- ECM Card 3: Live Decision (read-only, trust/debug) -->
-      <div class="card" id="ecmDecisionCard">
-        <h2>Live ECM Decision</h2>
-        <div class="row">
-          <div class="label">Pump</div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span id="ecmPumpIcon" style="font-size:16px;">—</span>
-            <span id="ecmPumpReason" style="font-size:13px;color:var(--muted);">—</span>
-          </div>
-        </div>
-        <div class="row">
-          <div class="label">Heater</div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span id="ecmHeaterIcon" style="font-size:16px;">—</span>
-            <span id="ecmHeaterReason" style="font-size:13px;color:var(--muted);">—</span>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Wire up advanced toggle
-    document.getElementById("ecmAdvancedToggle").addEventListener("click", function() {
-      const body = document.getElementById("ecmAdvancedBody");
-      const open = body.style.display !== "none";
-      body.style.display = open ? "none" : "";
-      this.textContent = (open ? "▶" : "▼") + " Advanced settings";
-    });
-  };
-
-  const renderEcm = (s, gwState) => {
-    const enabled   = !!s.switches.ecm_enable;
-    const available = !!s.binary.ecm_available;
-    const val       = s.sensors.ecm_value;
-
-    // ── Card 1: Status ──────────────────────────────────────────────────────
-    const heroEl = document.getElementById("ecmValueHero");
-    const tierEl = document.getElementById("ecmTierBadge");
-    const availEl = document.getElementById("ecmAvailPill");
-    const updateEl = document.getElementById("ecmLastUpdate");
-    const statusCard = document.getElementById("ecmStatusCard");
-
-    if (heroEl) {
-      heroEl.textContent = (!enabled || val === null) ? "--" : Math.round(val);
-      heroEl.style.color = !enabled ? "var(--muted)" : "var(--text)";
-    }
-
-    // Tier badge — from gateway state
-    if (tierEl) {
-      const tier = (gwState.texts.si_surplus_tier || "").trim();
-      const style = ECM_TIER_STYLE[tier];
-      if (style && enabled) {
-        tierEl.textContent = tier;
-        tierEl.style.background = style.bg;
-        tierEl.style.color = style.color;
-      } else {
-        tierEl.textContent = tier || "—";
-        tierEl.style.background = "var(--panel-2)";
-        tierEl.style.color = "var(--muted)";
-      }
-    }
-
-    // Availability pill
-    if (availEl) {
-      if (!enabled) {
-        availEl.textContent = "off";
-        availEl.className = "pill";
-      } else if (available) {
-        availEl.textContent = "✓ live";
-        availEl.className = "pill on";
-      } else {
-        availEl.textContent = "⚠ stale";
-        availEl.className = "pill warn";
-      }
-    }
-
-    // Last update age
-    if (updateEl) {
-      if (_ecmValueLastTs === null || !enabled) {
-        updateEl.textContent = "last update: —";
-      } else {
-        const secs = Math.round((Date.now() - _ecmValueLastTs) / 1000);
-        updateEl.textContent = secs < 60
-          ? `last update: ${secs}s ago`
-          : `last update: ${Math.round(secs / 60)}m ago`;
-      }
-    }
-
-    // Greyscale the whole status card when ECM is disabled
-    if (statusCard) {
-      statusCard.style.opacity  = enabled ? "1" : "0.55";
-      statusCard.style.filter   = enabled ? "none" : "grayscale(1)";
-    }
-
-    // ── Card 2: Controls ────────────────────────────────────────────────────
-    // The switch checkbox is handled by the generic renderPool switch loop.
-    // Dim the threshold controls when ECM is disabled so intent is clear.
-    const ctrlBody = document.getElementById("ecmControlsBody");
-    if (ctrlBody) ctrlBody.style.opacity = enabled ? "1" : "0.45";
-
-    // ── Card 3: Live Decision ───────────────────────────────────────────────
-    const pumpIcon   = document.getElementById("ecmPumpIcon");
-    const pumpReason = document.getElementById("ecmPumpReason");
-    const heatIcon   = document.getElementById("ecmHeaterIcon");
-    const heatReason = document.getElementById("ecmHeaterReason");
-
-    if (pumpIcon && pumpReason) {
-      const reason = s.texts.ecm_pump_reason || "";
-      const running = !!s.switches.pump;
-      pumpIcon.textContent   = !enabled ? "—" : (running ? "✅" : "⏸");
-      pumpReason.textContent = !enabled ? "ECM disabled" : (reason || "—");
-    }
-    if (heatIcon && heatReason) {
-      const reason = s.texts.ecm_heater_reason || "";
-      const running = !!s.switches.heat_pump;
-      heatIcon.textContent   = !enabled ? "—" : (running ? "✅" : "⏸");
-      heatReason.textContent = !enabled ? "ECM disabled" : (reason || "—");
-    }
-  };
-
-  // Refresh the "last update Xs ago" label every second (cheap DOM tick)
-  setInterval(() => {
-    const el = document.getElementById("ecmLastUpdate");
-    if (!el || !poolState.switches.ecm_enable || _ecmValueLastTs === null) return;
-    const secs = Math.round((Date.now() - _ecmValueLastTs) / 1000);
-    el.textContent = secs < 60
-      ? `last update: ${secs}s ago`
-      : `last update: ${Math.round(secs / 60)}m ago`;
-  }, 1000);
-
   const makeMqttModule = ({ name, broker, username, password, prefix, entities, state, render }) => {
     let client = null;
     let connected = false;
@@ -2222,20 +1966,6 @@
     maintenance_remaining:   { kind: "sensor",        name: "Maintenance Mode Remaining",  mqttId: "maintenance_mode_remaining" },
     dry_run_tripped:         { kind: "binary_sensor", name: "Dry Run Tripped",           mqttId: "dry_run_tripped" },
     dry_run_reset:           { kind: "button",        name: "Dry Run Reset",             mqttId: "dry_run_reset" },
-    // ---- ECM (Energy Comfort Model) — 11 entities added 2026-05-29 ----
-    // Slugs confirmed from live broker subscribe log. Note: ESPHome publishes
-    // text_sensor values under sensor/ prefix — makeMqttModule handles this.
-    ecm_enable:               { kind: "switch",        name: "ECM Enable",                 mqttId: "ecm_enable" },
-    ecm_value:                { kind: "sensor",        name: "ECM Value",                  mqttId: "ecm_value",                tier: "fast" },
-    ecm_available:            { kind: "binary_sensor", name: "ECM Available",              mqttId: "ecm_available" },
-    ecm_pump_reason:          { kind: "text_sensor",   name: "ECM Pump Reason",            mqttId: "ecm_pump_reason" },
-    ecm_heater_reason:        { kind: "text_sensor",   name: "ECM Heater Reason",          mqttId: "ecm_heater_reason" },
-    pump_ecm_threshold:       { kind: "number",        name: "Pool Pump ECM Threshold",    mqttId: "pool_pump_ecm_threshold" },
-    heater_ecm_threshold:     { kind: "number",        name: "Pool Heater ECM Threshold",  mqttId: "pool_heater_ecm_threshold" },
-    ecm_hysteresis:           { kind: "number",        name: "ECM Hysteresis",             mqttId: "ecm_hysteresis" },
-    pump_ecm_min_runtime_min: { kind: "number",        name: "Pump ECM Min Runtime",       mqttId: "pump_ecm_min_runtime" },
-    heater_ecm_min_runtime_min: { kind: "number",      name: "Heater ECM Min Runtime",     mqttId: "heater_ecm_min_runtime" },
-    ecm_stale_timeout_min:    { kind: "number",        name: "ECM Stale Timeout",          mqttId: "ecm_stale_timeout" },
   };
 
   const poolState = {
@@ -2243,33 +1973,22 @@
       pump:false, light:false, heat_pump:false, hp_enable:false, pump_timer_enable:false,
       dry_run_enable:true,
       maintenance_mode:false,
-      ecm_enable:false,
     },
     numbers:  {
       target_temp:null, pump_start:null, pump_stop:null, pump2_start:null, pump2_stop:null,
       filter_clean_threshold:null,
       dry_run_grace_seconds:null,
-      pump_ecm_threshold:null, heater_ecm_threshold:null,
-      ecm_hysteresis:null,
-      pump_ecm_min_runtime_min:null, heater_ecm_min_runtime_min:null,
-      ecm_stale_timeout_min:null,
     },
     sensors:  {
       pool_temp:null,
       pool_meter_current:null, pool_meter_power:null,
       pool_meter_voltage:null, pool_meter_pf:null,
       maintenance_remaining:null,
-      ecm_value:null,
     },
-    binary:   { filter_needs_attention:false, dry_run_tripped:false, maintenance_active:false, ecm_available:false },
-    texts:    { filter_status:"", ecm_pump_reason:"", ecm_heater_reason:"" },
+    binary:   { filter_needs_attention:false, dry_run_tripped:false, maintenance_active:false },
+    texts:    { filter_status:"" },
     selects:  {},
   };
-
-  // ECM "last update" timestamp — updated whenever ecm_value changes.
-  // Used by renderEcm to show "last update Xs ago".
-  let _ecmPrevValue   = null;
-  let _ecmValueLastTs = null;
 
   const poolCurrentMode = () => {
     if (poolState.switches.pump_timer_enable) return "auto";
@@ -2552,13 +2271,6 @@
       // Subtle outline when active so the whole card reads as "live"
       maintCard.style.outline = maintActive ? "2px solid var(--warn)" : "none";
     }
-
-    // ECM — update last-seen timestamp when value changes, then render
-    if (s.sensors.ecm_value !== null && s.sensors.ecm_value !== _ecmPrevValue) {
-      _ecmValueLastTs = Date.now();
-      _ecmPrevValue   = s.sensors.ecm_value;
-    }
-    renderEcm(s, gatewayState);
 
     renderPumpMode();
   };
@@ -2921,13 +2633,6 @@
     toggle_system_timer:   { kind: "switch", name: "Use Timer",       mqttId: "inverter_toggle_system_timer" },
     // ---- Grid charge current setpoint (amps) ----
     grid_charge_amps:  { kind: "number", name: "Grid Charge Amps", mqttId: "inverter_grid_charge_battery_current" },
-    // ---- ECM (Energy Comfort Model) — consumed by Pool tab hero ----
-    // Published by the Gateway firmware; the pool device subscribes to these
-    // directly via mqtt_client->subscribe(). The dashboard reads them here so
-    // the Pool ECM Status card can show the tier badge without a second broker
-    // connection. slugs confirmed live on broker 2026-05-29.
-    si_surplus_scale:  { kind: "sensor",      name: "SI Surplus Scale", mqttId: "si_surplus_scale", tier: "fast" },
-    si_surplus_tier:   { kind: "text_sensor", name: "SI Surplus Tier",  mqttId: "si_surplus_tier",  tier: "fast" },
   };
 
   const gatewayState = {
@@ -2946,10 +2651,9 @@
       pv_power: null, battery_power: null, grid_power: null, load_power: null,
       battery_soc: null,
       pv_today: null, grid_import_today: null, load_today: null,
-      si_surplus_scale: null,
     },
     binary: {},
-    texts:  { si_surplus_tier: "" },
+    texts:  {},
     selects: {
       energy_pattern: "",
       work_mode:      "",
@@ -3418,15 +3122,6 @@
   bindPoolSwitch("dry_run_enable");
   bindPoolSwitch("maintenance_mode");
   bindPoolNumber("dry_run_grace_seconds");
-  // ECM bindings
-  buildEcmCardGroup("pool-ecm-container");
-  bindPoolSwitch("ecm_enable");
-  bindPoolNumber("pump_ecm_threshold");
-  bindPoolNumber("heater_ecm_threshold");
-  bindPoolNumber("ecm_hysteresis");
-  bindPoolNumber("pump_ecm_min_runtime_min");
-  bindPoolNumber("heater_ecm_min_runtime_min");
-  bindPoolNumber("ecm_stale_timeout_min");
   bindPoolButton("dry_run_reset", "btnDryRunReset",
     "Reset the dry-run trip? Make sure you've fixed the cause first (lost prime, suction leak, drained pool).");
   bindPoolStepButtons();
