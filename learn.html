@@ -78,15 +78,16 @@
         </h2>
         <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">
           SI Gateway is a compact RS485-to-Wi-Fi bridge that sits in your distribution board or
-          next to the inverter. It reads live Modbus data from your Sunsynk inverter and publishes it
-          to the MQTT broker — giving every connected SI device and the dashboard real-time solar,
-          battery, grid and load data without any cloud dependency.
+          next to the inverter. It reads live Modbus data from your Sunsynk inverter, calculates
+          the ECM score, and exposes it via a <strong style="color:var(--text);">local HTTP endpoint</strong>.
+          Every connected SI device polls that endpoint directly — no broker, no cloud, no subscription
+          required for device intelligence.
         </p>
         <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;">
-          SI Gateway also hosts the <strong style="color:var(--text);">ECM (Energy Comfort Model)</strong> —
-          a derived score that combines solar surplus, battery state, grid dependence and load demand
-          into a single live number that tells you how energetically comfortable your property is
-          right now.
+          The <strong style="color:var(--text);">ECM (Energy Comfort Model)</strong> combines solar surplus,
+          battery state, grid dependence and load demand into a single live score — the shared energy
+          language that every SI device speaks. MQTT is available for the dashboard and Home Assistant,
+          but SI devices use HTTP and work completely independently of any broker.
         </p>
 
         <!-- Features -->
@@ -97,7 +98,7 @@
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
-            <div><strong style="font-size:13px;">ECM Score</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">A live 0–20 energy comfort score published to MQTT — every connected SI device reads it and makes its own decisions. No manual rules needed.</p></div>
+            <div><strong style="font-size:13px;">ECM Score — via local HTTP</strong><p style="font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5;">A live 0–20 energy comfort score exposed on a local HTTP endpoint. SI devices poll it directly — no broker dependency. MQTT publishes the same data for the dashboard and Home Assistant.</p></div>
           </div>
           <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);">
             <span style="color:var(--gateway);font-size:15px;flex-shrink:0;">✦</span>
@@ -278,8 +279,8 @@
       SI isn't competing with automation platforms — it's a different architecture entirely. Here's what that means in practice.
     </p>
 
-    <div style="overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+    <div class="table-scroll">
+      <table style="width:100%;min-width:560px;border-collapse:collapse;font-size:14px;">
         <thead>
           <tr style="border-bottom:2px solid var(--line);">
             <th style="text-align:left;padding:12px 16px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);width:35%;">Capability</th>
@@ -337,6 +338,11 @@
             <td style="padding:14px 16px;color:var(--text);font-weight:500;">Purpose-built for SA conditions</td>
             <td style="padding:14px 16px;text-align:center;color:var(--gateway);font-weight:600;">✓ Load shedding, local grid realities</td>
             <td style="padding:14px 16px;text-align:center;color:var(--muted);">Generic global platform</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--line);background:rgba(255,255,255,0.02);">
+            <td style="padding:14px 16px;color:var(--text);font-weight:500;">How devices get energy data</td>
+            <td style="padding:14px 16px;text-align:center;color:var(--gateway);font-weight:600;">✓ Local HTTP — no broker required</td>
+            <td style="padding:14px 16px;text-align:center;color:var(--muted);">MQTT or cloud API</td>
           </tr>
           <tr style="border-bottom:1px solid var(--line);">
             <td style="padding:14px 16px;color:var(--text);font-weight:500;">Home Assistant compatible</td>

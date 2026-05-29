@@ -614,6 +614,8 @@ footer {
   /* Stop horizontal scroll caused by overflowing content */
   html, body { overflow-x: hidden; }
   .wrap { overflow-x: hidden; }
+  /* Exception: table scroll wrappers must be able to scroll horizontally */
+  .wrap .table-scroll { overflow-x: auto; }
 
   /* ── Collapse ALL two-column inline grids to single column ── */
   /* These selectors target inline style attributes so !important is required */
