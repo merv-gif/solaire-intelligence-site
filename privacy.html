@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Solaire Intelligence</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #09090b;
+      color: #a1a1aa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 0 1rem 4rem;
+    }
+
+    header {
+      border-bottom: 1px solid #27272a;
+      padding: 1.25rem 0;
+      margin-bottom: 3rem;
+    }
+
+    .header-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-sun { font-size: 1.4rem; color: #f59e0b; }
+
+    .logo-text {
+      font-weight: 600;
+      color: #f4f4f5;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f4f4f5;
+      margin-bottom: 0.4rem;
+    }
+
+    .meta {
+      font-size: 0.8rem;
+      color: #52525b;
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e4e4e7;
+      margin: 2.25rem 0 0.6rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #27272a;
+    }
+
+    p { margin-bottom: 0.9rem; }
+
+    ul {
+      margin: 0.4rem 0 0.9rem 1.4rem;
+    }
+
+    ul li { margin-bottom: 0.35rem; }
+
+    a { color: #f59e0b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .highlight {
+      background: #f59e0b12;
+      border: 1px solid #f59e0b30;
+      border-radius: 0.6rem;
+      padding: 0.9rem 1.1rem;
+      margin: 1.25rem 0;
+      color: #d4d4d8;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      max-width: 720px;
+      margin: 3rem auto 0;
+      border-top: 1px solid #27272a;
+      padding-top: 1.5rem;
+      font-size: 0.8rem;
+      color: #52525b;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <span class="logo-sun">☀</span>
+      <a href="https://solaire-intelligence.co.za" class="logo-text">Solaire Intelligence</a>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <h1>Privacy Policy</h1>
+    <p class="meta">Effective date: 30 May 2026 &nbsp;·&nbsp; Solaire Intelligence (Pty) Ltd &nbsp;·&nbsp; South Africa</p>
+
+    <div class="highlight">
+      We do not sell, rent, or trade your personal information. We do not run advertising. The data we collect exists solely to operate the SI Portal and deliver the service to you.
+    </div>
+
+    <h2>1. Who We Are</h2>
+    <p>Solaire Intelligence provides hardware devices and a cloud-connected portal ("SI Portal") for monitoring and managing solar energy systems. This policy explains what data we collect, why we collect it, and how it is handled.</p>
+    <p>Contact: <a href="mailto:support@solaire-intelligence.co.za">support@solaire-intelligence.co.za</a></p>
+
+    <h2>2. Data We Collect</h2>
+
+    <p><strong style="color:#e4e4e7">Account data</strong></p>
+    <ul>
+      <li>Your email address and full name, provided when you create an account.</li>
+      <li>Your account role (client or installer).</li>
+      <li>Authentication tokens managed by our identity provider (Supabase Auth).</li>
+    </ul>
+
+    <p><strong style="color:#e4e4e7">Device &amp; telemetry data</strong></p>
+    <ul>
+      <li>The Client ID printed on your SI hardware device.</li>
+      <li>Live sensor readings published by your device — including inverter power, battery state-of-charge, pool temperature, pump status, energy counters, and derived metrics such as the Energy Comfort Model (ECM) score.</li>
+      <li>Device configuration values you set through the portal (e.g. temperature targets, pump schedules, ECM thresholds, electricity tariff).</li>
+    </ul>
+
+    <p><strong style="color:#e4e4e7">Notification data</strong></p>
+    <ul>
+      <li>If you grant permission, a push notification token for your device is stored to deliver alerts about your system.</li>
+    </ul>
+
+    <p><strong style="color:#e4e4e7">Usage data</strong></p>
+    <ul>
+      <li>Standard web server logs (IP address, browser type, pages visited). These are retained for up to 30 days for security and debugging purposes and are not linked to your account.</li>
+    </ul>
+
+    <h2>3. How We Use Your Data</h2>
+    <ul>
+      <li>To authenticate you and display your linked devices in the portal.</li>
+      <li>To relay live telemetry from your SI device to the portal over our MQTT broker.</li>
+      <li>To send push notifications about your system (only if you have opted in).</li>
+      <li>To allow you to share device access with other registered users (e.g. family members or a servicing installer).</li>
+      <li>To calculate and display cost and savings estimates based on the tariff you configure.</li>
+      <li>To diagnose faults, improve the firmware, and provide customer support.</li>
+    </ul>
+
+    <h2>4. Data Storage &amp; Security</h2>
+    <p>Account data is stored in a Supabase database hosted on infrastructure within the European Union. Telemetry data is transmitted over TLS-encrypted MQTT (port 8883) to our broker at <code style="color:#d4d4d8;background:#18181b;padding:1px 4px;border-radius:3px">mqtt.solaire-intelligence.co.za</code>. Row-level security policies ensure that each user can only access data belonging to their own devices or devices explicitly shared with them.</p>
+    <p>We apply reasonable technical and organisational measures to protect your data. No method of electronic storage or transmission is 100% secure; we cannot guarantee absolute security.</p>
+
+    <h2>5. Data Sharing</h2>
+    <p>We do not sell or share your personal data with third parties for marketing or advertising purposes. We may share data with:</p>
+    <ul>
+      <li><strong style="color:#e4e4e7">Service providers</strong> — Supabase (database &amp; auth), and cloud infrastructure providers — under data processing agreements that restrict them to acting on our instructions.</li>
+      <li><strong style="color:#e4e4e7">Installers you authorise</strong> — if you share access to a device with an installer, they can view that device's telemetry through their own portal account.</li>
+      <li><strong style="color:#e4e4e7">Legal obligations</strong> — if required by South African law or a valid court order.</li>
+    </ul>
+
+    <h2>6. Data Retention</h2>
+    <p>Account and device data is retained for as long as your account is active. Live telemetry is passed through the MQTT broker in real time and is not stored at the broker layer beyond the current session. If you close your account, we will delete your personal data within 30 days, except where retention is required by law.</p>
+
+    <h2>7. Your Rights (POPIA)</h2>
+    <p>Under the Protection of Personal Information Act (POPIA), you have the right to:</p>
+    <ul>
+      <li>Request access to the personal information we hold about you.</li>
+      <li>Request correction of inaccurate information.</li>
+      <li>Request deletion of your account and associated data.</li>
+      <li>Withdraw consent for push notifications at any time through your device settings.</li>
+      <li>Lodge a complaint with the Information Regulator of South Africa (<a href="https://www.justice.gov.za/inforeg/" target="_blank" rel="noopener">justice.gov.za/inforeg</a>).</li>
+    </ul>
+    <p>To exercise any of these rights, email <a href="mailto:support@solaire-intelligence.co.za">support@solaire-intelligence.co.za</a>.</p>
+
+    <h2>8. Children</h2>
+    <p>The SI Portal is not directed at children under the age of 18. We do not knowingly collect personal information from minors.</p>
+
+    <h2>9. Changes to This Policy</h2>
+    <p>We may update this policy from time to time. When we do, we will update the effective date at the top. Material changes will be communicated via email or an in-app notice. Continued use of the portal after any change constitutes acceptance of the updated policy.</p>
+
+    <h2>10. Contact</h2>
+    <p>If you have questions about this policy or how your data is handled, please contact us at <a href="mailto:support@solaire-intelligence.co.za">support@solaire-intelligence.co.za</a>.</p>
+
+  </div>
+
+  <footer>
+    <p>© 2026 Solaire Intelligence (Pty) Ltd · South Africa · <a href="https://solaire-intelligence.co.za">solaire-intelligence.co.za</a></p>
+  </footer>
+
+</body>
+</html>
