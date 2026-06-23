@@ -1,5 +1,5 @@
-let getStore;
-try { getStore = require('@netlify/blobs').getStore; } catch { getStore = null; }
+// Stock management — backed by Upstash Redis REST API
+// Env vars required: UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN
 
 const PRODUCTS = ['SI Gateway', 'SI Switch', 'SI Water', 'SI Pool'];
 
@@ -16,20 +16,53 @@ function getStatus(item) {
   return 'in';
 }
 
-exports.handler = async function (event) {
-  const store = getStore ? getStore('stock') : null;
+// ── Upstash helpers ───────────────────────────────────────────────────────────
+async function kvGet(key) {
+  const url  = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
 
-  // ── GET: return current stock (public) ────────────────────────────────────
+  const res = await fetch(`${url}/get/${encodeURIComponent(key)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return null;
+  const { result } = await res.json();
+  return result ? JSON.parse(result) : null;
+}
+
+async function kvSet(key, value) {
+  const url  = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) throw new Error('Upstash env vars not configured');
+
+  const res = await fetch(`${url}/set/${encodeURIComponent(key)}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(JSON.stringify(value)), // Upstash expects the value as a JSON string
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Upstash error ${res.status}: ${text}`);
+  }
+  const { result } = await res.json();
+  if (result !== 'OK') throw new Error(`Upstash SET returned: ${result}`);
+}
+
+// ── Handler ───────────────────────────────────────────────────────────────────
+exports.handler = async function (event) {
+
+  // ── GET: return current stock (public) ──────────────────────────────────────
   if (event.httpMethod === 'GET') {
     const result = {};
     for (const product of PRODUCTS) {
       let entry = { ...DEFAULTS[product] };
       try {
-        if (store) {
-          const raw = await store.get(product, { type: 'json' });
-          if (raw) entry = raw;
-        }
-      } catch { /* blobs unavailable — use defaults */ }
+        const stored = await kvGet(`stock:${product}`);
+        if (stored) entry = stored;
+      } catch { /* fall back to defaults */ }
       result[product] = { ...entry, status: getStatus(entry) };
     }
     return {
@@ -39,7 +72,7 @@ exports.handler = async function (event) {
     };
   }
 
-  // ── POST: update stock (admin only) ───────────────────────────────────────
+  // ── POST: update stock (admin only) ─────────────────────────────────────────
   if (event.httpMethod === 'POST') {
     let body;
     try { body = JSON.parse(event.body); } catch {
@@ -48,7 +81,7 @@ exports.handler = async function (event) {
 
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (!adminPassword || body.password !== adminPassword) {
-      return { statusCode: 401, body: JSON.stringify({ error: 'Unauthorised' }) };
+      return { statusCode: 401, body: JSON.stringify({ error: 'Wrong password' }) };
     }
 
     const { product, stock, threshold, lead_time } = body;
@@ -61,21 +94,15 @@ exports.handler = async function (event) {
       threshold: parseInt(threshold, 10),
       lead_time: lead_time || '3–5 business days',
     };
-    if (!store) {
-      return { statusCode: 503, body: JSON.stringify({ error: 'Storage not available — redeploy the site then try again' }) };
-    }
 
     try {
-      await Promise.race([
-        store.set(product, JSON.stringify(entry)),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Blobs write timed out after 8s')), 8000)),
-      ]);
-    } catch (writeErr) {
-      console.error('Blobs write error:', writeErr.message);
+      await kvSet(`stock:${product}`, entry);
+    } catch (err) {
+      console.error('kvSet error:', err.message);
       return {
         statusCode: 500,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: writeErr.message }),
+        body: JSON.stringify({ error: err.message }),
       };
     }
 
