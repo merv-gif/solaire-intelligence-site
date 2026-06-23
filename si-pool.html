@@ -36,6 +36,9 @@
       <li><a href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a></li>
     </ul>
     <div class="nav-spacer"></div>
+    <a href="cart.html" id="navCartBtn" style="position:relative;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:var(--panel);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--text);text-decoration:none;" aria-label="Cart">
+      🛒 Cart <span id="navBadge" style="display:none;align-items:center;justify-content:center;background:var(--pool);color:#041425;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;padding:0 4px;"></span>
+    </a>
     <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
     <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
   </div>
@@ -306,10 +309,13 @@
             <span style="font-size:14px;">ℹ</span> Wall-mounted installation by your electrician
           </li>
         </ul>
-        <button onclick="openModal()"
-           style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--pool),var(--pool-2));color:#041425;font-size:16px;font-weight:800;padding:16px 32px;border-radius:var(--radius);border:none;cursor:pointer;letter-spacing:-0.01em;">
-          Buy Now &nbsp;→
-        </button>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <button onclick="addToCart('SI Pool')"
+             style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--pool),var(--pool-2));color:#041425;font-size:16px;font-weight:800;padding:16px 32px;border-radius:var(--radius);border:none;cursor:pointer;letter-spacing:-0.01em;">
+            Add to Cart &nbsp;→
+          </button>
+          <button onclick="openModal()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;padding:4px;">Buy directly</button>
+        </div>
         <p style="font-size:12px;color:var(--muted);margin-top:12px;">Secured by Yoco · Card &amp; instant EFT accepted</p>
         <p style="font-size:12px;color:var(--muted);margin-top:4px;">Enter delivery details, then pay securely via Yoco.</p>
       </div>
@@ -467,6 +473,45 @@
       alert('Something went wrong. Please try again.');
     }
   });
+
+  // ── Cart helpers ─────────────────────────────────────────────────────────
+  const CART_PRICES = { 'SI Gateway': 165000, 'SI Switch': 135000, 'SI Water': 465000, 'SI Pool': 720000 };
+  const CART_COLORS = { 'SI Gateway': 'var(--gateway)', 'SI Switch': 'var(--switch)', 'SI Water': 'var(--water)', 'SI Pool': 'var(--pool)' };
+
+  function getCart() { try { return JSON.parse(localStorage.getItem('si-cart') || '{}'); } catch { return {}; } }
+  function saveCart(c) { localStorage.setItem('si-cart', JSON.stringify(c)); }
+
+  function updateCartBadge() {
+    const cart = getCart();
+    const count = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('navBadge');
+    if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'flex' : 'none'; }
+  }
+
+  function addToCart(product) {
+    const cart = getCart();
+    if (cart[product]) { cart[product].qty++; }
+    else { cart[product] = { price: CART_PRICES[product], color: CART_COLORS[product], label: product + ' Kit', qty: 1 }; }
+    saveCart(cart);
+    updateCartBadge();
+    showCartToast(product);
+  }
+
+  function showCartToast(product) {
+    let t = document.getElementById('cartToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'cartToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:14px;font-weight:600;color:var(--text);z-index:9999;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,0.4);transition:opacity .3s;';
+      document.body.appendChild(t);
+    }
+    t.innerHTML = `✓ ${product} added &nbsp;<a href="cart.html" style="color:var(--pool);font-weight:800;text-decoration:none;">View Cart →</a>`;
+    t.style.opacity = '1';
+    clearTimeout(t._hide);
+    t._hide = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+  }
+
+  updateCartBadge();
 </script>
 </body>
 </html>

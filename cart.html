@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cart — Solaire Intelligence</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .cart-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+    .cart-grid { display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start; }
+    @media (max-width: 700px) { .cart-grid { grid-template-columns: 1fr; } }
+
+    .cart-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px; background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; margin-bottom: 12px;
+    }
+    .cart-item-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .cart-item-name { flex: 1; font-size: 15px; font-weight: 700; color: var(--text); }
+    .cart-item-price { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); min-width: 70px; text-align: right; }
+    .qty-ctrl { display: flex; align-items: center; gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .qty-btn { background: var(--panel-2); border: none; color: var(--text); width: 32px; height: 32px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+    .qty-btn:hover { background: var(--line); }
+    .qty-num { width: 36px; text-align: center; font-size: 14px; font-weight: 700; color: var(--text); background: var(--bg); border: none; outline: none; pointer-events: none; }
+    .remove-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 6px; transition: color .15s; }
+    .remove-btn:hover { color: #f87171; }
+
+    .cart-empty { text-align: center; padding: 80px 20px; color: var(--muted); }
+    .cart-empty h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+
+    .summary-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px; position: sticky; top: 84px; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+    .summary-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; color: var(--text); padding-top: 14px; border-top: 1px solid var(--line); margin-top: 6px; }
+    .summary-total span:last-child { font-family: var(--mono); color: var(--accent); }
+
+    .checkout-btn {
+      width: 100%; margin-top: 20px; padding: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #041425; font-size: 15px; font-weight: 800; border: none;
+      border-radius: 10px; cursor: pointer; letter-spacing: -0.01em;
+      transition: opacity .15s;
+    }
+    .checkout-btn:hover { opacity: 0.88; }
+    .checkout-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .form-section { margin-top: 24px; display: none; }
+    .form-section.visible { display: block; }
+    .form-section h3 { font-size: 16px; font-weight: 800; margin-bottom: 16px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .form-field { margin-bottom: 14px; }
+    .form-field label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 6px; }
+    .form-field input, .form-field select {
+      width: 100%; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px;
+      box-sizing: border-box; font-family: var(--sans);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .nav-cart-link {
+      position: relative; display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: var(--radius-sm);
+      background: var(--panel); border: 1px solid var(--line);
+      font-size: 13px; font-weight: 600; color: var(--text);
+      text-decoration: none; transition: border-color .15s;
+    }
+    .nav-cart-link:hover { border-color: var(--accent); text-decoration: none; }
+    .cart-badge {
+      display: none; align-items: center; justify-content: center;
+      background: var(--accent); color: #041425;
+      font-size: 10px; font-weight: 800; min-width: 18px; height: 18px;
+      border-radius: 9px; padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-switch.html"><span class="dd-dot" style="background:var(--switch)"></span>SI Switch</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="ecm.html">ECM</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cart-link" href="cart.html">
+      🛒 Cart <span class="cart-badge" id="navBadge">0</span>
+    </a>
+    <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<div class="cart-wrap">
+  <h1 style="font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:32px;">Your Cart</h1>
+
+  <div id="cartEmpty" class="cart-empty" style="display:none;">
+    <h2>Your cart is empty</h2>
+    <p style="margin-bottom:28px;">Browse our products and add what you need.</p>
+    <a href="index.html" class="btn btn-primary">Browse products →</a>
+  </div>
+
+  <div id="cartContent" class="cart-grid">
+    <!-- Items -->
+    <div>
+      <div id="cartItems"></div>
+    </div>
+
+    <!-- Summary + checkout -->
+    <div class="summary-card">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:16px;">Order summary</h3>
+      <div id="summaryLines"></div>
+      <div class="summary-row"><span>Shipping</span><span style="color:var(--accent);font-weight:600;">Free</span></div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span id="summaryTotal">R0</span>
+      </div>
+
+      <button class="checkout-btn" id="checkoutBtn" onclick="showCheckout()">
+        Checkout →
+      </button>
+
+      <!-- Shipping form -->
+      <div class="form-section" id="checkoutForm">
+        <h3>Delivery details</h3>
+        <form id="orderForm">
+          <div class="form-field">
+            <label>Full name *</label>
+            <input name="name" required placeholder="Thabo Nkosi" />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Email *</label>
+              <input name="email" type="email" required placeholder="you@example.com" />
+            </div>
+            <div class="form-field">
+              <label>Phone *</label>
+              <input name="phone" type="tel" required placeholder="082 000 0000" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Street address *</label>
+            <input name="address" required placeholder="12 Solar Street, Sunridge" />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>City *</label>
+              <input name="city" required placeholder="Cape Town" />
+            </div>
+            <div class="form-field">
+              <label>Province *</label>
+              <select name="province" required>
+                <option value="" disabled selected>Select…</option>
+                <option>Western Cape</option><option>Gauteng</option><option>KwaZulu-Natal</option>
+                <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+                <option>North West</option><option>Free State</option><option>Northern Cape</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Postal code *</label>
+            <input name="postal_code" required placeholder="7500" maxlength="4" />
+          </div>
+          <button type="submit" class="checkout-btn" id="payBtn" style="margin-top:8px;">
+            Continue to payment →
+          </button>
+          <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">
+            Secured by Yoco · Card &amp; instant EFT accepted
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Netlify hidden forms for each product -->
+<form name="si-cart-order" netlify netlify-honeypot="bot-field" hidden>
+  <input name="bot-field" /><input name="items" /><input name="total" />
+  <input name="name" /><input name="email" /><input name="phone" />
+  <input name="address" /><input name="city" /><input name="province" /><input name="postal_code" />
+</form>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-switch.html">SI Switch</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="learn.html">Learning Centre</a></li>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="https://portal.solaire-intelligence.co.za/login">Portal Login</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span><a href="/privacy" style="color:var(--muted);text-decoration:none;">Privacy Policy</a> · solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  const PRODUCTS = {
+    'SI Gateway': { price: 165000, label: 'SI Gateway Kit',  color: 'var(--gateway)' },
+    'SI Switch':  { price: 135000, label: 'SI Switch Kit',   color: 'var(--switch)'  },
+    'SI Water':   { price: 465000, label: 'SI Water Kit',    color: 'var(--water)'   },
+    'SI Pool':    { price: 720000, label: 'SI Pool Kit',     color: 'var(--pool)'    },
+  };
+
+  function fmtPrice(cents) {
+    return 'R' + (cents / 100).toLocaleString('en-ZA', { minimumFractionDigits: 0 });
+  }
+
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('si-cart') || '{}'); } catch { return {}; }
+  }
+  function saveCart(c) { localStorage.setItem('si-cart', JSON.stringify(c)); }
+
+  function setQty(product, qty) {
+    const cart = getCart();
+    if (qty <= 0) { delete cart[product]; }
+    else { cart[product] = { ...PRODUCTS[product], qty }; }
+    saveCart(cart);
+    renderCart();
+  }
+
+  function renderCart() {
+    const cart = getCart();
+    const keys = Object.keys(cart);
+    const total = keys.reduce((s, k) => s + cart[k].price * cart[k].qty, 0);
+
+    // Nav badge
+    const count = keys.reduce((s, k) => s + cart[k].qty, 0);
+    const badge = document.getElementById('navBadge');
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'flex' : 'none';
+
+    if (keys.length === 0) {
+      document.getElementById('cartEmpty').style.display = 'block';
+      document.getElementById('cartContent').style.display = 'none';
+      return;
+    }
+    document.getElementById('cartEmpty').style.display = 'none';
+    document.getElementById('cartContent').style.display = 'grid';
+
+    // Items
+    document.getElementById('cartItems').innerHTML = keys.map(k => {
+      const item = cart[k];
+      const lineTotal = item.price * item.qty;
+      return `
+        <div class="cart-item">
+          <div class="cart-item-dot" style="background:${item.color}"></div>
+          <div class="cart-item-name">
+            ${item.label}
+            <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px;">${fmtPrice(item.price)} each</div>
+          </div>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="setQty('${k}', ${item.qty - 1})">−</button>
+            <span class="qty-num">${item.qty}</span>
+            <button class="qty-btn" onclick="setQty('${k}', ${item.qty + 1})">+</button>
+          </div>
+          <div class="cart-item-price">${fmtPrice(lineTotal)}</div>
+          <button class="remove-btn" onclick="setQty('${k}', 0)" title="Remove">✕</button>
+        </div>`;
+    }).join('');
+
+    // Summary
+    document.getElementById('summaryLines').innerHTML = keys.map(k => {
+      const item = cart[k];
+      return `<div class="summary-row"><span>${item.label} × ${item.qty}</span><span>${fmtPrice(item.price * item.qty)}</span></div>`;
+    }).join('');
+    document.getElementById('summaryTotal').querySelector('span:last-child').textContent = fmtPrice(total);
+  }
+
+  function showCheckout() {
+    const form = document.getElementById('checkoutForm');
+    form.classList.add('visible');
+    document.getElementById('checkoutBtn').style.display = 'none';
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('payBtn');
+    btn.textContent = 'Processing…';
+    btn.disabled = true;
+
+    const cart = getCart();
+    const fd = new FormData(this);
+    const items = Object.entries(cart).map(([product, item]) => ({ product, qty: item.qty }));
+
+    const payload = {
+      items,
+      name:        fd.get('name'),
+      email:       fd.get('email'),
+      phone:       fd.get('phone'),
+      address:     fd.get('address'),
+      city:        fd.get('city'),
+      province:    fd.get('province'),
+      postal_code: fd.get('postal_code'),
+    };
+
+    try {
+      const res  = await fetch('/.netlify/functions/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.redirectUrl) {
+        localStorage.removeItem('si-cart'); // clear cart after redirect
+        window.location.href = data.redirectUrl;
+      } else {
+        throw new Error(data.error || 'No redirect URL');
+      }
+    } catch (err) {
+      console.error(err);
+      btn.textContent = 'Continue to payment →';
+      btn.disabled = false;
+      alert('Something went wrong. Please try again.');
+    }
+  });
+
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  renderCart();
+</script>
+</body>
+</html>
