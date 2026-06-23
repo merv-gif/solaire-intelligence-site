@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SI Switch — Smart Energy Control · Solaire Intelligence</title>
+  <meta name="description" content="Turn any circuit into an intelligent solar load. SI Switch automatically runs your pool, geyser, heat pump or any load when solar energy is available — reducing grid consumption without lifting a finger." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-switch.html"><span class="dd-dot" style="background:var(--switch)"></span>SI Switch</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="ecm.html">ECM</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero hero-switch">
+  <div class="wrap">
+    <div style="margin-bottom:16px;">
+      <span class="chip chip-switch">SI Switch · Smart Energy Control</span>
+    </div>
+    <h1>Turn any circuit into<br><em style="color:var(--switch)">an intelligent solar load.</em></h1>
+    <p class="hero-sub">
+      SI Switch transforms ordinary electrical circuits into energy-aware devices that
+      automatically operate when solar is available — reducing grid consumption, protecting
+      battery reserves and improving the return on your solar investment. No appliance
+      replacement required. Retrofits into your existing installation.
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" style="background:linear-gradient(135deg,var(--switch),var(--switch-2));color:#0b1220;" href="index.html#contact">Talk to an installer</a>
+      <a class="btn btn-ghost" href="https://portal.solaire-intelligence.co.za/login">Portal Login →</a>
+    </div>
+
+    <!-- Hero: phone + stats side by side -->
+    <div style="margin-top:48px;display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap;">
+
+      <!-- Phone mockup -->
+      <div class="phone-frame" style="width:210px;flex-shrink:0;">
+        <img src="/screenshots/resized/switch-1.PNG" alt="SI Switch — live relay status and power draw"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+        <!-- Fallback inline mockup if screenshot not present -->
+        <div style="display:none;flex-direction:column;background:#0b1220;padding:20px 16px;gap:12px;min-height:380px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">⚡ SI SWITCH &nbsp;&nbsp; <span style="color:var(--switch);">● Live</span></div>
+          <div style="background:#162241;border:1px solid #1f2d51;border-radius:10px;padding:12px;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;">Operating Mode</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text);">🌡️ &nbsp;Heater Mode</div>
+          </div>
+          <div style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.35);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Relay</div>
+              <div style="font-family:var(--mono);font-size:22px;font-weight:800;color:#a78bfa;">ON</div>
+            </div>
+            <div style="width:36px;height:36px;border-radius:50%;border:2px solid #a78bfa;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#a78bfa;">ON</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="background:#162241;border:1px solid #1f2d51;border-radius:8px;padding:10px;">
+              <div style="font-size:8px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">⚡ Power</div>
+              <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);">2,421<span style="font-size:10px;color:var(--muted);margin-left:2px;">W</span></div>
+            </div>
+            <div style="background:#162241;border:1px solid #1f2d51;border-radius:8px;padding:10px;">
+              <div style="font-size:8px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">〜 Voltage</div>
+              <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);">241<span style="font-size:10px;color:var(--muted);margin-left:2px;">V</span></div>
+            </div>
+            <div style="background:#162241;border:1px solid #1f2d51;border-radius:8px;padding:10px;">
+              <div style="font-size:8px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">⌀ Current</div>
+              <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);">10.0<span style="font-size:10px;color:var(--muted);margin-left:2px;">A</span></div>
+            </div>
+            <div style="background:#162241;border:1px solid #1f2d51;border-radius:8px;padding:10px;">
+              <div style="font-size:8px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Today</div>
+              <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--switch);">3.80<span style="font-size:10px;color:var(--muted);margin-left:2px;">kWh</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live stats panel -->
+      <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:12px;padding-top:8px;">
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Live · Lounge Underfloor</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:var(--switch);box-shadow:0 0 6px var(--switch);"></div>
+            <span style="font-size:16px;font-weight:700;color:var(--switch);">Running</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);">Heater Mode · ECM auto</div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Power Draw</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--text);line-height:1;">2,421 <span style="font-size:14px;color:var(--muted);">W</span></div>
+          <div style="height:4px;background:var(--panel-2);border-radius:2px;margin-top:10px;overflow:hidden;">
+            <div style="height:100%;width:62%;background:var(--switch);border-radius:2px;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--muted);">
+            <span>241 V &nbsp;·&nbsp; 10.0 A</span><span>3.8 kWh today</span>
+          </div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">7-Day Consumption</div>
+          <div style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--switch);line-height:1;">16.08 <span style="font-size:14px;color:var(--muted);">kWh</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">Tracked · Solar served first</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Key benefits ────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">What SI Switch does</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:36px;">
+      More solar used. Less wasted. Less bought.
+    </h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">☀️</div>
+        <h3>Maximise Solar Self-Consumption</h3>
+        <p>Automatically runs loads when excess solar is available, reducing reliance on Eskom and improving the return on your solar investment. The load only runs when the energy is already there — no expensive grid top-ups required.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3>Lower Electricity Bills</h3>
+        <p>Uses available solar energy first. Every kWh consumed from surplus solar is a kWh that doesn't come from the grid — at your current municipal tariff rate. Across a pool pump, geyser or heat pump, that adds up fast.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Intelligent Energy Decisions</h3>
+        <p>Powered by the SI Energy Comfort Margin (ECM), the switch makes real-time decisions based on your solar production, battery status, household demand and grid conditions — not a fixed timer that doesn't know what the sun is doing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Full Remote Control</h3>
+        <p>Monitor power consumption, override schedules, switch the load on or off and receive alerts — from anywhere, using the SI Portal app. No VPN, no IT setup.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Smart Notifications</h3>
+        <p>Receive push alerts when the load starts or stops, when abnormal power draw is detected, or when the device requires attention. Know what's happening without being there.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Fail-Safe Local Operation</h3>
+        <p>All automation logic runs on the device itself. If internet connectivity is lost, the switch continues operating against its last-known schedule and ECM state — no cloud dependency for the core function.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔧</div>
+        <h3>Easy Retrofit Installation</h3>
+        <p>Installs into existing electrical systems without replacing appliances or rewiring. A qualified installer can have it commissioned in under an hour. No new equipment to purchase — your existing load becomes the smart load.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Energy Monitoring</h3>
+        <p>On-board energy metering tracks real power draw and accumulated consumption. Review daily kWh consumed, operating hours and estimated cost savings in the SI Portal app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Typical applications ────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="section-label">Typical Applications</p>
+    <h2 style="font-size:clamp(22px,3.5vw,30px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;">
+      Any load that benefits from knowing when solar is available.
+    </h2>
+    <p style="color:var(--muted);font-size:15px;max-width:600px;margin-bottom:36px;line-height:1.65;">
+      If it draws power, runs on a schedule, and doesn't care exactly when it runs —
+      SI Switch can make it smarter.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">🏊</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Pool Pumps</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Run your pool during the sunniest parts of the day. Filtration happens either way — SI Switch just makes sure Eskom isn't paying for it.</p>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">🚿</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Geysers</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Heat water using available solar energy instead of expensive grid power. One of the highest-return applications — geysers are typically the biggest single load in a home.</p>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">🌡️</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Heat Pumps</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Optimise operation to maximise solar usage and minimise battery drain. Heat pumps draw significant current — running them on surplus solar instead of the battery extends battery life.</p>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">🏠</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Underfloor Heating</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Automatically heat the slab during periods of surplus solar generation. The thermal mass holds the heat long after the circuit switches off — smart operation, comfortable results.</p>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">💧</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Water Pumps</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Intelligently manage boreholes, irrigation and transfer pumps. Fill tanks or run irrigation during the solar peak — the timing is automatic, the savings are real.</p>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">⚡</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Electric Heaters</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Use available solar energy to maintain comfort without excessive grid consumption. Pre-heat the room during the solar window instead of drawing from battery or grid in the evening.</p>
+      </div>
+
+      <div style="background:var(--panel);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius);padding:20px 22px;">
+        <div style="font-size:22px;margin-bottom:10px;">🔌</div>
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--switch);">General Loads</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Any appliance or circuit that benefits from intelligent scheduling and energy-aware control. If it can wait for the sun, SI Switch can make that happen automatically.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── App screenshots ─────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap" style="text-align:center;">
+    <p class="section-label" style="justify-content:center;display:flex;">App Preview</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;">SI Switch in your pocket.</h2>
+    <p style="color:var(--muted);font-size:15px;max-width:480px;margin:0 auto 36px;line-height:1.6;">
+      Monitor live power draw, override automation, review consumption history and receive alerts — all from the SI Portal app.
+    </p>
+    <div class="app-gallery" style="justify-content:center;">
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:180px;">
+          <img src="/screenshots/resized/switch-1.PNG" alt="SI Switch — live relay status, 2421W, Heater Mode"
+               onerror="this.closest('.app-gallery-item').style.display='none'" />
+        </div>
+        <span class="cap">Relay ON · 2,421 W · Heater Mode</span>
+      </div>
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:180px;">
+          <img src="/screenshots/resized/switch-2.PNG" alt="SI Switch — operating mode selector and 4-window timer schedule"
+               onerror="this.closest('.app-gallery-item').style.display='none'" />
+        </div>
+        <span class="cap">Operating modes &amp; 4-window timer schedule</span>
+      </div>
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:180px;">
+          <img src="/screenshots/resized/switch-3.PNG" alt="SI Switch — 7-day energy summary, 16.08 kWh consumed"
+               onerror="this.closest('.app-gallery-item').style.display='none'" />
+        </div>
+        <span class="cap">7-day summary · 16.08 kWh consumed</span>
+      </div>
+    </div>
+
+    <!-- App Store badge -->
+    <div style="margin:32px auto 0;display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <a href="https://apps.apple.com/za/app/solaire-intelligence/id6773606892"
+         target="_blank" rel="noopener"
+         style="display:inline-block;padding:10px;">
+        <img src="/assets/app-store-badge.svg"
+             alt="Download on the App Store"
+             style="height:40px;width:auto;" />
+      </a>
+      <p style="font-size:11px;color:var(--muted);margin:0;">
+        App Store is a service mark of Apple Inc., registered in the U.S. and other countries.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Hardware ─────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <p class="section-label">The Hardware</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;">DIN rail. Wi-Fi. 63 A.</h2>
+    <p style="color:var(--muted);font-size:15px;max-width:560px;line-height:1.6;margin-bottom:40px;">
+      SI Switch is built around a proven DIN-rail smart relay with real-time power monitoring. It clips directly into your distribution board and connects to the SI Portal over Wi-Fi — no additional hubs, no rewiring.
+    </p>
+    <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+
+      <!-- Device shot -->
+      <div style="flex-shrink:0;text-align:center;">
+        <img src="/screenshots/resized/switch-device.jpg"
+             alt="SI Switch DIN rail relay — Tongou TO-Q-SY2-JWM, 63A, Wi-Fi, power monitoring"
+             style="width:200px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.45);"
+             onerror="this.closest('div').style.display='none'" />
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;">63A DIN rail relay · Wi-Fi</div>
+      </div>
+
+      <!-- Box / packaging shot -->
+      <div style="flex-shrink:0;text-align:center;">
+        <img src="/screenshots/resized/switch-box.jpg"
+             alt="SI Switch retail box with Solaire Intelligence branding"
+             style="width:280px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.45);"
+             onerror="this.closest('div').style.display='none'" />
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;">Retail packaging</div>
+      </div>
+
+      <!-- Key specs callout -->
+      <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Rated current</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">63 A</span>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Supply voltage</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">100–240 V AC</span>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Connectivity</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">Wi-Fi 2.4 GHz</span>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Monitoring</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">Real-time power</span>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Form factor</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">DIN rail (35 mm)</span>
+        </div>
+        <div style="background:var(--panel);border:1px solid rgba(74,222,128,0.25);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Installation</span>
+          <span style="font-size:13px;font-weight:700;color:var(--switch);">Certified electrician</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Callout ─────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap">
+    <div class="callout switch">
+      <p>
+        <strong>SI Switch is the gateway drug into intelligent energy management.</strong>
+        One device, one retrofit installation, and your biggest loads start working
+        with your solar system instead of against it. Every kWh of surplus solar that
+        runs your geyser or pool is a kWh you didn't buy from Eskom — and didn't drain
+        from your battery.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── ECM section ─────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label">Powered by ECM</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;">
+      Not a timer. An energy decision.
+    </h2>
+    <p style="color:var(--muted);font-size:15px;max-width:640px;line-height:1.7;margin-bottom:28px;">
+      Traditional smart switches run on fixed timers. SI Switch runs on the
+      <strong style="color:var(--text);">Energy Comfort Margin (ECM)</strong> — a real-time score
+      that combines solar production, battery state of charge, household load and grid conditions
+      into a single number from 0 to 20. When the score is high enough, the load runs.
+      When conditions change, it stops. Automatically.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;max-width:700px;">
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
+        <div style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--switch);line-height:1;">16–20</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">Strong surplus — run all loads</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
+        <div style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--warn);line-height:1;">8–15</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">Moderate — priority loads only</div>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
+        <div style="font-family:var(--mono);font-size:28px;font-weight:800;color:var(--danger);line-height:1;">0–7</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">Low — loads suppressed</div>
+      </div>
+    </div>
+    <p style="margin-top:20px;font-size:14px;">
+      <a href="ecm.html" style="color:var(--switch);text-decoration:none;font-weight:600;">Learn more about ECM →</a>
+    </p>
+  </div>
+</section>
+
+<!-- ── Specs ───────────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label">Technical Specifications</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:24px;">
+      Everything the installer needs to know.
+    </h2>
+    <div class="card" style="max-width:680px;">
+      <table class="spec-table">
+        <tr><td>Controller</td><td>Wi-Fi MCU, on-device firmware</td></tr>
+        <tr><td>Energy metering</td><td>On-board energy meter — real W, kWh &amp; power factor</td></tr>
+        <tr><td>Output</td><td>Relay contact — configurable load circuit</td></tr>
+        <tr><td>Automation</td><td>ECM-driven + up to 4 manual schedule windows per day</td></tr>
+        <tr><td>Connectivity</td><td>Wi-Fi 2.4 GHz · MQTT · SI Portal cloud</td></tr>
+        <tr><td>Power supply</td><td>220 V AC, ~1–2 W idle</td></tr>
+        <tr><td>Local intelligence</td><td>Continues operating if internet is unavailable</td></tr>
+        <tr><td>Remote access</td><td>SI Portal app — monitor, control &amp; notifications</td></tr>
+        <tr><td>HA integration</td><td>Auto MQTT discovery, no YAML required</td></tr>
+        <tr><td>Dry-run protection</td><td>Available for pump applications</td></tr>
+        <tr><td>Maintenance mode</td><td>Suspend automation during servicing</td></tr>
+        <tr><td>Origin</td><td>Made in South Africa</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Ideal for ───────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;">
+  <div class="wrap">
+    <p class="section-label" style="margin-bottom:12px;">Ideal For</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <span class="chip chip-switch">Solar homes with large loads</span>
+      <span class="chip chip-switch">Pool &amp; geyser automation</span>
+      <span class="chip chip-switch">Heat pump optimisation</span>
+      <span class="chip chip-switch">Irrigation &amp; borehole control</span>
+      <span class="chip chip-switch">Underfloor heating</span>
+      <span class="chip chip-neutral">Any existing load installation</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── Bottom CTA ──────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;">
+      <div>
+        <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">
+          Ready to put your loads to work?
+        </h2>
+        <p style="color:var(--muted);font-size:15px;margin-bottom:24px;line-height:1.65;">
+          Whether you're a homeowner wanting smarter automation or an installer
+          looking for a versatile smart-load SKU, get in touch and we'll guide you through.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a class="btn btn-primary" style="background:linear-gradient(135deg,var(--switch),var(--switch-2));color:#0b1220;" href="index.html#contact">Talk to an installer</a>
+          <a class="btn btn-ghost" href="docs.html">Installer documents →</a>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--switch);">SI Switch Datasheet — End User (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--switch);">SI Switch Installer Brochure (PDF)</a>
+        </div>
+        <div style="padding:14px 16px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+          📄 <a href="docs.html" style="color:var(--switch);">SI Switch Quick-Start Guide (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-switch.html">SI Switch</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="learn.html">Learning Centre</a></li>
+        <li><a href="ecm.html">About ECM</a></li>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="https://portal.solaire-intelligence.co.za/login">Portal Login</a></li>
+        <li><a href="mailto:info@si-sa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#trade">Installers</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span><a href="/privacy" style="color:var(--muted);text-decoration:none;">Privacy Policy</a> · solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

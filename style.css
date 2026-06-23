@@ -19,6 +19,8 @@
   --pool-2:      #3ce0c3;
   --water:       #4aa8ff;
   --water-2:     #2dd4bf;
+  --switch:      #4ade80;
+  --switch-2:    #86efac;
   --ok:          #3ce08f;
   --warn:        #ffb547;
   --danger:      #ff5a7a;
@@ -213,6 +215,7 @@ nav {
 .chip-gateway { color: var(--gateway); border-color: rgba(255,181,71,0.35); background: rgba(255,181,71,0.08); }
 .chip-pool    { color: var(--pool);    border-color: rgba(47,181,255,0.35); background: rgba(47,181,255,0.08); }
 .chip-water   { color: var(--water);   border-color: rgba(74,168,255,0.35); background: rgba(74,168,255,0.08); }
+.chip-switch  { color: var(--switch);  border-color: rgba(74,222,128,0.35); background: rgba(74,222,128,0.08); }
 .chip-neutral { color: var(--muted);   border-color: var(--line);           background: var(--panel-2); }
 
 /* ── Section labels ──────────────────────────────────────────────────────── */
@@ -279,6 +282,7 @@ nav {
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 
 /* Product hero colour overrides */
+.hero-switch::before  { background: radial-gradient(ellipse 60% 50% at 70% 40%, rgba(74,222,128,0.12) 0%, transparent 70%); }
 .hero-gateway::before {
   background: radial-gradient(ellipse 80% 60% at 60% -10%, rgba(255,181,71,0.08) 0%, transparent 70%);
 }
@@ -326,6 +330,7 @@ nav {
 .product-card.gateway:hover { border-color: rgba(255,181,71,0.5); }
 .product-card.pool:hover    { border-color: rgba(47,181,255,0.5); }
 .product-card.water:hover   { border-color: rgba(74,168,255,0.5); }
+.product-card.switch:hover  { border-color: rgba(74,222,128,0.5); }
 .product-card-icon {
   width: 44px; height: 44px; border-radius: 11px;
   display: grid; place-items: center; font-size: 20px;
@@ -337,6 +342,7 @@ nav {
 .product-card .card-link { font-size: 13px; font-weight: 600; color: var(--accent); }
 .product-card.gateway .card-link { color: var(--gateway); }
 .product-card.water   .card-link { color: var(--water); }
+.product-card.switch  .card-link { color: var(--switch); }
 
 /* ── Architecture diagram ─────────────────────────────────────────────────── */
 .arch-diagram {
@@ -413,6 +419,7 @@ nav {
 .callout.gateway { border-left-color: var(--gateway); }
 .callout.pool    { border-left-color: var(--pool); }
 .callout.water   { border-left-color: var(--water); }
+.callout.switch  { border-left-color: var(--switch); }
 .callout p { font-size: 15px; color: var(--muted); line-height: 1.7; }
 .callout strong { color: var(--text); }
 
