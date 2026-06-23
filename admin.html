@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Admin — Solaire Intelligence</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { background: var(--bg); }
+    .admin-wrap { max-width: 640px; margin: 0 auto; padding: 60px 20px 80px; }
+    .admin-wrap h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .admin-wrap p { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+    .login-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 32px; max-width: 360px; margin: 0 auto; }
+    .login-card h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+
+    .product-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+    .product-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .product-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .product-card-header h3 { font-size: 16px; font-weight: 800; flex: 1; }
+    .stock-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .stock-badge.in  { background: rgba(74,222,128,0.15); color: #4ade80; }
+    .stock-badge.low { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .stock-badge.out { background: rgba(248,113,113,0.15); color: #f87171; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 12px; }
+    .form-field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; }
+    .form-field input { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 14px; box-sizing: border-box; font-family: var(--sans); }
+    .form-field input:focus { outline: none; border-color: var(--accent); }
+
+    .save-btn { margin-top: 16px; padding: 10px 20px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #041425; font-size: 13px; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; transition: opacity .15s; }
+    .save-btn:hover { opacity: 0.85; }
+    .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .field-pw { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; color: var(--text); font-size: 14px; box-sizing: border-box; margin-bottom: 14px; font-family: var(--sans); }
+    .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #041425; font-size: 14px; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; }
+
+    .toast { display:none; position:fixed; bottom:24px; right:24px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px; font-size:14px; font-weight:600; color:var(--text); z-index:9999; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
+  </div>
+</nav>
+
+<div class="admin-wrap">
+  <h1>Stock Admin</h1>
+  <p>Update stock levels and lead times. Changes go live immediately — no deploy needed.</p>
+
+  <!-- Login -->
+  <div id="loginSection">
+    <div class="login-card">
+      <h2>Enter admin password</h2>
+      <input id="pwField" class="field-pw" type="password" placeholder="Password" />
+      <button class="login-btn" onclick="login()">Unlock →</button>
+      <p id="loginErr" style="color:#f87171;font-size:13px;margin-top:10px;display:none;">Incorrect password.</p>
+    </div>
+  </div>
+
+  <!-- Stock editor (hidden until logged in) -->
+  <div id="stockSection" style="display:none;">
+    <div id="productCards">
+      <p style="color:var(--muted);font-size:14px;">Loading stock…</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const PRODUCTS = [
+    { id: 'SI Gateway', color: 'var(--gateway)' },
+    { id: 'SI Switch',  color: 'var(--switch)'  },
+    { id: 'SI Water',   color: 'var(--water)'   },
+    { id: 'SI Pool',    color: 'var(--pool)'    },
+  ];
+
+  let adminPw = '';
+  let stockData = {};
+
+  function login() {
+    const pw = document.getElementById('pwField').value;
+    if (!pw) return;
+    adminPw = pw;
+    // Verify by loading stock
+    loadStock(true);
+  }
+
+  document.getElementById('pwField').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+
+  async function loadStock(fromLogin = false) {
+    try {
+      const res = await fetch('/.netlify/functions/stock');
+      if (!res.ok) throw new Error('Failed');
+      stockData = await res.json();
+      if (fromLogin) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('stockSection').style.display = 'block';
+      }
+      renderCards();
+    } catch (err) {
+      if (fromLogin) {
+        document.getElementById('loginErr').style.display = 'block';
+        adminPw = '';
+      }
+    }
+  }
+
+  function statusLabel(status) {
+    if (status === 'out') return 'Out of Stock';
+    if (status === 'low') return 'Low Stock';
+    return 'In Stock';
+  }
+
+  function renderCards() {
+    document.getElementById('productCards').innerHTML = PRODUCTS.map(p => {
+      const d = stockData[p.id] || { stock: 0, threshold: 3, lead_time: '3–5 business days', status: 'out' };
+      return `
+        <div class="product-card">
+          <div class="product-card-header">
+            <div class="product-dot" style="background:${p.color}"></div>
+            <h3>${p.id}</h3>
+            <span class="stock-badge ${d.status}">${statusLabel(d.status)}</span>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Stock units</label>
+              <input type="number" min="0" id="stock_${p.id}" value="${d.stock}" />
+            </div>
+            <div class="form-field">
+              <label>Low stock at</label>
+              <input type="number" min="1" id="thresh_${p.id}" value="${d.threshold}" />
+            </div>
+            <div class="form-field">
+              <label>Lead time (shown to customer)</label>
+              <input type="text" id="lead_${p.id}" value="${d.lead_time}" />
+            </div>
+          </div>
+          <button class="save-btn" id="btn_${p.id}" onclick="save('${p.id}')">Save ${p.id}</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function save(product) {
+    const btn = document.getElementById(`btn_${product}`);
+    btn.textContent = 'Saving…';
+    btn.disabled = true;
+
+    const payload = {
+      password:   adminPw,
+      product,
+      stock:     document.getElementById(`stock_${product}`).value,
+      threshold: document.getElementById(`thresh_${product}`).value,
+      lead_time: document.getElementById(`lead_${product}`).value,
+    };
+
+    try {
+      const res = await fetch('/.netlify/functions/stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error');
+      stockData[product] = data;
+      renderCards();
+      showToast(`✓ ${product} updated`);
+    } catch (err) {
+      showToast('❌ ' + err.message, true);
+      btn.textContent = `Save ${product}`;
+      btn.disabled = false;
+    }
+  }
+
+  function showToast(msg, isErr = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    t.style.color = isErr ? '#f87171' : 'var(--text)';
+    clearTimeout(t._hide);
+    t._hide = setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+</script>
+</body>
+</html>

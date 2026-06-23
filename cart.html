@@ -280,12 +280,26 @@
     document.getElementById('cartItems').innerHTML = keys.map(k => {
       const item = cart[k];
       const lineTotal = item.price * item.qty;
+      const s = stockData[k];
+      let stockBadge = '';
+      let leadLine = '';
+      if (s) {
+        if (s.status === 'out') {
+          stockBadge = `<span style="background:rgba(248,113,113,0.15);color:#f87171;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;">Out of Stock</span>`;
+        } else if (s.status === 'low') {
+          stockBadge = `<span style="background:rgba(251,191,36,0.15);color:#fbbf24;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;">Low Stock</span>`;
+        } else {
+          stockBadge = `<span style="background:rgba(74,222,128,0.12);color:#4ade80;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;">In Stock</span>`;
+        }
+        leadLine = `<div style="font-size:11px;color:var(--muted);margin-top:3px;">🚚 Ships in ${s.lead_time}</div>`;
+      }
       return `
         <div class="cart-item">
           <div class="cart-item-dot" style="background:${item.color}"></div>
           <div class="cart-item-name">
-            ${item.label}
+            <div style="display:flex;align-items:center;flex-wrap:wrap;">${item.label}${stockBadge}</div>
             <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px;">${fmtPrice(item.price)} each</div>
+            ${leadLine}
           </div>
           <div class="qty-ctrl">
             <button class="qty-btn" onclick="setQty('${k}', ${item.qty - 1})">−</button>
@@ -359,7 +373,40 @@
     document.getElementById('navLinks').classList.toggle('open');
   });
 
+  // ── Stock checking ────────────────────────────────────────────────────────
+  let stockData = {};
+
+  async function loadStock() {
+    try {
+      const res = await fetch('/.netlify/functions/stock');
+      if (res.ok) {
+        stockData = await res.json();
+        renderCart(); // re-render with stock badges
+        checkStockForCheckout();
+      }
+    } catch { /* non-fatal, badges just won't show */ }
+  }
+
+  function checkStockForCheckout() {
+    const cart = getCart();
+    const outItems = Object.keys(cart).filter(k => stockData[k] && stockData[k].status === 'out');
+    let warning = document.getElementById('stockWarning');
+    if (!warning) {
+      warning = document.createElement('p');
+      warning.id = 'stockWarning';
+      warning.style.cssText = 'font-size:13px;color:#fbbf24;margin-top:12px;display:none;';
+      document.getElementById('checkoutBtn').after(warning);
+    }
+    if (outItems.length > 0) {
+      warning.textContent = '⚠ One or more items may have an extended lead time. We\'ll confirm your delivery estimate by email.';
+      warning.style.display = 'block';
+    } else {
+      warning.style.display = 'none';
+    }
+  }
+
   renderCart();
+  loadStock();
 </script>
 </body>
 </html>
