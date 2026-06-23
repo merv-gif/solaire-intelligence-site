@@ -175,7 +175,8 @@
       renderCards();
       showToast(`✓ ${product} updated`);
     } catch (err) {
-      showToast('❌ ' + err.message, true);
+      showToast('❌ ' + (err.message || 'Unknown error'), true);
+      console.error('Save error:', err);
       btn.textContent = `Save ${product}`;
       btn.disabled = false;
     }

@@ -61,8 +61,16 @@ exports.handler = async function (event) {
       threshold: parseInt(threshold, 10),
       lead_time: lead_time || '3–5 business days',
     };
-    if (!store) return { statusCode: 503, body: JSON.stringify({ error: 'Storage not available yet — try again after next deploy' }) };
-    await store.set(product, JSON.stringify(entry));
+    if (!store) {
+      return { statusCode: 503, body: JSON.stringify({ error: 'Storage not available — redeploy the site then try again' }) };
+    }
+
+    try {
+      await store.set(product, JSON.stringify(entry));
+    } catch (writeErr) {
+      console.error('Blobs write error:', writeErr);
+      return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save: ' + writeErr.message }) };
+    }
 
     return {
       statusCode: 200,
