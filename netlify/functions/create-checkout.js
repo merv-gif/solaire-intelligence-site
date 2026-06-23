@@ -23,8 +23,22 @@ exports.handler = async function (event) {
   }
 
   const origin = 'https://solaire-intelligence.co.za';
-  const key = process.env.YOCO_SECRET_KEY;
-  console.log('Key present:', !!key, '| Key prefix:', key ? key.substring(0, 10) : 'MISSING');
+  const formName = product === 'SI Gateway' ? 'si-gateway-order' : 'si-switch-order';
+
+  // Submit to Netlify Forms so order details are captured regardless of payment outcome
+  try {
+    const formData = new URLSearchParams({
+      'form-name': formName,
+      product, name, email, phone, address, city, province, postal_code,
+    });
+    await fetch(`${origin}/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+    });
+  } catch (formErr) {
+    console.warn('Netlify Forms submission failed (non-fatal):', formErr.message);
+  }
 
   try {
     const response = await fetch('https://payments.yoco.com/api/checkouts', {
