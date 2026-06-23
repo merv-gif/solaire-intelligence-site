@@ -439,6 +439,7 @@
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
           <span style="background:rgba(74,168,255,0.12);border:1px solid rgba(74,168,255,0.3);color:var(--water);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;">🚚 R160 shipping in SA</span>
+          <span id="stockBadge" style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;display:none;"></span>
         </div>
         <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;">
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
@@ -661,6 +662,23 @@
   }
 
   updateCartBadge();
+
+  (async () => {
+    try {
+      const res = await fetch('/.netlify/functions/stock');
+      if (!res.ok) return;
+      const data = await res.json();
+      const s = data['SI Water'];
+      if (!s) return;
+      const badge = document.getElementById('stockBadge');
+      if (!badge) return;
+      const styles = { in: 'background:rgba(74,168,255,0.12);border:1px solid rgba(74,168,255,0.3);color:#4aa8ff;', low: 'background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;', out: 'background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.3);color:#f87171;' };
+      const labels = { in: '✓ In Stock', low: '⚡ Low Stock', out: '⏳ Available to order' };
+      badge.style.cssText += styles[s.status] || styles.in;
+      badge.textContent = labels[s.status] || labels.in;
+      badge.style.display = 'inline-block';
+    } catch { /* non-fatal */ }
+  })();
 </script>
 </body>
 </html>
