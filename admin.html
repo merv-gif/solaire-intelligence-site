@@ -87,31 +87,25 @@
   let stockData = {};
 
   function login() {
-    const pw = document.getElementById('pwField').value;
+    const pw = document.getElementById('pwField').value.trim();
     if (!pw) return;
     adminPw = pw;
-    // Verify by loading stock
-    loadStock(true);
+    // Show the panel immediately — password is verified server-side on first Save
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('stockSection').style.display = 'block';
+    loadStock();
   }
 
   document.getElementById('pwField').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 
-  async function loadStock(fromLogin = false) {
+  async function loadStock() {
     try {
       const res = await fetch('/.netlify/functions/stock');
-      if (!res.ok) throw new Error('Failed');
-      stockData = await res.json();
-      if (fromLogin) {
-        document.getElementById('loginSection').style.display = 'none';
-        document.getElementById('stockSection').style.display = 'block';
+      if (res.ok) {
+        stockData = await res.json();
+        renderCards();
       }
-      renderCards();
-    } catch (err) {
-      if (fromLogin) {
-        document.getElementById('loginErr').style.display = 'block';
-        adminPw = '';
-      }
-    }
+    } catch { /* non-fatal — defaults shown */ }
   }
 
   function statusLabel(status) {
@@ -169,6 +163,7 @@
         body: JSON.stringify(payload),
       });
       const data = await res.json();
+      if (res.status === 401) throw new Error('Wrong password — check your ADMIN_PASSWORD in Netlify');
       if (!res.ok) throw new Error(data.error || 'Error');
       stockData[product] = data;
       renderCards();
