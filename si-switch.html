@@ -203,7 +203,7 @@
       <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
         <div style="font-size:22px;margin-bottom:10px;">🏊</div>
         <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);">Pool Pumps</h3>
-        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Run your pool during the sunniest parts of the day. Filtration happens either way — SI Switch just makes sure Eskom isn't paying for it.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">Run your pool on solar and let the app tell you when the filter is dirty or the pump is running dry — using power draw alone, no extra sensors.</p>
       </div>
 
       <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;">
@@ -290,6 +290,72 @@
       <p style="font-size:11px;color:var(--muted);margin:0;">
         App Store is a service mark of Apple Inc., registered in the U.S. and other countries.
       </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Pool Pump Mode ──────────────────────────────────────────────────────── -->
+<section style="padding-top:0;padding-bottom:0;">
+  <div class="wrap">
+    <div style="padding:40px 0;border-top:1px solid var(--line);">
+      <p class="section-label">Pool Pump Mode</p>
+      <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
+        Your switch knows when your filter needs cleaning.
+      </h2>
+      <p style="color:var(--muted);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:14px;">
+        In Pool Pump Mode, SI Switch watches the pump's power draw continuously. A clean filter lets water flow freely — the pump works at full load. As the filter blocks up, flow drops and so does the wattage. When it falls below your configured threshold, the status flips to <strong style="color:#f87171;">Dirty</strong>. No extra sensor. No float switch. Just the power meter that's already there.
+      </p>
+      <p style="color:var(--muted);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:32px;">
+        Enable <strong style="color:var(--text);">Dry Run Protection</strong> and the switch will cut power if the pump starts drawing near-zero current — a clear sign it's running without water. A configurable grace period lets the pump prime normally before protection kicks in. Your motor stays safe even when the borehole runs dry or the pool valve is closed.
+      </p>
+
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
+
+        <!-- Screenshots -->
+        <div style="display:flex;gap:16px;flex-wrap:wrap;flex-shrink:0;">
+          <div style="text-align:center;">
+            <div class="phone-frame" style="width:175px;">
+              <img src="/screenshots/resized/pump-mode-clean.jpg"
+                   alt="SI Switch Pool Pump Mode — Filter Status: Clean, 272W draw, pump ON"
+                   onerror="this.closest('.phone-frame').style.display='none'" />
+            </div>
+            <span class="cap" style="display:block;margin-top:8px;">✓ Filter clean · 272 W</span>
+          </div>
+          <div style="text-align:center;">
+            <div class="phone-frame" style="width:175px;">
+              <img src="/screenshots/resized/pump-mode-dirty.jpg"
+                   alt="SI Switch Pool Pump Mode — Filter Status: Dirty, wattage below threshold"
+                   onerror="this.closest('.phone-frame').style.display='none'" />
+            </div>
+            <span class="cap" style="display:block;margin-top:8px;">⚠ Filter dirty · clean needed</span>
+          </div>
+          <div style="text-align:center;">
+            <div class="phone-frame" style="width:175px;">
+              <img src="/screenshots/resized/pump-mode-settings.jpg"
+                   alt="SI Switch Pump Mode settings — filter threshold, dry run protection, grace period"
+                   onerror="this.closest('.phone-frame').style.display='none'" />
+            </div>
+            <span class="cap" style="display:block;margin-top:8px;">Settings · threshold &amp; dry run</span>
+          </div>
+        </div>
+
+        <!-- Feature chips -->
+        <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:14px;padding-top:4px;">
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
+            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">🔍 Sensor-free filter monitoring</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Power draw is the sensor. A clean filter = full flow = full watts. A dirty filter = restricted flow = fewer watts. Set your clean threshold once and the app does the rest.</div>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
+            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">🛡️ Dry run protection</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Near-zero current while the pump is running means it's running without water — a fast way to burn out the motor. SI Switch can cut the pump automatically, with a configurable grace period for priming.</div>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
+            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">⚙️ Fully configurable</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Filter clean threshold and dry run grace period are adjustable from the app. Dial them in for your specific pump and installation — no one-size-fits-all assumptions.</div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
@@ -494,6 +560,7 @@
     <div style="display:flex;flex-wrap:wrap;gap:8px;">
       <span class="chip chip-switch">Solar homes with large loads</span>
       <span class="chip chip-switch">Pool &amp; geyser automation</span>
+      <span class="chip chip-switch">Filter &amp; dry run monitoring</span>
       <span class="chip chip-switch">Heat pump optimisation</span>
       <span class="chip chip-switch">Irrigation &amp; borehole control</span>
       <span class="chip chip-switch">Underfloor heating</span>
