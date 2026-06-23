@@ -667,19 +667,38 @@
   document.getElementById('orderForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('orderSubmit');
-    btn.textContent = 'Submitting…';
+    btn.textContent = 'Processing…';
     btn.disabled = true;
+
+    const fd = new FormData(this);
+    const payload = {
+      product:     'SI Switch',
+      name:        fd.get('name'),
+      email:       fd.get('email'),
+      phone:       fd.get('phone'),
+      address:     fd.get('address'),
+      city:        fd.get('city'),
+      province:    fd.get('province'),
+      postal_code: fd.get('postal_code'),
+    };
+
     try {
-      await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(new FormData(this)).toString()
+      const res  = await fetch('/.netlify/functions/create-checkout', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
       });
-      window.location.href = 'https://pay.yoco.com/r/2pj8wz';
-    } catch {
+      const data = await res.json();
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      } else {
+        throw new Error(data.error || 'No redirect URL');
+      }
+    } catch (err) {
+      console.error(err);
       btn.textContent = 'Continue to payment →';
       btn.disabled = false;
-      window.location.href = 'https://pay.yoco.com/r/2pj8wz';
+      alert('Something went wrong. Please try again.');
     }
   });
 </script>
