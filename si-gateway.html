@@ -362,6 +362,7 @@
           <span style="background:rgba(255,181,71,0.12);border:1px solid rgba(255,181,71,0.3);color:var(--gateway);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;">🚚 R160 shipping in SA</span>
           <span id="stockBadge" style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;display:none;"></span>
         </div>
+        <p id="leadTimeLine" style="font-size:12px;color:var(--muted);margin:-16px 0 20px;display:none;">📦 Ships in <strong id="leadTimeText"></strong></p>
         <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;">
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
             <span style="color:var(--gateway);font-size:16px;">✓</span> SI Gateway bridge unit
@@ -732,6 +733,10 @@
       badge.style.cssText += styles[s.status] || styles.in;
       badge.textContent = labels[s.status] || labels.in;
       badge.style.display = 'inline-block';
+      if (s.lead_time) {
+        document.getElementById('leadTimeText').textContent = s.lead_time;
+        document.getElementById('leadTimeLine').style.display = 'block';
+      }
     } catch { /* non-fatal */ }
   })();
 </script>
