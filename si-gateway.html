@@ -203,6 +203,11 @@
         <h3>Ecosystem Orchestration</h3>
         <p>SI Gateway is the coordination layer for the whole SI platform. It aggregates telemetry from SI Pool, SI Water and future products — enabling cross-domain automations like battery-aware heating and solar-surplus pool heating.</p>
       </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔌</div>
+        <h3>Prepaid Electricity Tracking</h3>
+        <p>Log your prepaid balance and SI Gateway tracks remaining units against your actual consumption. Know your days-to-empty before your CIU does — with low-balance alerts and one-tap recalibration from your meter.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -340,6 +345,58 @@
       </div>
       <div class="phone-frame" style="width:200px;flex-shrink:0;">
         <img src="/screenshots/resized/cost-tracking.PNG" alt="SI Gateway — Cost & Savings: grid cost, solar savings and solar independence percentage" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Prepaid ───────────────────────────────────────────────────────────────── -->
+<section style="padding-top:0;padding-bottom:0;">
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;padding:40px 0;border-top:1px solid var(--line);flex-wrap:wrap;">
+      <div>
+        <p class="section-label">Prepaid electricity</p>
+        <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
+          Know exactly how many days of electricity you have left.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          Log your prepaid balance once and SI Gateway does the rest — tracking your consumption against your units in real time. Based on your 7-day average, it tells you exactly how many days remain before you need to top up.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:20px;">
+          When you buy more units, tap <strong style="color:var(--text);">Add Units</strong> and enter the kWh from your token slip. If the estimate drifts, <strong style="color:var(--text);">Recalibrate</strong> from your actual CIU meter reading to snap it back to reality.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+            <span style="color:#4ade80;">⚡</span> Days remaining estimate
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+            <span style="color:#4ade80;">📉</span> Based on your actual usage
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+            <span style="color:#4ade80;">🔔</span> Low balance alert
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius-sm);font-size:13px;color:var(--muted);">
+            <span style="color:#4ade80;">🎯</span> CIU recalibration
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshots -->
+      <div style="display:flex;gap:16px;align-items:flex-start;flex-shrink:0;flex-wrap:wrap;justify-content:center;">
+        <div class="phone-frame" style="width:200px;">
+          <img src="/screenshots/resized/prepaid-card.jpg"
+               alt="SI Gateway — Prepaid Electricity tracker showing 200.9 kWh remaining, 35 days, Healthy status" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding-top:20px;">
+          <div class="phone-frame" style="width:160px;">
+            <img src="/screenshots/resized/prepaid-add-units.jpg"
+                 alt="Add purchased units — enter kWh from token slip" />
+          </div>
+          <div class="phone-frame" style="width:160px;">
+            <img src="/screenshots/resized/prepaid-calibrate.jpg"
+                 alt="Recalibrate from actual CIU meter reading" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
