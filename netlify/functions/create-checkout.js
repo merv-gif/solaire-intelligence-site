@@ -37,10 +37,10 @@ exports.handler = async function (event) {
       body: JSON.stringify({
         amount,
         currency: 'ZAR',
-        successUrl: `${origin}/thank-you.html`,
+        successUrl: `${origin}/thank-you`,
         cancelUrl:  product === 'SI Gateway'
-          ? `${origin}/si-gateway.html#buy`
-          : `${origin}/si-switch.html#buy`,
+          ? `${origin}/si-gateway#buy`
+          : `${origin}/si-switch#buy`,
         metadata: { product, name, email, phone, address, city, province, postal_code },
       }),
     });
