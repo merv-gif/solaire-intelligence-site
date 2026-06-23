@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Received — Solaire Intelligence</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .ty-wrap {
+      min-height: calc(100vh - var(--nav-h));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+    }
+    .ty-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      max-width: 560px;
+      width: 100%;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .ty-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2fb5ff22, #3ce0c322);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 24px;
+    }
+    .ty-card h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0 0 12px;
+    }
+    .ty-card .subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      margin: 0 0 32px;
+      line-height: 1.6;
+    }
+    .ty-steps {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 0 0 36px;
+    }
+    .ty-step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .ty-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #041425;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .ty-step-text strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .ty-step-text span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .ty-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .ty-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #041425;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity .15s;
+    }
+    .ty-btn-primary:hover { opacity: 0.88; text-decoration: none; }
+    .ty-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      text-decoration: none;
+      transition: border-color .15s, color .15s;
+    }
+    .ty-btn-secondary:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+    .ty-divider {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 32px 0;
+    }
+    .ty-contact {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .ty-contact a { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <div class="nav-logo">SI</div>
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-switch.html"><span class="dd-dot" style="background:var(--switch)"></span>SI Switch</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="ecm.html">ECM</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<div class="ty-wrap">
+  <div class="ty-card">
+    <div class="ty-icon">✓</div>
+    <h1>Order Received!</h1>
+    <p class="subtitle">
+      Thank you for your purchase. Your payment has been confirmed and your order is now with us.
+      We'll take it from here.
+    </p>
+
+    <div class="ty-steps">
+      <div class="ty-step">
+        <div class="ty-step-num">1</div>
+        <div class="ty-step-text">
+          <strong>Order confirmed</strong>
+          <span>You'll receive a payment receipt from Yoco shortly. Keep it for your records.</span>
+        </div>
+      </div>
+      <div class="ty-step">
+        <div class="ty-step-num">2</div>
+        <div class="ty-step-text">
+          <strong>We'll prepare your shipment</strong>
+          <span>Your device will be packed and handed to our courier. Most orders ship within 1–2 business days.</span>
+        </div>
+      </div>
+      <div class="ty-step">
+        <div class="ty-step-num">3</div>
+        <div class="ty-step-text">
+          <strong>Tracking details on the way</strong>
+          <span>Once your order is dispatched we'll send your tracking number so you can follow it to your door.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ty-actions">
+      <a class="ty-btn-primary" href="index.html">← Back to home</a>
+      <a class="ty-btn-secondary" href="learn.html">Browse guides</a>
+    </div>
+
+    <hr class="ty-divider" />
+    <p class="ty-contact">
+      Questions? Reach us at <a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <div class="nav-logo">SI</div>
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-switch.html">SI Switch</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="learn.html">Learning Centre</a></li>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="https://portal.solaire-intelligence.co.za/login">Portal Login</a></li>
+        <li><a href="mailto:info@si-sa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#trade">Installers</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:info@si-sa.co.za">info@si-sa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span><a href="/privacy" style="color:var(--muted);text-decoration:none;">Privacy Policy</a> · solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+
+</body>
+</html>
