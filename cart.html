@@ -187,6 +187,7 @@
   <input name="bot-field" /><input name="items" /><input name="total" />
   <input name="name" /><input name="email" /><input name="phone" />
   <input name="address" /><input name="city" /><input name="province" /><input name="postal_code" />
+  <!-- items field carries variant info inline e.g. "SI Gateway (Deye/Sunsynk 8kW) ×1" -->
 </form>
 
 <footer>
@@ -246,10 +247,10 @@
   }
   function saveCart(c) { localStorage.setItem('si-cart', JSON.stringify(c)); }
 
-  function setQty(product, qty) {
+  function setQty(key, qty) {
     const cart = getCart();
-    if (qty <= 0) { delete cart[product]; }
-    else { cart[product] = { ...PRODUCTS[product], qty }; }
+    if (qty <= 0) { delete cart[key]; }
+    else if (cart[key]) { cart[key].qty = qty; }
     saveCart(cart);
     renderCart();
   }
@@ -277,7 +278,9 @@
     document.getElementById('cartItems').innerHTML = keys.map(k => {
       const item = cart[k];
       const lineTotal = item.price * item.qty;
-      const s = stockData[k];
+      // Base product name for stock lookup (strip variant suffix if present)
+      const baseProduct = k.includes('::') ? k.split('::')[0] : k;
+      const s = stockData[baseProduct];
       let stockBadge = '';
       let leadLine = '';
       if (s) {
@@ -290,11 +293,15 @@
         }
         leadLine = `<div style="font-size:11px;color:var(--muted);margin-top:3px;">🚚 Ships in ${s.lead_time}</div>`;
       }
+      const variantLine = item.variant
+        ? `<div style="font-size:12px;color:var(--muted);font-weight:500;margin-top:2px;">📡 ${item.variant}</div>`
+        : '';
       return `
         <div class="cart-item">
           <div class="cart-item-dot" style="background:${item.color}"></div>
           <div class="cart-item-name">
             <div style="display:flex;align-items:center;flex-wrap:wrap;">${item.label}${stockBadge}</div>
+            ${variantLine}
             <div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px;">${fmtPrice(item.price)} each</div>
             ${leadLine}
           </div>
@@ -332,7 +339,11 @@
 
     const cart = getCart();
     const fd = new FormData(this);
-    const items = Object.entries(cart).map(([product, item]) => ({ product, qty: item.qty }));
+    const items = Object.entries(cart).map(([key, item]) => ({
+      product: key.includes('::') ? key.split('::')[0] : key,
+      variant: item.variant || null,
+      qty: item.qty,
+    }));
 
     const payload = {
       items,
@@ -386,7 +397,10 @@
 
   function checkStockForCheckout() {
     const cart = getCart();
-    const outItems = Object.keys(cart).filter(k => stockData[k] && stockData[k].status === 'out');
+    const outItems = Object.keys(cart).filter(k => {
+      const base = k.includes('::') ? k.split('::')[0] : k;
+      return stockData[base] && stockData[base].status === 'out';
+    });
     let warning = document.getElementById('stockWarning');
     if (!warning) {
       warning = document.createElement('p');

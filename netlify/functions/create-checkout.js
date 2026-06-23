@@ -35,7 +35,10 @@ exports.handler = async function (event) {
     }
     const SHIPPING = 16000; // R160 flat shipping
     const amount = items.reduce((s, i) => s + PRICES[i.product] * i.qty, 0) + SHIPPING;
-    const itemSummary = items.map(i => `${i.product} ×${i.qty}`).join(', ');
+    const itemSummary = items.map(i => {
+      const variantStr = i.variant ? ` (${i.variant})` : '';
+      return `${i.product}${variantStr} ×${i.qty}`;
+    }).join(', ');
 
     const origin = 'https://solaire-intelligence.co.za';
 
@@ -89,7 +92,7 @@ exports.handler = async function (event) {
   }
 
   // ─── Single-product path (product pages buy-direct) ──────────────────────
-  const { product } = body;
+  const { product, variant } = body;
   const productPrice = PRICES[product];
   if (!productPrice) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Unknown product' }) };
@@ -109,7 +112,7 @@ exports.handler = async function (event) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         'form-name': formName,
-        product, name, email, phone, address, city, province, postal_code,
+        product, variant: variant || '', name, email, phone, address, city, province, postal_code,
       }).toString(),
     });
   } catch (formErr) {
@@ -134,7 +137,7 @@ exports.handler = async function (event) {
           'SI Water':   `${origin}/si-water#buy`,
           'SI Pool':    `${origin}/si-pool#buy`,
         }[product] || `${origin}/`,
-        metadata: { product, name, email, phone, address, city, province, postal_code },
+        metadata: { product, variant: variant || '', name, email, phone, address, city, province, postal_code },
       }),
     });
 

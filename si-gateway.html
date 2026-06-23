@@ -380,6 +380,20 @@
             <span style="color:var(--gateway);font-size:16px;">✓</span> Plug &amp; play — no electrician needed
           </li>
         </ul>
+        <div style="margin-bottom:20px;">
+          <label style="font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px;">Inverter model *</label>
+          <select id="gatewayVariant" style="width:100%;max-width:380px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;font-family:var(--sans);" onchange="this.style.borderColor='var(--line)';document.getElementById('variantError').style.display='none'">
+            <option value="">Select your inverter…</option>
+            <option value="Deye/Sunsynk 5.5kW">Deye / Sunsynk 5.5 kW</option>
+            <option value="Deye/Sunsynk 8kW">Deye / Sunsynk 8 kW</option>
+            <option value="Deye/Sunsynk 10kW">Deye / Sunsynk 10 kW</option>
+            <option value="Deye/Sunsynk 12kW Single phase">Deye / Sunsynk 12 kW — Single phase</option>
+            <option value="Deye/Sunsynk 16kW Single phase">Deye / Sunsynk 16 kW — Single phase</option>
+            <option value="Deye/Sunsynk 12kW Three phase">Deye / Sunsynk 12 kW — Three phase</option>
+            <option value="Victron Cerbo GX">Victron Cerbo GX</option>
+          </select>
+          <p id="variantError" style="font-size:12px;color:#f87171;margin-top:6px;display:none;">Please select your inverter model before adding to cart.</p>
+        </div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <button onclick="addToCart('SI Gateway')"
              style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--gateway),#ffcc44);color:#0b1220;font-size:16px;font-weight:800;padding:16px 32px;border-radius:var(--radius);border:none;cursor:pointer;letter-spacing:-0.01em;">
@@ -544,7 +558,7 @@
 
 <!-- Netlify form detection (hidden — required for build-time registration) -->
 <form name="si-gateway-order" netlify netlify-honeypot="bot-field" hidden>
-  <input name="bot-field" /><input name="product" /><input name="name" />
+  <input name="bot-field" /><input name="product" /><input name="variant" /><input name="name" />
   <input name="email" /><input name="phone" /><input name="address" />
   <input name="city" /><input name="province" /><input name="postal_code" />
 </form>
@@ -564,6 +578,21 @@
       <input type="hidden" name="form-name" value="si-gateway-order" />
       <input type="hidden" name="product" value="SI Gateway Kit — R1,650" />
       <p style="display:none;"><input name="bot-field" /></p>
+
+      <div>
+        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Inverter model *</label>
+        <select id="modalVariant" name="variant" required
+                style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;">
+          <option value="">Select your inverter…</option>
+          <option value="Deye/Sunsynk 5.5kW">Deye / Sunsynk 5.5 kW</option>
+          <option value="Deye/Sunsynk 8kW">Deye / Sunsynk 8 kW</option>
+          <option value="Deye/Sunsynk 10kW">Deye / Sunsynk 10 kW</option>
+          <option value="Deye/Sunsynk 12kW Single phase">Deye / Sunsynk 12 kW — Single phase</option>
+          <option value="Deye/Sunsynk 16kW Single phase">Deye / Sunsynk 16 kW — Single phase</option>
+          <option value="Deye/Sunsynk 12kW Three phase">Deye / Sunsynk 12 kW — Three phase</option>
+          <option value="Victron Cerbo GX">Victron Cerbo GX</option>
+        </select>
+      </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <div style="grid-column:1/-1;">
@@ -628,6 +657,10 @@
     const m = document.getElementById('orderModal');
     m.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    // Pre-fill modal variant from the buy section selector if already chosen
+    const pageSel = document.getElementById('gatewayVariant');
+    const modalSel = document.getElementById('modalVariant');
+    if (pageSel && modalSel && pageSel.value) modalSel.value = pageSel.value;
   }
   function closeModal() {
     document.getElementById('orderModal').style.display = 'none';
@@ -646,6 +679,7 @@
     const fd = new FormData(this);
     const payload = {
       product:     'SI Gateway',
+      variant:     fd.get('variant') || '',
       name:        fd.get('name'),
       email:       fd.get('email'),
       phone:       fd.get('phone'),
@@ -690,6 +724,26 @@
   }
 
   function addToCart(product) {
+    // SI Gateway requires an inverter model selection
+    const variantSel = document.getElementById('gatewayVariant');
+    if (variantSel) {
+      const variant = variantSel.value;
+      if (!variant) {
+        variantSel.style.borderColor = '#f87171';
+        document.getElementById('variantError').style.display = 'block';
+        variantSel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const key = product + '::' + variant;
+      const cart = getCart();
+      if (cart[key]) { cart[key].qty++; }
+      else { cart[key] = { price: CART_PRICES[product], color: CART_COLORS[product], label: product + ' Kit', variant, qty: 1 }; }
+      saveCart(cart);
+      updateCartBadge();
+      showCartToast(product);
+      return;
+    }
+    // Other products (no variant)
     const cart = getCart();
     if (cart[product]) { cart[product].qty++; }
     else { cart[product] = { price: CART_PRICES[product], color: CART_COLORS[product], label: product + ' Kit', qty: 1 }; }
