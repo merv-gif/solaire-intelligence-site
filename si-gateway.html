@@ -209,23 +209,37 @@
   <div class="wrap" style="text-align:center;">
     <p class="section-label" style="justify-content:center;display:flex;">App Preview</p>
     <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;">SI Gateway in your hand.</h2>
-    <p style="color:var(--muted);font-size:15px;max-width:480px;margin:0 auto 36px;line-height:1.6;">
+    <p style="color:var(--muted);font-size:15px;max-width:540px;margin:0 auto 36px;line-height:1.6;">
       Live solar production, ECM score, battery state and grid status — all updated in real time from anywhere.
     </p>
     <div class="app-gallery" style="justify-content:center;">
       <div class="app-gallery-item">
-        <div class="phone-frame" style="width:190px;">
-          <img src="/screenshots/resized/gateway-1.PNG" alt="SI Gateway — ECM Score and live solar energy view"
+        <div class="phone-frame" style="width:175px;">
+          <img src="/screenshots/resized/gateway-1.PNG" alt="SI Gateway — ECM Score 16/20, Solar 5.1kW, Load 3.7kW, live"
                onerror="this.closest('.app-gallery-item').style.display='none'" />
         </div>
-        <span class="cap">ECM Score, solar, load &amp; grid — live</span>
+        <span class="cap">ECM 16/20 · Solar 5.1 kW · Load 3.7 kW</span>
       </div>
       <div class="app-gallery-item">
-        <div class="phone-frame" style="width:190px;">
-          <img src="/screenshots/resized/gateway-2.PNG" alt="SI Gateway — Battery SOC, daily totals and inverter controls"
+        <div class="phone-frame" style="width:175px;">
+          <img src="/screenshots/resized/gateway-2.PNG" alt="SI Gateway — inverter controls and time-of-use SOC targets"
                onerror="this.closest('.app-gallery-item').style.display='none'" />
         </div>
-        <span class="cap">Battery SOC, daily totals &amp; inverter controls</span>
+        <span class="cap">Inverter controls &amp; time-of-use SOC targets</span>
+      </div>
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:175px;">
+          <img src="/screenshots/resized/gateway-3.PNG" alt="SI Gateway — today's power chart and battery SOC history"
+               onerror="this.closest('.app-gallery-item').style.display='none'" />
+        </div>
+        <span class="cap">Power chart · Battery SOC · ECM history</span>
+      </div>
+      <div class="app-gallery-item">
+        <div class="phone-frame" style="width:175px;">
+          <img src="/screenshots/resized/gateway-4.PNG" alt="SI Gateway — 7-day energy summary: 101kWh PV, 157kWh grid import"
+               onerror="this.closest('.app-gallery-item').style.display='none'" />
+        </div>
+        <span class="cap">7-day summary · 101 kWh PV · Grid import</span>
       </div>
     </div>
 
@@ -243,6 +257,57 @@
       </p>
     </div>
 
+  </div>
+</section>
+
+<!-- ── Hardware ─────────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">The Hardware</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:10px;">Small box. Big picture.</h2>
+    <p style="color:var(--muted);font-size:15px;max-width:560px;line-height:1.6;margin-bottom:36px;">
+      The SI Gateway bridge clips onto your inverter's RS485 port and connects over Wi-Fi. No cloud subscription required — it runs locally and pushes data in real time. Everything in the box: bridge unit, power supply, and patch cable.
+    </p>
+    <div style="display:flex;gap:40px;align-items:center;flex-wrap:wrap;">
+
+      <!-- Device photo -->
+      <div style="flex:1;min-width:260px;">
+        <img src="/screenshots/resized/gateway-device.jpg"
+             alt="SI Gateway hardware — bridge unit, power supply and ethernet cable"
+             style="width:100%;max-width:600px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.4);"
+             onerror="this.closest('div').style.display='none'" />
+        <div style="font-size:11px;color:var(--muted);margin-top:10px;">SI Gateway · power supply · CAT5 patch cable (included)</div>
+      </div>
+
+      <!-- Key specs -->
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:220px;">
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Interface</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">RS485 Modbus</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Connectivity</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">Wi-Fi 2.4 GHz</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Poll rate</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">Every 5 seconds</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Power supply</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">Included</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Patch cable</span>
+          <span style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);">Included</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid rgba(255,181,71,0.25);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;color:var(--muted);">Installation</span>
+          <span style="font-size:13px;font-weight:700;color:var(--gateway);">Plug &amp; play</span>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
