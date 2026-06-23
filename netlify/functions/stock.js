@@ -62,7 +62,7 @@ exports.handler = async function (event) {
       lead_time: lead_time || '3–5 business days',
     };
     if (!store) return { statusCode: 503, body: JSON.stringify({ error: 'Storage not available yet — try again after next deploy' }) };
-    await store.setJSON(product, entry);
+    await store.set(product, JSON.stringify(entry));
 
     return {
       statusCode: 200,

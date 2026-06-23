@@ -117,7 +117,8 @@
 
   function renderCards() {
     document.getElementById('productCards').innerHTML = PRODUCTS.map(p => {
-      const d = stockData[p.id] || { stock: 0, threshold: 3, lead_time: '3–5 business days', status: 'out' };
+      const FALLBACKS = { 'SI Gateway': 10, 'SI Switch': 10, 'SI Water': 5, 'SI Pool': 5 };
+      const d = stockData[p.id] || { stock: FALLBACKS[p.id], threshold: 3, lead_time: '3–5 business days', status: 'in' };
       return `
         <div class="product-card">
           <div class="product-card-header">
@@ -164,8 +165,8 @@
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (res.status === 401) throw new Error('Wrong password — check your ADMIN_PASSWORD in Netlify');
-      if (!res.ok) throw new Error(data.error || 'Error');
+      if (res.status === 401) throw new Error('Wrong password');
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       stockData[product] = data;
       renderCards();
       showToast(`✓ ${product} updated`);
