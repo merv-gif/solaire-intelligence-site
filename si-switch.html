@@ -300,14 +300,33 @@
     <div style="padding:40px 0;border-top:1px solid var(--line);">
       <p class="section-label">Pool Pump Mode</p>
       <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
-        Your switch knows when your filter needs cleaning.
+        It doesn't just save electricity. It saves your pump and your pool.
       </h2>
-      <p style="color:var(--muted);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:14px;">
-        In Pool Pump Mode, SI Switch watches the pump's power draw continuously. A clean filter lets water flow freely — the pump works at full load. As the filter blocks up, flow drops and so does the wattage. When it falls below your configured threshold, the status flips to <strong style="color:#f87171;">Dirty</strong>. No extra sensor. No float switch. Just the power meter that's already there.
+      <p style="color:var(--muted);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:20px;">
+        Pool Pump Mode turns SI Switch into an active pool health monitor. Most pool owners backwash on a fixed schedule — wasting thousands of litres of water whether the filter needs it or not. SI Switch watches the pump's power draw in real time. A clean filter allows free water flow and the pump draws full wattage. As the filter loads up, flow drops and so does the power. When it falls below your threshold, the app flags it as <strong style="color:#f87171;">Dirty</strong>. Backwash only when it's actually needed — not before, not after.
       </p>
-      <p style="color:var(--muted);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:32px;">
-        Enable <strong style="color:var(--text);">Dry Run Protection</strong> and the switch will cut power if the pump starts drawing near-zero current — a clear sign it's running without water. A configurable grace period lets the pump prime normally before protection kicks in. Your motor stays safe even when the borehole runs dry or the pool valve is closed.
+      <div style="display:flex;gap:12px;flex-wrap:wrap;max-width:640px;margin-bottom:20px;">
+        <div style="flex:1;min-width:180px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:20px;margin-bottom:6px;">💧</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Save thousands of litres a year</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;">Backwash only when the filter is actually dirty — not on a guess or a fixed weekly schedule.</div>
+        </div>
+        <div style="flex:1;min-width:180px;background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius-sm);padding:14px 16px;">
+          <div style="font-size:20px;margin-bottom:6px;">🏊</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Protect your pool water quality</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;">A blocked filter strains the pump, reduces circulation and compromises water chemistry. Know the moment it needs attention.</div>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:15px;line-height:1.7;max-width:640px;margin-bottom:8px;">
+        <strong style="color:var(--text);">Dry Run Protection</strong> addresses the number one cause of pool pump failure worldwide. Suction loss, a clogged skimmer basket, a closed valve or a low water level — all result in the pump running without water. Most homeowners only find out when the motor burns out. SI Switch detects near-zero current draw while the pump is running and cuts power before damage occurs. A configurable grace period allows for normal priming so you don't get false trips.
       </p>
+      <div style="max-width:640px;margin-bottom:32px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius-sm);padding:16px 18px;display:flex;gap:14px;align-items:flex-start;">
+        <span style="font-size:22px;flex-shrink:0;">🛡️</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Save thousands of rands on pump repairs and replacements</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;">Pool pump replacements routinely run R3,000–R8,000 installed. Dry run is the leading cause. Built-in protection costs nothing extra and runs silently in the background every time the pump is on.</div>
+        </div>
+      </div>
 
       <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;">
 
@@ -342,16 +361,16 @@
         <!-- Feature chips -->
         <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:14px;padding-top:4px;">
           <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
-            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">🔍 Sensor-free filter monitoring</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Power draw is the sensor. A clean filter = full flow = full watts. A dirty filter = restricted flow = fewer watts. Set your clean threshold once and the app does the rest.</div>
+            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">🔍 No extra sensor needed</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Power draw is the sensor. Clean filter = free flow = full watts. Dirty filter = restricted flow = fewer watts. The metering already built into SI Switch does all the work.</div>
           </div>
           <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
-            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">🛡️ Dry run protection</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Near-zero current while the pump is running means it's running without water — a fast way to burn out the motor. SI Switch can cut the pump automatically, with a configurable grace period for priming.</div>
+            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">💧 Backwash only when needed</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;">A typical backwash uses 400–600 litres of water. Do that weekly on a schedule instead of on demand and you waste tens of thousands of litres a year for no reason.</div>
           </div>
           <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;">
-            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">⚙️ Fully configurable</div>
-            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Filter clean threshold and dry run grace period are adjustable from the app. Dial them in for your specific pump and installation — no one-size-fits-all assumptions.</div>
+            <div style="font-size:13px;font-weight:700;color:var(--switch);margin-bottom:6px;">⚙️ Set once, forget</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6;">Dial in your filter's clean threshold and dry run grace period from the app. SI Switch monitors silently every time the pump runs — no manual checks required.</div>
           </div>
         </div>
 
