@@ -33,7 +33,8 @@ exports.handler = async function (event) {
         return { statusCode: 400, body: JSON.stringify({ error: `Invalid qty for ${item.product}` }) };
       }
     }
-    const amount = items.reduce((s, i) => s + PRICES[i.product] * i.qty, 0);
+    const SHIPPING = 16000; // R160 flat shipping
+    const amount = items.reduce((s, i) => s + PRICES[i.product] * i.qty, 0) + SHIPPING;
     const itemSummary = items.map(i => `${i.product} ×${i.qty}`).join(', ');
 
     const origin = 'https://solaire-intelligence.co.za';
@@ -89,10 +90,11 @@ exports.handler = async function (event) {
 
   // ─── Single-product path (product pages buy-direct) ──────────────────────
   const { product } = body;
-  const amount = PRICES[product];
-  if (!amount) {
+  const productPrice = PRICES[product];
+  if (!productPrice) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Unknown product' }) };
   }
+  const amount = productPrice + 16000; // + R160 shipping
 
   const origin = 'https://solaire-intelligence.co.za';
   const formName =

@@ -122,7 +122,7 @@
     <div class="summary-card">
       <h3 style="font-size:16px;font-weight:800;margin-bottom:16px;">Order summary</h3>
       <div id="summaryLines"></div>
-      <div class="summary-row"><span>Shipping</span><span style="color:var(--accent);font-weight:600;">Free</span></div>
+      <div class="summary-row"><span>Shipping</span><span style="font-family:var(--mono);font-weight:600;">R160</span></div>
       <div class="summary-total">
         <span>Total</span>
         <span id="summaryTotal">R0</span>
@@ -302,7 +302,8 @@
       const item = cart[k];
       return `<div class="summary-row"><span>${item.label} × ${item.qty}</span><span>${fmtPrice(item.price * item.qty)}</span></div>`;
     }).join('');
-    document.getElementById('summaryTotal').querySelector('span:last-child').textContent = fmtPrice(total);
+    const SHIPPING = 16000; // R160 in cents
+    document.getElementById('summaryTotal').textContent = fmtPrice(total + SHIPPING);
   }
 
   function showCheckout() {
