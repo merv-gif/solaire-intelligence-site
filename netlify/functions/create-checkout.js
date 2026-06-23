@@ -23,6 +23,8 @@ exports.handler = async function (event) {
   }
 
   const origin = 'https://solaire-intelligence.co.za';
+  const key = process.env.YOCO_SECRET_KEY;
+  console.log('Key present:', !!key, '| Key prefix:', key ? key.substring(0, 10) : 'MISSING');
 
   try {
     const response = await fetch('https://payments.yoco.com/api/checkouts', {
