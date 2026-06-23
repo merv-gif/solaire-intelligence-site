@@ -66,10 +66,17 @@ exports.handler = async function (event) {
     }
 
     try {
-      await store.set(product, JSON.stringify(entry));
+      await Promise.race([
+        store.set(product, JSON.stringify(entry)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Blobs write timed out after 8s')), 8000)),
+      ]);
     } catch (writeErr) {
-      console.error('Blobs write error:', writeErr);
-      return { statusCode: 500, body: JSON.stringify({ error: 'Failed to save: ' + writeErr.message }) };
+      console.error('Blobs write error:', writeErr.message);
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: writeErr.message }),
+      };
     }
 
     return {
