@@ -381,15 +381,15 @@
             <span style="color:var(--switch);font-size:16px;">✓</span> 4-window timer + ECM auto mode
           </li>
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);">
-            <span style="color:var(--muted);font-size:16px;">⚡</span> Installed by certified electrician
+            <span style="color:var(--muted);font-size:16px;">ℹ</span> Requires DB installation by your electrician
           </li>
         </ul>
-        <a href="https://pay.yoco.com/r/2pj8wz" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--switch),var(--switch-2));color:#0b1220;font-size:16px;font-weight:800;padding:16px 32px;border-radius:var(--radius);text-decoration:none;letter-spacing:-0.01em;">
+        <button onclick="openModal()"
+           style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--switch),var(--switch-2));color:#0b1220;font-size:16px;font-weight:800;padding:16px 32px;border-radius:var(--radius);border:none;cursor:pointer;letter-spacing:-0.01em;">
           Buy Now &nbsp;→
-        </a>
+        </button>
         <p style="font-size:12px;color:var(--muted);margin-top:12px;">Secured by Yoco · Card &amp; instant EFT accepted</p>
-        <p style="font-size:12px;color:var(--muted);margin-top:4px;">We'll be in touch to arrange delivery after payment.</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px;">Enter delivery details, then pay securely via Yoco.</p>
       </div>
 
       <!-- Device image -->
@@ -569,9 +569,118 @@
   </div>
 </footer>
 
+<!-- Netlify form detection (hidden) -->
+<form name="si-switch-order" netlify netlify-honeypot="bot-field" hidden>
+  <input name="bot-field" /><input name="product" /><input name="name" />
+  <input name="email" /><input name="phone" /><input name="address" />
+  <input name="city" /><input name="province" /><input name="postal_code" />
+</form>
+
+<!-- ── Shipping Modal ──────────────────────────────────────────────────────── -->
+<div id="orderModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:32px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--switch);margin-bottom:4px;">SI Switch · R1,350</div>
+        <h3 style="font-size:20px;font-weight:800;margin:0;">Delivery details</h3>
+      </div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;padding:4px;">✕</button>
+    </div>
+
+    <form id="orderForm" name="si-switch-order" method="POST" netlify netlify-honeypot="bot-field" style="display:flex;flex-direction:column;gap:14px;">
+      <input type="hidden" name="form-name" value="si-switch-order" />
+      <input type="hidden" name="product" value="SI Switch — R1,350" />
+      <p style="display:none;"><input name="bot-field" /></p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Full name *</label>
+          <input name="name" required placeholder="Thabo Nkosi"
+                 style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Email *</label>
+          <input name="email" type="email" required placeholder="you@example.com"
+                 style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Phone *</label>
+          <input name="phone" type="tel" required placeholder="082 000 0000"
+                 style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Street address *</label>
+          <input name="address" required placeholder="12 Solar Street, Sunridge"
+                 style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">City *</label>
+          <input name="city" required placeholder="Cape Town"
+                 style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Province *</label>
+          <select name="province" required
+                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;">
+            <option value="" disabled selected>Select…</option>
+            <option>Western Cape</option><option>Gauteng</option><option>KwaZulu-Natal</option>
+            <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+            <option>North West</option><option>Free State</option><option>Northern Cape</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Postal code *</label>
+          <input name="postal_code" required placeholder="7500" maxlength="4"
+                 style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+      </div>
+
+      <button type="submit" id="orderSubmit"
+              style="margin-top:8px;background:linear-gradient(135deg,var(--switch),var(--switch-2));color:#0b1220;font-size:15px;font-weight:800;padding:14px 24px;border:none;border-radius:var(--radius);cursor:pointer;letter-spacing:-0.01em;">
+        Continue to payment →
+      </button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin:0;">
+        You'll be taken to Yoco to pay securely after this step.
+      </p>
+    </form>
+  </div>
+</div>
+
 <script>
   document.getElementById('navBurger').addEventListener('click', () => {
     document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  function openModal() {
+    const m = document.getElementById('orderModal');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('orderModal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  document.getElementById('orderModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('orderSubmit');
+    btn.textContent = 'Submitting…';
+    btn.disabled = true;
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(this)).toString()
+      });
+      window.location.href = 'https://pay.yoco.com/r/2pj8wz';
+    } catch {
+      btn.textContent = 'Continue to payment →';
+      btn.disabled = false;
+      window.location.href = 'https://pay.yoco.com/r/2pj8wz';
+    }
   });
 </script>
 </body>
