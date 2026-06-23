@@ -54,7 +54,7 @@
       Assistant discovery. One IP65 unit. Properly installed. Reliably deployed.
     </p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="index.html#contact">Get SI Pool</a>
+      <a class="btn btn-primary" href="#buy" onclick="event.preventDefault();document.getElementById('buy').scrollIntoView({behavior:'smooth'});" style="background:linear-gradient(135deg,var(--pool),var(--pool-2));color:#041425;">Buy Now →</a>
       <a class="btn btn-ghost" href="docs.html">Download installer spec →</a>
     </div>
 
@@ -275,6 +275,48 @@
   </div>
 </section>
 
+<!-- ── Buy ──────────────────────────────────────────────────────────────────── -->
+<section id="buy" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div style="display:flex;gap:48px;align-items:center;flex-wrap:wrap;">
+      <div style="flex:1;min-width:240px;">
+        <p class="section-label">Order online</p>
+        <h2 style="font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;">SI Pool Kit</h2>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:16px;">
+          <span style="font-family:var(--mono);font-size:42px;font-weight:800;color:var(--pool);">R7,200</span>
+          <span style="font-size:14px;color:var(--muted);">incl. VAT</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
+          <span style="background:rgba(47,181,255,0.12);border:1px solid rgba(47,181,255,0.3);color:var(--pool);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;">🚚 Free shipping in SA</span>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
+            <span style="color:var(--pool);font-size:16px;">✓</span> SI Pool controller (IP65 wall-mount enclosure)
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
+            <span style="color:var(--pool);font-size:16px;">✓</span> Temperature probe (SS thermowell + waterproof sensor)
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
+            <span style="color:var(--pool);font-size:16px;">✓</span> AC current transformer for pump monitoring
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
+            <span style="color:var(--pool);font-size:16px;">✓</span> SI Portal app access (iOS)
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);">
+            <span style="font-size:14px;">ℹ</span> Wall-mounted installation by your electrician
+          </li>
+        </ul>
+        <button onclick="openModal()"
+           style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--pool),var(--pool-2));color:#041425;font-size:16px;font-weight:800;padding:16px 32px;border-radius:var(--radius);border:none;cursor:pointer;letter-spacing:-0.01em;">
+          Buy Now &nbsp;→
+        </button>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px;">Secured by Yoco · Card &amp; instant EFT accepted</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px;">Enter delivery details, then pay securely via Yoco.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -317,9 +359,113 @@
   </div>
 </footer>
 
+<!-- Netlify form detection -->
+<form name="si-pool-order" netlify netlify-honeypot="bot-field" hidden>
+  <input name="bot-field" /><input name="product" /><input name="name" />
+  <input name="email" /><input name="phone" /><input name="address" />
+  <input name="city" /><input name="province" /><input name="postal_code" />
+</form>
+
+<!-- Shipping Modal -->
+<div id="orderModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:32px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--pool);margin-bottom:4px;">SI Pool Kit · R7,200</div>
+        <h3 style="font-size:20px;font-weight:800;margin:0;">Delivery details</h3>
+      </div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;padding:4px;">✕</button>
+    </div>
+    <form id="orderForm" name="si-pool-order" method="POST" netlify netlify-honeypot="bot-field" style="display:flex;flex-direction:column;gap:14px;">
+      <input type="hidden" name="form-name" value="si-pool-order" />
+      <input type="hidden" name="product" value="SI Pool Kit — R7,200" />
+      <p style="display:none;"><input name="bot-field" /></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Full name *</label>
+          <input name="name" required placeholder="Thabo Nkosi" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Email *</label>
+          <input name="email" type="email" required placeholder="you@example.com" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Phone *</label>
+          <input name="phone" type="tel" required placeholder="082 000 0000" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Street address *</label>
+          <input name="address" required placeholder="12 Solar Street, Sunridge" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">City *</label>
+          <input name="city" required placeholder="Cape Town" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Province *</label>
+          <select name="province" required style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;">
+            <option value="" disabled selected>Select…</option>
+            <option>Western Cape</option><option>Gauteng</option><option>KwaZulu-Natal</option>
+            <option>Eastern Cape</option><option>Limpopo</option><option>Mpumalanga</option>
+            <option>North West</option><option>Free State</option><option>Northern Cape</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Postal code *</label>
+          <input name="postal_code" required placeholder="7500" maxlength="4" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
+        </div>
+      </div>
+      <button type="submit" id="orderSubmit" style="margin-top:8px;background:linear-gradient(135deg,var(--pool),var(--pool-2));color:#041425;font-size:15px;font-weight:800;padding:14px 24px;border:none;border-radius:var(--radius);cursor:pointer;letter-spacing:-0.01em;">
+        Continue to payment →
+      </button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin:0;">You'll be taken to Yoco to pay securely after this step.</p>
+    </form>
+  </div>
+</div>
+
 <script>
   document.getElementById('navBurger').addEventListener('click', () => {
     document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  function openModal() {
+    const m = document.getElementById('orderModal');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('orderModal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  document.getElementById('orderModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('orderSubmit');
+    btn.textContent = 'Processing…';
+    btn.disabled = true;
+    const fd = new FormData(this);
+    const payload = {
+      product: 'SI Pool', name: fd.get('name'), email: fd.get('email'),
+      phone: fd.get('phone'), address: fd.get('address'), city: fd.get('city'),
+      province: fd.get('province'), postal_code: fd.get('postal_code'),
+    };
+    try {
+      const res = await fetch('/.netlify/functions/create-checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.redirectUrl) { window.location.href = data.redirectUrl; }
+      else { throw new Error(data.error || 'No redirect URL'); }
+    } catch (err) {
+      console.error(err);
+      btn.textContent = 'Continue to payment →';
+      btn.disabled = false;
+      alert('Something went wrong. Please try again.');
+    }
   });
 </script>
 </body>

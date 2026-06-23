@@ -16,6 +16,8 @@ exports.handler = async function (event) {
   const amounts = {
     'SI Gateway': 165000,
     'SI Switch':  135000,
+    'SI Water':   465000,
+    'SI Pool':    720000,
   };
   const amount = amounts[product];
   if (!amount) {
@@ -52,9 +54,12 @@ exports.handler = async function (event) {
         amount,
         currency: 'ZAR',
         successUrl: `${origin}/thank-you`,
-        cancelUrl:  product === 'SI Gateway'
-          ? `${origin}/si-gateway#buy`
-          : `${origin}/si-switch#buy`,
+        cancelUrl: {
+          'SI Gateway': `${origin}/si-gateway#buy`,
+          'SI Switch':  `${origin}/si-switch#buy`,
+          'SI Water':   `${origin}/si-water#buy`,
+          'SI Pool':    `${origin}/si-pool#buy`,
+        }[product] || `${origin}/`,
         metadata: { product, name, email, phone, address, city, province, postal_code },
       }),
     });
