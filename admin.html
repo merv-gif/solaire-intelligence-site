@@ -99,13 +99,14 @@
   document.getElementById('pwField').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
 
   async function loadStock() {
+    renderCards(); // show defaults immediately — never hang
     try {
       const res = await fetch('/.netlify/functions/stock');
       if (res.ok) {
         stockData = await res.json();
-        renderCards();
+        renderCards(); // update with saved values
       }
-    } catch { /* non-fatal — defaults shown */ }
+    } catch { /* use defaults */ }
   }
 
   function statusLabel(status) {

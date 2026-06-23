@@ -1,4 +1,5 @@
-const { getStore } = require('@netlify/blobs');
+let getStore;
+try { getStore = require('@netlify/blobs').getStore; } catch { getStore = null; }
 
 const PRODUCTS = ['SI Gateway', 'SI Switch', 'SI Water', 'SI Pool'];
 
@@ -16,19 +17,20 @@ function getStatus(item) {
 }
 
 exports.handler = async function (event) {
-  const store = getStore('stock');
+  const store = getStore ? getStore('stock') : null;
 
   // ── GET: return current stock (public) ────────────────────────────────────
   if (event.httpMethod === 'GET') {
     const result = {};
     for (const product of PRODUCTS) {
+      let entry = { ...DEFAULTS[product] };
       try {
-        const raw = await store.get(product, { type: 'json' });
-        result[product] = raw || DEFAULTS[product];
-      } catch {
-        result[product] = DEFAULTS[product];
-      }
-      result[product].status = getStatus(result[product]);
+        if (store) {
+          const raw = await store.get(product, { type: 'json' });
+          if (raw) entry = raw;
+        }
+      } catch { /* blobs unavailable — use defaults */ }
+      result[product] = { ...entry, status: getStatus(entry) };
     }
     return {
       statusCode: 200,
@@ -59,6 +61,7 @@ exports.handler = async function (event) {
       threshold: parseInt(threshold, 10),
       lead_time: lead_time || '3–5 business days',
     };
+    if (!store) return { statusCode: 503, body: JSON.stringify({ error: 'Storage not available yet — try again after next deploy' }) };
     await store.setJSON(product, entry);
 
     return {
