@@ -55,19 +55,16 @@
     }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .nav-cart-link {
-      position: relative; display: flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border-radius: var(--radius-sm);
-      background: var(--panel); border: 1px solid var(--line);
-      font-size: 13px; font-weight: 600; color: var(--text);
-      text-decoration: none; transition: border-color .15s;
-    }
-    .nav-cart-link:hover { border-color: var(--accent); text-decoration: none; }
-    .cart-badge {
-      display: none; align-items: center; justify-content: center;
-      background: var(--accent); color: #041425;
-      font-size: 10px; font-weight: 800; min-width: 18px; height: 18px;
-      border-radius: 9px; padding: 0 4px;
+    /* ── Mobile cart item layout ── */
+    @media (max-width: 520px) {
+      .cart-item { flex-wrap: wrap; gap: 10px; }
+      .cart-item-dot { display: none; }
+      .cart-item-name { flex: 1 1 100%; order: 0; }
+      .qty-ctrl { order: 1; }
+      .cart-item-price { order: 2; flex: 1; text-align: left; min-width: unset; }
+      .remove-btn { order: 3; }
+      .cart-grid { grid-template-columns: 1fr; }
+      .summary-card { position: static; }
     }
   </style>
 </head>
@@ -95,8 +92,8 @@
       <li><a href="index.html#contact">Contact</a></li>
     </ul>
     <div class="nav-spacer"></div>
-    <a class="nav-cart-link" href="cart.html">
-      🛒 Cart <span class="cart-badge" id="navBadge">0</span>
+    <a class="nav-cart-btn" href="cart.html" aria-label="Cart">
+      🛒 <span class="cart-label">Cart</span> <span class="nav-cart-badge" id="navBadge"></span>
     </a>
     <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
     <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
