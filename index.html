@@ -758,6 +758,7 @@
         </div>
         <button type="submit" class="btn btn-primary" style="justify-content:center;">Send Enquiry</button>
         <p id="c-confirm" style="font-size:13px;color:var(--ok);display:none;text-align:center;">✓ Message sent — we'll be in touch shortly.</p>
+        <p id="c-error"   style="font-size:13px;color:#f87171;display:none;text-align:center;"></p>
       </form>
     </div>
   </div>
@@ -812,16 +813,46 @@
     document.getElementById('navLinks').classList.toggle('open');
   });
 
-  // Contact form (mailto fallback — replace with actual backend)
-  function handleContact(e) {
+  // Contact form — submits to Netlify Function → Resend
+  async function handleContact(e) {
     e.preventDefault();
-    const name  = document.getElementById('c-name').value;
-    const email = document.getElementById('c-email').value;
-    const type  = document.getElementById('c-type').value;
-    const msg   = document.getElementById('c-msg').value;
-    const body  = encodeURIComponent(`Name: ${name}\nType: ${type}\n\n${msg}`);
-    window.open(`mailto:info@si-sa.co.za?subject=SI Enquiry — ${type}&body=${body}`);
-    document.getElementById('c-confirm').style.display = 'block';
+    const btn     = e.target.querySelector('button[type="submit"]');
+    const confirm = document.getElementById('c-confirm');
+    const errMsg  = document.getElementById('c-error');
+
+    btn.disabled    = true;
+    btn.textContent = 'Sending…';
+    confirm.style.display = 'none';
+    errMsg.style.display  = 'none';
+
+    try {
+      const res = await fetch('/.netlify/functions/contact', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name:    document.getElementById('c-name').value,
+          email:   document.getElementById('c-email').value,
+          type:    document.getElementById('c-type').value,
+          message: document.getElementById('c-msg').value,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.ok) {
+        confirm.style.display = 'block';
+        e.target.reset();
+      } else {
+        errMsg.textContent    = data.error || 'Something went wrong — please try again.';
+        errMsg.style.display  = 'block';
+      }
+    } catch {
+      errMsg.textContent   = 'Network error — please email us directly at info@si-sa.co.za';
+      errMsg.style.display = 'block';
+    } finally {
+      btn.disabled    = false;
+      btn.textContent = 'Send Enquiry';
+    }
   }
 </script>
 </body>
