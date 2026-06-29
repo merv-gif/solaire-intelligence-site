@@ -700,4 +700,9 @@ footer {
   [style*="grid-template-columns:1fr 1fr"][style*="align-items:start"] {
     grid-template-columns: 1fr !important;
   }
+
+  /* Demo strip: stack on mobile */
+  [style*="grid-template-columns:1fr auto"][style*="gap:40px"] {
+    grid-template-columns: 1fr !important;
+  }
 }
