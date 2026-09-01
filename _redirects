@@ -1,0 +1,17 @@
+# ── /dashboard → the real portal ───────────────────────────────────────────
+# dashboard.html used to live here: a 166 KB standalone customer dashboard,
+# served publicly, with the broker username AND password written into its
+# JavaScript in clear text (lines 2589-2590). Anyone who opened View Source on
+# solaire-intelligence.co.za had readwrite si/# across the entire fleet.
+#
+# It was a parallel implementation of the portal, on a third auth system
+# (provision.solaire-intelligence.co.za), and securing it properly meant
+# teaching that system to issue scoped MQTT credentials — a second copy of work
+# already done once. The page is retired instead. portal.html sends users here
+# and this sends them on to the app, which has real auth and per-client broker
+# credentials.
+#
+# 301, not 302: the old page is not coming back, and browsers that cached it
+# should stop asking.
+/dashboard    https://portal.solaire-intelligence.co.za/    301!
+/dashboard.html   https://portal.solaire-intelligence.co.za/    301!
