@@ -12,11 +12,21 @@ exports.handler = async function (event) {
 
   // Price list (cents) — single source of truth server-side
   const PRICES = {
-    'SI Gateway': 165000,
+    'SI Gateway': 185000,
     'SI Switch':  135000,
     'SI Water':   465000,
     'SI Pool':    720000,
   };
+
+  // Delivery, in cents, per product. SI Gateway ships free (launch promo).
+  // A mixed cart pays the highest single shipping charge, not the sum.
+  const SHIPPING_BY_PRODUCT = {
+    'SI Gateway': 0,
+    'SI Switch':  16000,
+    'SI Water':   16000,
+    'SI Pool':    16000,
+  };
+  const DEFAULT_SHIPPING = 16000;
 
   const { name, email, phone, address, city, province, postal_code } = body;
 
@@ -33,7 +43,8 @@ exports.handler = async function (event) {
         return { statusCode: 400, body: JSON.stringify({ error: `Invalid qty for ${item.product}` }) };
       }
     }
-    const SHIPPING = 16000; // R160 flat shipping
+    const SHIPPING = items.reduce(
+      (m, i) => Math.max(m, SHIPPING_BY_PRODUCT[i.product] ?? DEFAULT_SHIPPING), 0);
     const amount = items.reduce((s, i) => s + PRICES[i.product] * i.qty, 0) + SHIPPING;
     const itemSummary = items.map(i => {
       const variantStr = i.variant ? ` (${i.variant})` : '';
@@ -97,7 +108,7 @@ exports.handler = async function (event) {
   if (!productPrice) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Unknown product' }) };
   }
-  const amount = productPrice + 16000; // + R160 shipping
+  const amount = productPrice + (SHIPPING_BY_PRODUCT[product] ?? DEFAULT_SHIPPING);
 
   const origin = 'https://solaire-intelligence.co.za';
   const formName =

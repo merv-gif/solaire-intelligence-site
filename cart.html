@@ -135,7 +135,7 @@
     <div class="summary-card">
       <h3 style="font-size:16px;font-weight:800;margin-bottom:16px;">Order summary</h3>
       <div id="summaryLines"></div>
-      <div class="summary-row"><span>Shipping</span><span style="font-family:var(--mono);font-weight:600;">R160</span></div>
+      <div class="summary-row"><span>Shipping</span><span id="summaryShipping" style="font-family:var(--mono);font-weight:600;">—</span></div>
       <div class="summary-total">
         <span>Total</span>
         <span id="summaryTotal">R0</span>
@@ -248,11 +248,16 @@
 
 <script>
   const PRODUCTS = {
-    'SI Gateway': { price: 165000, label: 'SI Gateway Kit',  color: 'var(--gateway)' },
+    'SI Gateway': { price: 185000, label: 'SI Gateway Kit',  color: 'var(--gateway)' },
     'SI Switch':  { price: 135000, label: 'SI Switch Kit',   color: 'var(--switch)'  },
     'SI Water':   { price: 465000, label: 'SI Water Kit',    color: 'var(--water)'   },
     'SI Pool':    { price: 720000, label: 'SI Pool Kit',     color: 'var(--pool)'    },
   };
+
+  // Delivery per product, in cents. SI Gateway ships free (launch promo).
+  // A mixed cart pays the highest single shipping charge, not the sum.
+  const SHIPPING_BY_PRODUCT = { 'SI Gateway': 0, 'SI Switch': 16000, 'SI Water': 16000, 'SI Pool': 16000 };
+  const DEFAULT_SHIPPING = 16000;
 
   function fmtPrice(cents) {
     return 'R' + (cents / 100).toLocaleString('en-ZA', { minimumFractionDigits: 0 });
@@ -336,7 +341,16 @@
       const item = cart[k];
       return `<div class="summary-row"><span>${item.label} × ${item.qty}</span><span>${fmtPrice(item.price * item.qty)}</span></div>`;
     }).join('');
-    const SHIPPING = 16000; // R160 in cents
+    const SHIPPING = keys.reduce((m, k) => {
+      const prod = k.includes('::') ? k.split('::')[0] : k;
+      return Math.max(m, SHIPPING_BY_PRODUCT[prod] ?? DEFAULT_SHIPPING);
+    }, 0);
+    const shipEl = document.getElementById('summaryShipping');
+    if (shipEl) {
+      shipEl.innerHTML = SHIPPING === 0
+        ? '<span style="color:#4ade80;">FREE</span>'
+        : fmtPrice(SHIPPING);
+    }
     document.getElementById('summaryTotal').textContent = fmtPrice(total + SHIPPING);
   }
 
