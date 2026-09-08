@@ -273,6 +273,48 @@
   document.getElementById('navBurger').addEventListener('click', () => {
     document.getElementById('navLinks').classList.toggle('open');
   });
+
+  // ── Purchase tracking ────────────────────────────────────────────────────
+  // create-checkout.js sends the order total (in cents) through as ?v=.
+  // Fires once per order: a refresh or a bookmarked visit will not re-count,
+  // because the guard key is the order value plus the day it landed.
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var cents  = parseInt(params.get('v'), 10);
+
+    // Always clear the cart on a completed order, tracked or not.
+    try { localStorage.removeItem('si-cart'); } catch (e) {}
+    var badge = document.getElementById('navBadge');
+    if (badge) badge.style.display = 'none';
+
+    if (!cents || cents <= 0 || typeof gtag !== 'function') return;
+
+    var value = cents / 100;
+    var txnId = 'si-' + new Date().toISOString().slice(0, 10) + '-' + cents;
+    try {
+      if (localStorage.getItem('si-purchase-' + txnId)) return; // already counted
+      localStorage.setItem('si-purchase-' + txnId, '1');
+    } catch (e) { /* private mode — accept the small double-count risk */ }
+
+    // GA4 ecommerce — imports into Google Ads as a conversion action.
+    gtag('event', 'purchase', {
+      transaction_id: txnId,
+      value: value,
+      currency: 'ZAR',
+    });
+
+    // Google Ads conversion. Fill CONVERSION_LABEL in from the Ads UI
+    // (Goals -> Conversions -> the purchase action -> tag setup) to enable it.
+    var CONVERSION_LABEL = '';
+    if (CONVERSION_LABEL) {
+      gtag('event', 'conversion', {
+        send_to: 'AW-17542095019/' + CONVERSION_LABEL,
+        value: value,
+        currency: 'ZAR',
+        transaction_id: txnId,
+      });
+    }
+  })();
 </script>
 
 </body>
