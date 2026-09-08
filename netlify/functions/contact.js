@@ -1,6 +1,6 @@
 // Contact form handler — sends enquiry email via Resend
 // Env vars required: RESEND_API_KEY
-// To address: info@si-sa.co.za
+// To address: sales@solairesa.co.za
 // From address: noreply@solaire-intelligence.co.za (must be verified in Resend)
 
 export async function handler(event) {
@@ -54,7 +54,7 @@ export async function handler(event) {
       },
       body: JSON.stringify({
         from:     "Solaire Intelligence <noreply@solaire-intelligence.co.za>",
-        to:       ["info@si-sa.co.za"],
+        to:       ["sales@solairesa.co.za"],
         reply_to: email,
         subject:  `SI Enquiry — ${type || "General"} (${name})`,
         html,
@@ -64,7 +64,7 @@ export async function handler(event) {
     if (!res.ok) {
       const err = await res.text();
       console.error("Resend error:", err);
-      return { statusCode: 500, body: JSON.stringify({ error: "Failed to send. Please email us directly at info@si-sa.co.za" }) };
+      return { statusCode: 500, body: JSON.stringify({ error: "Failed to send. Please email us directly at sales@solairesa.co.za" }) };
     }
 
     return {
@@ -74,6 +74,6 @@ export async function handler(event) {
     };
   } catch (err) {
     console.error("Contact function error:", err);
-    return { statusCode: 500, body: JSON.stringify({ error: "Unexpected error. Please email us directly at info@si-sa.co.za" }) };
+    return { statusCode: 500, body: JSON.stringify({ error: "Unexpected error. Please email us directly at sales@solairesa.co.za" }) };
   }
 }
