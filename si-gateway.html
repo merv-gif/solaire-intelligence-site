@@ -329,10 +329,22 @@
 
       <!-- Device photo -->
       <div style="flex:1;min-width:260px;">
-        <img src="/screenshots/resized/gateway-kit.jpg"
-             alt="SI Gateway kit — gateway unit, 12 V power supply and ethernet patch cable in the box"
-             style="width:100%;max-width:600px;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.4);"
-             onerror="this.closest('div').style.display='none'" />
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <picture style="flex:1;min-width:180px;">
+            <source srcset="/assets/products/si-gateway-device.webp" type="image/webp" />
+            <img src="/assets/products/si-gateway-device.png"
+                 alt="SI Gateway — sealed wall-mount enclosure with RS485 and 12 V inputs"
+                 loading="lazy" style="width:100%;max-width:320px;display:block;filter:drop-shadow(0 14px 28px rgba(0,0,0,0.55));"
+                 onerror="this.closest('picture').style.display='none'" />
+          </picture>
+          <picture style="flex:1;min-width:180px;">
+            <source srcset="/assets/products/si-gateway-open.webp" type="image/webp" />
+            <img src="/assets/products/si-gateway-open.png"
+                 alt="Inside the SI Gateway — SI Node board, Wi-Fi antenna and RS485 RJ45 jack"
+                 loading="lazy" style="width:100%;max-width:320px;display:block;filter:drop-shadow(0 14px 28px rgba(0,0,0,0.55));"
+                 onerror="this.closest('picture').style.display='none'" />
+          </picture>
+        </div>
         <div style="font-size:11px;color:var(--muted);margin-top:10px;">SI Gateway · antenna fitted · 12&nbsp;V power supply · Ethernet cable · mounting screws · printed quick start guide</div>
       </div>
 
@@ -520,10 +532,13 @@
 
       <!-- Device image -->
       <div style="flex-shrink:0;max-width:380px;">
-        <img src="/screenshots/resized/gateway-device.jpg"
-             alt="SI Gateway — wall-mountable gateway unit"
-             style="width:100%;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.5);"
-             onerror="this.closest('div').style.display='none'" />
+        <picture>
+          <source srcset="/assets/products/si-gateway-open-2.webp" type="image/webp" />
+          <img src="/assets/products/si-gateway-open-2.png"
+               alt="SI Gateway — wall-mountable unit with the SI Node board and RS485 jack visible"
+               loading="lazy" style="width:100%;display:block;filter:drop-shadow(0 18px 36px rgba(0,0,0,0.6));"
+               onerror="this.closest('picture').style.display='none'" />
+        </picture>
       </div>
 
     </div>
