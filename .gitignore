@@ -5,3 +5,6 @@ node_modules/
 # Camera originals for product shots (cut-outs live in assets/products/)
 assets/IMG_*.jpeg
 assets/_thumbs/
+
+.DS_Store
+*.bak
