@@ -735,27 +735,27 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <div style="grid-column:1/-1;">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Full name *</label>
-          <input name="name" required placeholder="Thabo Nkosi"
+          <input name="name" required
                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
         </div>
         <div>
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Email *</label>
-          <input name="email" type="email" required placeholder="you@example.com"
+          <input name="email" type="email" required
                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
         </div>
         <div>
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Phone *</label>
-          <input name="phone" type="tel" required placeholder="082 000 0000"
+          <input name="phone" type="tel" required
                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
         </div>
         <div style="grid-column:1/-1;">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Street address *</label>
-          <input name="address" required placeholder="12 Solar Street, Sunridge"
+          <input name="address" required
                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
         </div>
         <div>
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">City *</label>
-          <input name="city" required placeholder="Cape Town"
+          <input name="city" required
                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
         </div>
         <div>
@@ -770,7 +770,7 @@
         </div>
         <div>
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Postal code *</label>
-          <input name="postal_code" required placeholder="7500" maxlength="4"
+          <input name="postal_code" required maxlength="4"
                  style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;box-sizing:border-box;" />
         </div>
       </div>
@@ -835,10 +835,15 @@
         throw new Error(data.error || 'No redirect URL');
       }
     } catch (err) {
-      console.error(err);
+      console.error('[checkout]', err);
       btn.textContent = 'Continue to payment →';
       btn.disabled = false;
-      alert('Something went wrong. Please try again.');
+      const reason = (err && err.message) ? err.message : '';
+      alert(
+        (reason ? reason + '\n\n' : 'We could not start the payment.\n\n') +
+        'Nothing has been charged. Please try again, or email sales@solairesa.co.za ' +
+        'and we will take the order manually.'
+      );
     }
   });
 

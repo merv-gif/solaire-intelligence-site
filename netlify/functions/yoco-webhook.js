@@ -13,6 +13,7 @@
 //   the webhook-signature header is a space-separated list of "v1,<sig>"
 
 import crypto from "node:crypto";
+import { markPaid, markPaidByEmail } from "./lib/db.js";
 
 const TOLERANCE_SECONDS = 3 * 60;
 
@@ -107,6 +108,15 @@ export async function handler(event) {
       </p>
     </div>
   `;
+
+  // Close the order record out before mailing, so a mail failure can't lose the fact of payment.
+  const checkoutId = m.checkoutId || p.checkoutId || evt.payload?.checkoutId || null;
+  const marked = checkoutId
+    ? await markPaid({ checkoutId, paymentId: p.id })
+    : await markPaidByEmail({ email: m.email, paymentId: p.id });
+  if (!marked) {
+    console.warn("Payment %s could not be matched to a web_checkouts row", p.id);
+  }
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {

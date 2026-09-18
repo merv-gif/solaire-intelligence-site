@@ -5,3 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# Nudge checkouts that were started but never paid. One email per checkout, ever.
+[functions."checkout-reminders"]
+  schedule = "@hourly"

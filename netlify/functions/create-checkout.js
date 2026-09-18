@@ -1,6 +1,18 @@
-exports.handler = async function (event) {
+import { recordCheckout, resumeUrlFor } from "./lib/db.js";
+
+export async function handler(event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
+  // `netlify dev` posts to the production origin, so a local test would mail a real
+  // order notification and write a real checkout row. Keep test runs out of both.
+  const IS_LOCAL = process.env.NETLIFY_DEV === 'true';
+
+  if (!process.env.YOCO_SECRET_KEY) {
+    // Without this we'd send "Bearer undefined" and get an opaque 403 back from Yoco.
+    console.error('YOCO_SECRET_KEY not set — run `netlify link` so dev pulls the site env, or set it in Netlify.');
+    return { statusCode: 500, body: JSON.stringify({ error: 'Payments are not configured. Please email sales@solairesa.co.za.' }) };
   }
 
   let body;
@@ -55,6 +67,7 @@ exports.handler = async function (event) {
 
     // Submit to Netlify Forms (non-fatal)
     try {
+      if (IS_LOCAL) throw new Error('local run — order mail skipped');
       await fetch(`${origin}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -92,6 +105,14 @@ exports.handler = async function (event) {
         console.error('Yoco error:', data);
         return { statusCode: response.status, body: JSON.stringify({ error: data.message || 'Yoco error' }) };
       }
+
+      // Order record + the basis for the unpaid-cart nudge. Never blocks the customer.
+      if (!IS_LOCAL) await recordCheckout({
+        checkout_id: data.id, items: itemSummary, amount_cents: amount,
+        customer_name: name, email, phone, address, city, province, postal_code,
+        resume_url: resumeUrlFor(itemSummary),
+      });
+
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -119,6 +140,7 @@ exports.handler = async function (event) {
 
   // Submit to Netlify Forms (non-fatal)
   try {
+    if (IS_LOCAL) throw new Error('local run — order mail skipped');
     await fetch(`${origin}/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -159,6 +181,14 @@ exports.handler = async function (event) {
       console.error('Yoco error:', data);
       return { statusCode: response.status, body: JSON.stringify({ error: data.message || 'Yoco error' }) };
     }
+
+    const itemSummary = `${product}${variant ? ` (${variant})` : ''} ×1`;
+    if (!IS_LOCAL) await recordCheckout({
+      checkout_id: data.id, items: itemSummary, amount_cents: amount,
+      customer_name: name, email, phone, address, city, province, postal_code,
+      resume_url: resumeUrlFor(product),
+    });
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -168,4 +198,4 @@ exports.handler = async function (event) {
     console.error('Function error:', err);
     return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) };
   }
-};
+}

@@ -8,3 +8,15 @@ assets/_thumbs/
 
 .DS_Store
 *.bak
+
+# Local Netlify folder
+.netlify
+
+# Local secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Netlify CLI scratch
+deno.lock
+.netlify/
