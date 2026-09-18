@@ -60,6 +60,7 @@ exports.handler = async function (event) {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           'form-name': 'si-cart-order',
+          status: 'CHECKOUT STARTED — payment NOT confirmed. A paid order arrives separately from the Yoco webhook.',
           items: itemSummary,
           total: `R${(amount / 100).toFixed(2)}`,
           name, email, phone, address, city, province, postal_code,
@@ -123,6 +124,7 @@ exports.handler = async function (event) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         'form-name': formName,
+        status: 'CHECKOUT STARTED — payment NOT confirmed. A paid order arrives separately from the Yoco webhook.',
         product, variant: variant || '', name, email, phone, address, city, province, postal_code,
       }).toString(),
     });
