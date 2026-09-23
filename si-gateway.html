@@ -241,6 +241,11 @@
         <p>SI Gateway is the coordination layer for the whole SI platform. It aggregates telemetry from SI Pool, SI Water and future products — enabling cross-domain automations like battery-aware heating and solar-surplus pool heating.</p>
       </div>
       <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>Plant Reports by Email</h3>
+        <p>Choose any dates and get a PDF report: solar, house use, grid, rand savings at your tariff, and every offline period. Installers can send it straight to the homeowner. <a href="#reports" style="color:var(--gateway);">See a real one &rarr;</a></p>
+      </div>
+      <div class="feature-card">
         <div class="feature-icon">🔌</div>
         <h3>Prepaid Electricity Tracking</h3>
         <p>Log your prepaid balance and SI Gateway tracks remaining units against your actual consumption. Know your days-to-empty before your CIU does — with low-balance alerts and one-tap recalibration from your meter.</p>
@@ -407,6 +412,40 @@
       <div class="phone-frame" style="width:200px;flex-shrink:0;">
         <img src="/screenshots/resized/cost-tracking.PNG" alt="SI Gateway — Cost & Savings: grid cost, solar savings and solar independence percentage" />
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Plant reports ─────────────────────────────────────────────────────────── -->
+<section id="reports" style="padding-top:0;padding-bottom:0;">
+  <div class="wrap">
+    <div class="report-grid">
+      <div>
+        <p class="section-label">Plant reports</p>
+        <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">
+          Your savings, in writing. Any dates, one tap.
+        </h2>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          Pick a period in the SI app &mdash; yesterday, last month, or any custom range up to three months &mdash; and a PDF plant report lands in your inbox. Solar generated, house use, what you bought from the grid, and what the system saved you in rand, at your own tariff.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+          Every offline period is listed to the minute. If the gateway lost its connection, the report says so &mdash; it doesn't fill the gap with guesses. A short range shows the power flow minute by minute; a longer one shows energy day by day.
+        </p>
+        <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:20px;">
+          <strong style="color:var(--text);">Installers:</strong> send the report straight to the homeowner from your own account. Their address comes from the plant, you get a copy, and the numbers do the talking.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div class="report-chip"><span>📅</span> Any date range</div>
+          <div class="report-chip"><span>💰</span> Rand savings at your tariff</div>
+          <div class="report-chip"><span>📶</span> Offline periods listed</div>
+          <div class="report-chip"><span>✉️</span> Email to the owner</div>
+        </div>
+      </div>
+      <figure class="report-frame">
+        <img src="/screenshots/resized/plant-report-sample.jpg" loading="lazy"
+             alt="SI plant report PDF for 16&ndash;22 Sep 2026: 181.4 kWh solar, 210.9 kWh house use, 32.9 kWh from the grid, R587 saved by solar and battery, with a daily energy chart and daily totals table" />
+        <figcaption>Real report from an active SI site, 16&ndash;22 Sep 2026. Rand values at R3.30/kWh, energy charge only.</figcaption>
+      </figure>
     </div>
   </div>
 </section>
