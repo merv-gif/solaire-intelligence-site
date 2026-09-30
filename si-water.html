@@ -480,7 +480,7 @@
         <p class="section-label">Order online</p>
         <h2 style="font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;">SI Water Kit</h2>
         <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:16px;">
-          <span style="font-family:var(--mono);font-size:42px;font-weight:800;color:var(--water);">R4,650</span>
+          <span style="font-family:var(--mono);font-size:42px;font-weight:800;color:var(--water);">R7,899</span>
           <span style="font-size:14px;color:var(--muted);">incl. VAT</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px;">
@@ -596,14 +596,14 @@
   <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:32px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
       <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--water);margin-bottom:4px;">SI Water Kit · R4,650</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--water);margin-bottom:4px;">SI Water Kit · R7,899</div>
         <h3 style="font-size:20px;font-weight:800;margin:0;">Delivery details</h3>
       </div>
       <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;padding:4px;">✕</button>
     </div>
     <form id="orderForm" name="si-water-order" method="POST" netlify netlify-honeypot="bot-field" style="display:flex;flex-direction:column;gap:14px;">
       <input type="hidden" name="form-name" value="si-water-order" />
-      <input type="hidden" name="product" value="SI Water Kit — R4,650" />
+      <input type="hidden" name="product" value="SI Water Kit — R7,899" />
       <p style="display:none;"><input name="bot-field" /></p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
         <div style="grid-column:1/-1;">
@@ -699,7 +699,7 @@
   });
 
   // ── Cart helpers ─────────────────────────────────────────────────────────
-  const CART_PRICES = { 'SI Gateway': 185000, 'SI Switch': 135000, 'SI Water': 465000, 'SI Pool': 720000 };
+  const CART_PRICES = { 'SI Gateway': 185000, 'SI Switch': 135000, 'SI Water': 789900, 'SI Pool': 720000 };
   const CART_COLORS = { 'SI Gateway': 'var(--gateway)', 'SI Switch': 'var(--switch)', 'SI Water': 'var(--water)', 'SI Pool': 'var(--pool)' };
 
   function getCart() { try { return JSON.parse(localStorage.getItem('si-cart') || '{}'); } catch { return {}; } }

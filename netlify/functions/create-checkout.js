@@ -26,7 +26,7 @@ export async function handler(event) {
   const PRICES = {
     'SI Gateway': 185000,
     'SI Switch':  135000,
-    'SI Water':   465000,
+    'SI Water':   789900,
     'SI Pool':    720000,
   };
 
