@@ -15,3 +15,6 @@
 # should stop asking.
 /dashboard    https://portal.solaire-intelligence.co.za/    301!
 /dashboard.html   https://portal.solaire-intelligence.co.za/    301!
+
+# Short, permanent brochure links to send to clients. Repoint here when a new rev ships.
+/brochure/si-water    /docs/SI-Water_Brochure_v3.pdf    302
