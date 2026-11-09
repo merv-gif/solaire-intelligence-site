@@ -67,6 +67,10 @@
     <div style="margin-bottom:16px;">
       <span class="chip chip-gateway">SI Gateway · Energy &amp; Orchestration</span>
     </div>
+    <a href="#bn-offer" class="bn-offer" style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:20px;padding:10px 16px;border-radius:12px;background:linear-gradient(135deg,rgba(255,181,71,0.16),rgba(255,204,68,0.06));border:1px solid rgba(255,181,71,0.45);color:var(--text);text-decoration:none;font-size:14px;">
+      <strong style="color:var(--gateway);letter-spacing:0.04em;text-transform:uppercase;font-size:12px;">Black November</strong>
+      <span>Free installation within 35&nbsp;km of Sandton · until&nbsp;30&nbsp;Nov · 30&nbsp;units&nbsp;only&nbsp;→</span>
+    </a>
     <h1>See your solar system<br><em style="color:var(--gateway)">live on your phone.</em></h1>
     <p class="hero-sub">
       The SI Gateway connects your Sunsynk or Deye inverter to the Solaire Intelligence app —
@@ -520,6 +524,13 @@
           <span id="stockBadge" style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;display:none;"></span>
         </div>
         <p id="leadTimeLine" style="font-size:12px;color:var(--muted);margin:-16px 0 20px;display:none;">📦 Ships in <strong id="leadTimeText"></strong></p>
+        <div id="bn-offer" class="bn-offer" style="margin:0 0 28px;padding:18px 20px;border-radius:var(--radius);background:linear-gradient(135deg,rgba(255,181,71,0.14),rgba(255,204,68,0.04));border:1px solid rgba(255,181,71,0.45);">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--gateway);margin-bottom:6px;">Black November · 9–30 Nov 2026</div>
+          <h3 style="font-size:20px;font-weight:800;letter-spacing:-0.01em;margin:0 0 10px;">Installed free in Joburg</h3>
+          <p style="font-size:14px;color:var(--text);line-height:1.6;margin:0 0 10px;">Order an SI Gateway by 30 November and we install it free if you are within 35 km of Sandton: Fourways, Randburg, Midrand, Roodepoort, Bedfordview, Kempton Park, Centurion and everything in between. Limited to 30 units.</p>
+          <p style="font-size:14px;color:var(--text);line-height:1.6;margin:0 0 10px;">We mount the gateway, connect the power supply and comms cable to your inverter, and get you live in the app. Single phase, three phase and 50 kW HV. If your inverter needs an RS485/CAN splitter, that is quoted separately.</p>
+          <p style="font-size:13px;color:var(--muted);line-height:1.5;margin:0;">Installs are booked in order of payment. Lead times may apply, and we confirm your date on WhatsApp within one working day.</p>
+        </div>
         <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;">
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
             <span style="color:var(--gateway);font-size:16px;">✓</span> SI Gateway unit in wall-mount enclosure
@@ -553,6 +564,7 @@
             <option value="Sunsynk/Deye 12kW single phase">Sunsynk / Deye 12 kW — single phase</option>
             <option value="Sunsynk/Deye 16kW single phase">Sunsynk / Deye 16 kW — single phase</option>
             <option value="Sunsynk/Deye 12kW three phase">Sunsynk / Deye 12 kW — three phase</option>
+            <option value="Sunsynk/Deye 50kW three phase HV">Sunsynk / Deye 50 kW — three phase (HV)</option>
             <option value="Other Sunsynk or Deye model">Another Sunsynk or Deye model — we&rsquo;ll confirm before shipping</option>
           </select>
           <p id="variantError" style="font-size:12px;color:#f87171;margin-top:6px;display:none;">Please select your inverter model before adding to cart.</p>
@@ -819,6 +831,7 @@
           <option value="Sunsynk/Deye 12kW single phase">Sunsynk / Deye 12 kW — single phase</option>
           <option value="Sunsynk/Deye 16kW single phase">Sunsynk / Deye 16 kW — single phase</option>
           <option value="Sunsynk/Deye 12kW three phase">Sunsynk / Deye 12 kW — three phase</option>
+            <option value="Sunsynk/Deye 50kW three phase HV">Sunsynk / Deye 50 kW — three phase (HV)</option>
           <option value="Other Sunsynk or Deye model">Another Sunsynk or Deye model — we&rsquo;ll confirm before shipping</option>
         </select>
       </div>
@@ -1027,6 +1040,10 @@
       }
     } catch { /* non-fatal */ }
   })();
+</script>
+<script>
+  // Black November offer ends 30 Nov 2026 23:59 SAST — blocks hide themselves after that
+  (function(){ if (Date.now() > Date.parse('2026-11-30T23:59:59+02:00')) document.querySelectorAll('.bn-offer').forEach(function(e){e.style.display='none';}); })();
 </script>
 </body>
 </html>
