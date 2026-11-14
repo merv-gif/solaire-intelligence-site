@@ -79,8 +79,10 @@
     </p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="#buy" style="background:linear-gradient(135deg,var(--gateway),#ffcc44);color:#0b1220;border:none;">Buy now — R1,850 →</a>
+      <a class="btn btn-ghost bn-offer" href="https://wa.me/27738948248?text=Hi%20Solaire%2C%20I%27d%20like%20to%20book%20a%20free%20SI%20Gateway%20install%20%28Black%20November%29.%0ASuburb%3A%20%0AInverter%20make%20and%20model%3A%20" target="_blank" rel="noopener" style="background:rgba(37,211,102,0.14);border:1px solid rgba(37,211,102,0.55);color:#e7fbe9;">💬 Book my free install →</a>
       <a class="btn btn-ghost" href="#setup">Set it up in 30 minutes →</a>
     </div>
+    <p class="bn-offer" style="margin-top:10px;font-size:13px;color:var(--muted);">Within 35 km of Sandton? Book on WhatsApp. No payment until we confirm your install date.</p>
     <p style="margin-top:16px;font-size:13px;color:var(--muted);">
       🚚 Free delivery in South Africa &nbsp;·&nbsp; 🛡️ 12-month warranty &nbsp;·&nbsp; 🚫 No subscription, ever
     </p>
@@ -529,7 +531,8 @@
           <h3 style="font-size:20px;font-weight:800;letter-spacing:-0.01em;margin:0 0 10px;">Installed free in Joburg</h3>
           <p style="font-size:14px;color:var(--text);line-height:1.6;margin:0 0 10px;">Order an SI Gateway by 30 November and we install it free if you are within 35 km of Sandton: Fourways, Randburg, Midrand, Roodepoort, Bedfordview, Kempton Park, Centurion and everything in between. Limited to 30 units.</p>
           <p style="font-size:14px;color:var(--text);line-height:1.6;margin:0 0 10px;">We mount the gateway, connect the power supply and comms cable to your inverter, and get you live in the app. Single phase, three phase and 50 kW HV. If your inverter needs an RS485/CAN splitter, that is quoted separately.</p>
-          <p style="font-size:13px;color:var(--muted);line-height:1.5;margin:0;">Installs are booked in order of payment. Lead times may apply, and we confirm your date on WhatsApp within one working day.</p>
+          <p style="font-size:14px;color:var(--text);line-height:1.6;margin:0 0 14px;"><strong>Book on WhatsApp, pay later.</strong> Send us your suburb and inverter model and we confirm your install date within one working day. No payment until your date is confirmed. Lead times may apply.</p>
+          <a class="btn btn-ghost" href="https://wa.me/27738948248?text=Hi%20Solaire%2C%20I%27d%20like%20to%20book%20a%20free%20SI%20Gateway%20install%20%28Black%20November%29.%0ASuburb%3A%20%0AInverter%20make%20and%20model%3A%20" target="_blank" rel="noopener" style="background:rgba(37,211,102,0.14);border:1px solid rgba(37,211,102,0.55);color:#e7fbe9;">💬 Book my free install →</a>
         </div>
         <ul style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:10px;">
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);">
@@ -1040,6 +1043,16 @@
       }
     } catch { /* non-fatal */ }
   })();
+</script>
+<script>
+  // WhatsApp taps = leads. Google Ads conversion "WhatsApp - Book free install (SI Gateway)"
+  // in 679-031-6356, plus a GA4 event. Added 14 Nov 2026.
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+    if (!a || typeof gtag !== 'function') return;
+    gtag('event', 'conversion', {'send_to': 'AW-18387154604/xtEcCLvopLgdEKzt1r9E'});
+    gtag('event', 'whatsapp_click', {'link_text': (a.textContent||'').trim().slice(0,60), 'page': 'si-gateway'});
+  });
 </script>
 <script>
   // Black November offer ends 30 Nov 2026 23:59 SAST — blocks hide themselves after that
