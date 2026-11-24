@@ -15,7 +15,7 @@
   <meta property="og:url" content="https://solaire-intelligence.co.za/sunsynk-wifi-dongle-alternative" />
   <meta property="og:image" content="https://solaire-intelligence.co.za/assets/products/si-gateway-device-v2.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "No. The SI app and web portal work on their own. Home Assistant is optional, and the gateway shows up in it automatically if you run it."}}, {"@type": "Question", "name": "Is there a subscription?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's a once-off R1,850 including VAT, with app access included."}}, {"@type": "Question", "name": "Can I see my system when I'm away from home?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The app connects over an encrypted link with no router setup, port-forwarding or third-party tunnel."}}, {"@type": "Question", "name": "How often does the data update?", "acceptedAnswer": {"@type": "Answer", "text": "The gateway reads your inverter every 5 seconds."}}, {"@type": "Question", "name": "Which inverters does it work with?", "acceptedAnswer": {"@type": "Answer", "text": "Sunsynk and Deye hybrid inverters: 5.5, 8, 10, 12 and 16 kW single phase, 12 kW three phase and 50 kW high-voltage three phase. Ask us about other models."}}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I have to remove my Sunsynk or Deye dongle?", "acceptedAnswer": {"@type": "Answer", "text": "No. The SI Gateway talks to the inverter over Modbus on its RS485 port, so your existing dongle stays where it is. Keep it for the manufacturer's firmware updates and as a backup."}}, {"@type": "Question", "name": "Do I need Home Assistant?", "acceptedAnswer": {"@type": "Answer", "text": "No. The SI app and web portal work on their own. Home Assistant is optional, and the gateway shows up in it automatically if you run it."}}, {"@type": "Question", "name": "Is there a subscription?", "acceptedAnswer": {"@type": "Answer", "text": "No. It's a once-off R1,850 including VAT, with app access included."}}, {"@type": "Question", "name": "Can I see my system when I'm away from home?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The app connects over an encrypted link with no router setup, port-forwarding or third-party tunnel."}}, {"@type": "Question", "name": "How often does the data update?", "acceptedAnswer": {"@type": "Answer", "text": "The gateway reads your inverter every 5 seconds."}}, {"@type": "Question", "name": "Which inverters does it work with?", "acceptedAnswer": {"@type": "Answer", "text": "Sunsynk and Deye hybrid inverters: 5.5, 8, 10, 12 and 16 kW single phase, 12 kW three phase and 50 kW high-voltage three phase. Ask us about other models."}}]}</script>
 <!-- SEO:END -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -81,7 +81,7 @@
     <p style="color:var(--muted);font-size:17px;line-height:1.65;max-width:720px;margin:18px 0 26px;">
       The standard Sunsynk and Deye WiFi dongle sends your inverter data to the manufacturer's cloud, usually every few minutes,
       and your app reads it back from there. The SI Gateway reads your inverter directly over RS485 every 5 seconds and keeps
-      working on your own network — with Home Assistant built in and no subscription.
+      working on your own network — with Home Assistant built in and no subscription. Your existing dongle stays in place.
     </p>
     <div style="display:flex;gap:12px;flex-wrap:wrap;">
       <a class="btn btn-primary" style="background:linear-gradient(135deg,var(--gateway),#ffcc44);color:#0b1220;border:none;" href="/si-gateway#buy">Buy the SI Gateway — R1,850 →</a>
@@ -107,6 +107,7 @@
         <tr><td>Home Assistant</td><td>The official integration reads from the Sunsynk cloud and needs your Sunsynk Connect login</td><td>Native ESPHome device, auto-discovered on your network. No add-on, API key or cloud account</td></tr>
         <tr><td>Load control</td><td>Monitoring only</td><td>Drives SI Switch, SI Pool and SI Water through the ECM comfort score</td></tr>
         <tr><td>Reports</td><td>In the manufacturer app</td><td>PDF plant reports with rand savings at your tariff, emailed on request</td></tr>
+        <tr><td>Works with your dongle</td><td>&mdash;</td><td>Yes. Uses the RS485 port, so the dongle stays in place for firmware updates and backup</td></tr>
         <tr><td>Subscription</td><td>None</td><td>None</td></tr>
       </table>
     </div>
@@ -209,6 +210,7 @@
   <div class="wrap" style="max-width:860px;">
     <p class="section-label">Questions</p>
     <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:20px;">Common questions</h2>
+    <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">Do I have to remove my Sunsynk or Deye dongle?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">No. The SI Gateway talks to the inverter over Modbus on its RS485 port, so your existing dongle stays where it is. Keep it for the manufacturer's firmware updates and as a backup.</p></div>
     <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">Do I need Home Assistant?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">No. The SI app and web portal work on their own. Home Assistant is optional, and the gateway shows up in it automatically if you run it.</p></div>
     <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">Is there a subscription?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">No. It's a once-off R1,850 including VAT, with app access included.</p></div>
     <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">Can I see my system when I'm away from home?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">Yes. The app connects over an encrypted link with no router setup, port-forwarding or third-party tunnel.</p></div>
