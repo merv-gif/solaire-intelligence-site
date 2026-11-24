@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin
+Disallow: /cart
+Disallow: /thank-you
+Disallow: /portal
+
+Sitemap: https://solaire-intelligence.co.za/sitemap.xml
