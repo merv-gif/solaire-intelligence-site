@@ -97,7 +97,7 @@ def main():
         if not f.exists():
             print("skip (missing)", f.name); continue
         html = f.read_text(encoding="utf-8")
-        html = re.sub(r"\n?<!-- SEO:BEGIN.*?<!-- SEO:END -->", "", html, flags=re.S)
+        html = re.sub(r"\n[ \t]*<!-- SEO:BEGIN.*?<!-- SEO:END -->(?:\n[ \t]*(?=\n))*", "", html, flags=re.S)
         block = build_block(slug, cfg, html)
         anchor = re.search(r'<meta name="description"[^>]*>', html) or re.search(r"</title>", html)
         html = html[:anchor.end()] + "\n  " + block + html[anchor.end():]
