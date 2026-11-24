@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How to Connect a Sunsynk or Deye Inverter to Home Assistant (South Africa) · Solaire Intelligence</title>
+  <meta name="description" content="Three ways to get a Sunsynk or Deye hybrid inverter into Home Assistant: the cloud integration, a DIY RS485 reader with ESPHome, or a ready-made local gateway. What each costs in effort and data freshness, and which suits real-time automations." />
+  <!-- SEO:BEGIN (scripts/seo-tags.py) -->
+  <link rel="canonical" href="https://solaire-intelligence.co.za/sunsynk-deye-home-assistant" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Solaire Intelligence" />
+  <meta property="og:locale" content="en_ZA" />
+  <meta property="og:title" content="How to Connect a Sunsynk or Deye Inverter to Home Assistant (South Africa) · Solaire Intelligence" />
+  <meta property="og:description" content="Three ways to get a Sunsynk or Deye hybrid inverter into Home Assistant: the cloud integration, a DIY RS485 reader with ESPHome, or a ready-made local gateway. What each costs in effort and data freshness, and which suits real-time automations." />
+  <meta property="og:url" content="https://solaire-intelligence.co.za/sunsynk-deye-home-assistant" />
+  <meta property="og:image" content="https://solaire-intelligence.co.za/assets/products/si-gateway-device-v2.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can Home Assistant read a Sunsynk inverter without the cloud?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Reading the inverter over its RS485 port, either with a DIY ESP32 or Raspberry Pi reader or a ready-made gateway, keeps the data on your own network with no cloud account."}}, {"@type": "Question", "name": "Does the same method work for Deye inverters?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Sunsynk and Deye hybrid inverters use the same Modbus register maps, so the RS485 routes work on both. Single-phase and three-phase models need different configurations."}}, {"@type": "Question", "name": "How often does the data update?", "acceptedAnswer": {"@type": "Answer", "text": "The cloud route updates when the dongle uploads, typically every 1 to 5 minutes. A local RS485 reader updates every few seconds; the SI Gateway reads every 5 seconds."}}, {"@type": "Question", "name": "Do I need Home Assistant to use the SI Gateway?", "acceptedAnswer": {"@type": "Answer", "text": "No. The SI app and web portal work on their own, and the gateway's load control runs on the device. Home Assistant is optional."}}]}</script>
+<!-- SEO:END -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-17542095019"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-17542095019');
+  gtag('config', 'AW-18387154604'); // Solaire Power Systems 679-031-6356 (SI Gateway campaign)
+</script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TZGPQ1FGH1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-TZGPQ1FGH1");
+</script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="index.html">
+      <img src="/assets/si-logo.png" alt="SI" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;" />
+      <span class="nav-name">Solaire <span>Intelligence</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <button class="nav-link" aria-haspopup="true">Products ▾</button>
+        <div class="nav-dropdown">
+          <a href="si-gateway.html"><span class="dd-dot" style="background:var(--gateway)"></span>SI Gateway</a>
+          <a href="si-switch.html"><span class="dd-dot" style="background:var(--switch)"></span>SI Switch</a>
+          <a href="si-pool.html"><span class="dd-dot" style="background:var(--pool)"></span>SI Pool</a>
+          <a href="si-water.html"><span class="dd-dot" style="background:var(--water)"></span>SI Water</a>
+        </div>
+      </li>
+      <li><a href="ecm.html">ECM</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="docs.html">Documents</a></li>
+      <li><a href="index.html#trade">Installers</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+      <li><a href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a></li>
+    </ul>
+    <div class="nav-spacer"></div>
+    <a href="cart.html" id="navCartBtn" class="nav-cart-btn" aria-label="Cart">
+      🛒 <span class="cart-label">Cart</span> <span id="navBadge" class="nav-cart-badge"></span>
+    </a>
+    <a class="nav-cta" href="https://portal.solaire-intelligence.co.za/login">⬡ Portal Login</a>
+    <button class="nav-burger" id="navBurger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────────────────────── -->
+<section class="hero hero-gateway">
+  <div class="wrap">
+    <p class="section-label">Guide · Home Assistant</p>
+    <h1>How to connect a Sunsynk or Deye inverter<br><em style="color:var(--gateway)">to Home Assistant.</em></h1>
+    <p style="color:var(--muted);font-size:17px;line-height:1.65;max-width:740px;margin:18px 0 0;">
+      There are three ways to get a Sunsynk or Deye hybrid inverter into Home Assistant: through the manufacturer's cloud,
+      by building your own RS485 reader, or with a ready-made local gateway. This guide explains how each one works, what it
+      costs you in time and freshness of data, and which one suits the automations you want to run.
+    </p>
+  </div>
+</section>
+
+<!-- ── The three routes ───────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <p class="section-label">The options</p>
+    <h2 style="font-size:clamp(22px,3.5vw,32px);font-weight:800;letter-spacing:-0.02em;margin-bottom:24px;">Three routes, compared</h2>
+    <div class="card" style="overflow-x:auto;">
+      <table class="spec-table" style="min-width:620px;">
+        <tr><td style="font-weight:700;">&nbsp;</td><td style="font-weight:700;">Cloud integration</td><td style="font-weight:700;">DIY RS485 reader</td><td style="font-weight:700;color:var(--gateway);">Ready-made local gateway</td></tr>
+        <tr><td>How it connects</td><td>Your WiFi dongle uploads to the manufacturer's cloud; Home Assistant reads it back</td><td>An ESP32 or Raspberry Pi wired to the inverter's RS485 port</td><td>A finished device plugged into the RS485 port</td></tr>
+        <tr><td>Data freshness</td><td>As fresh as the dongle's upload, typically 1 to 5 minutes</td><td>Seconds</td><td>Seconds</td></tr>
+        <tr><td>Works without internet</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Effort</td><td>Low: log in with your app account</td><td>High: source parts, wire, flash and maintain firmware</td><td>Low: mount, connect one cable, pair</td></tr>
+        <tr><td>Good for</td><td>Watching your system</td><td>Tinkerers who enjoy building it</td><td>Real-time automations without the build</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Route 1 ─────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap" style="max-width:860px;">
+    <p class="section-label">Route 1</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">The cloud integration</h2>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+      Home Assistant has an official Sunsynk integration. It signs in with your Sunsynk Connect account and reads the same data
+      you see in the Sunsynk app, which the inverter's WiFi or Ethernet data logger uploads to the Sunsynk cloud. Deye owners on
+      the Solarman or Deye Cloud apps have similar community integrations.
+    </p>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;">
+      It's the quickest way to see your figures in Home Assistant. The catch is the delay: the numbers are only as fresh as the
+      dongle's last upload, and they stop when your internet or the manufacturer's servers do. That's fine for a dashboard, and
+      a poor fit for anything that switches a pump or geyser on solar surplus.
+    </p>
+  </div>
+</section>
+
+<!-- ── Route 2 ─────────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap" style="max-width:860px;">
+    <p class="section-label">Route 2</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">Build your own RS485 reader</h2>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+      Sunsynk and Deye hybrids speak Modbus RTU over RS485, and the South African community has done excellent work here. The
+      two best-known projects are slipx06's ESPHome configurations (an ESP32 with an RS485 module) and kellerza's Sunsynk
+      add-on for Home Assistant OS (a USB RS485 adapter on the Home Assistant machine, publishing over MQTT).
+    </p>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:10px;">Practical notes if you go this way:</p>
+    <ul style="color:var(--muted);font-size:15px;line-height:1.8;margin:0 0 14px 18px;">
+      <li>If your lithium battery talks to the inverter over the BMS485 port, connect your reader to the inverter's separate RS485/Modbus port.</li>
+      <li>Single-phase and three-phase inverters use different register maps. Use the configuration that matches your model.</li>
+      <li>Keep the electronics away from the inverter's metal housing and run a short Ethernet cable out to avoid interference.</li>
+      <li>Opening the inverter's wiring cover is a job for a registered electrician or accredited solar installer.</li>
+    </ul>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;">
+      You get real-time data with no cloud in the way. In exchange, you source the parts, build the enclosure and power supply,
+      and keep the firmware up to date yourself.
+    </p>
+  </div>
+</section>
+
+<!-- ── Route 3 ─────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap" style="max-width:860px;">
+    <p class="section-label">Route 3</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">A ready-made local gateway</h2>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:14px;">
+      If you want the local, real-time result without the build, a finished gateway does the RS485 side for you. Our own is the
+      <a href="/si-gateway" style="color:var(--gateway);">SI Gateway</a>: it reads the inverter every 5 seconds, runs ESPHome
+      underneath, and Home Assistant discovers it on your network as a native ESPHome device. No add-on, no API key and no
+      cloud account.
+    </p>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;">Getting it into Home Assistant:</p>
+    <ol style="color:var(--muted);font-size:15px;line-height:1.8;margin:8px 0 14px 18px;">
+      <li>Mount the gateway next to the inverter and connect it to the RS485 port with the supplied Ethernet cable.</li>
+      <li>Power it up and join it to your WiFi from the SI app.</li>
+      <li>In Home Assistant, open <strong>Settings → Devices &amp; services</strong>. The gateway appears under ESPHome. Select <strong>Add</strong>.</li>
+      <li>Load a free ready-made dashboard from <a href="https://github.com/solaire-intelligence/solaire-home-assistant" style="color:var(--gateway);">our GitHub</a>, or build your own from the sensors.</li>
+    </ol>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;">
+      The automation logic lives on the gateway itself. It calculates a live <a href="/ecm" style="color:var(--gateway);">ECM comfort score</a>
+      that SI Switch, SI Pool and SI Water read directly, so your loads keep running correctly even if Home Assistant is restarting
+      or offline. Home Assistant is a window onto the system, not a single point of failure.
+    </p>
+  </div>
+</section>
+
+<!-- ── Which ───────────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap" style="max-width:860px;">
+    <p class="section-label">Which should you choose?</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:14px;line-height:1.2;">Match the route to the job</h2>
+    <ul style="color:var(--muted);font-size:15px;line-height:1.8;margin:0 0 0 18px;">
+      <li><strong>Just want to see your figures in Home Assistant?</strong> The cloud integration is enough.</li>
+      <li><strong>Enjoy building things and want full control?</strong> Go DIY with ESPHome or the Sunsynk add-on.</li>
+      <li><strong>Want real-time automations that work without the internet, without the build?</strong> Use a ready-made local gateway.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── FAQ ─────────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="wrap" style="max-width:860px;">
+    <p class="section-label">Questions</p>
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:20px;">Common questions</h2>
+    <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">Can Home Assistant read a Sunsynk inverter without the cloud?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">Yes. Reading the inverter over its RS485 port, either with a DIY ESP32 or Raspberry Pi reader or a ready-made gateway, keeps the data on your own network with no cloud account.</p></div>
+    <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">Does the same method work for Deye inverters?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">Yes. Sunsynk and Deye hybrid inverters use the same Modbus register maps, so the RS485 routes work on both. Single-phase and three-phase models need different configurations.</p></div>
+    <div class="card" style="margin-bottom:12px;"><h3 style="font-size:16px;margin:0 0 6px;">How often does the data update?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">The cloud route updates when the dongle uploads, typically every 1 to 5 minutes. A local RS485 reader updates every few seconds; the SI Gateway reads every 5 seconds.</p></div>
+    <div class="card"><h3 style="font-size:16px;margin:0 0 6px;">Do I need Home Assistant to use the SI Gateway?</h3><p style="color:var(--muted);margin:0;line-height:1.65;">No. The SI app and web portal work on their own, and the gateway's load control runs on the device. Home Assistant is optional.</p></div>
+  </div>
+</section>
+
+<!-- ── CTA ─────────────────────────────────────────────────────────────────── -->
+<section style="background:var(--panel);border-top:1px solid var(--line);">
+  <div class="wrap">
+    <h2 style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;">Skip the build.</h2>
+    <p style="color:var(--muted);font-size:15px;margin-bottom:24px;line-height:1.65;max-width:720px;">
+      The SI Gateway is R1,850 incl. VAT with free delivery in South Africa, a 12-month warranty and no subscription. Not sure it
+      fits your inverter? <a href="https://wa.me/27738948248" style="color:var(--gateway);">WhatsApp 073 894 8248</a>
+      or email <a href="mailto:sales@solairesa.co.za" style="color:var(--gateway);">sales@solairesa.co.za</a>.
+    </p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <a class="btn btn-primary" style="background:linear-gradient(135deg,var(--gateway),#ffcc44);color:#0b1220;border:none;" href="/si-gateway#buy">Buy the SI Gateway — R1,850 →</a>
+      <a class="btn btn-ghost" href="/sunsynk-wifi-dongle-alternative">SI Gateway vs the WiFi dongle →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a class="nav-brand" href="index.html" style="margin-bottom:12px;display:inline-flex;">
+        <img src="/assets/si-logo.png" alt="SI" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;" />
+        <span class="nav-name" style="margin-left:10px;">Solaire <span>Intelligence</span></span>
+      </a>
+      <p>Local-first infrastructure intelligence for South African homes. Energy, water and pool systems — monitored, controlled and automated.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="si-gateway.html">SI Gateway</a></li>
+        <li><a href="si-switch.html">SI Switch</a></li>
+        <li><a href="si-pool.html">SI Pool</a></li>
+        <li><a href="si-water.html">SI Water</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="learn.html">Learning Centre</a></li>
+        <li><a href="/sunsynk-wifi-dongle-alternative">Sunsynk dongle alternative</a></li>
+        <li><a href="/sunsynk-deye-home-assistant">Home Assistant guide</a></li>
+        <li><a href="docs.html">Documents</a></li>
+        <li><a href="https://portal.solaire-intelligence.co.za/login">Portal Login</a></li>
+        <li><a href="mailto:sales@solairesa.co.za">Support</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="index.html#trade">Installers</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+        <li><a href="mailto:sales@solairesa.co.za">sales@solairesa.co.za</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Solaire Intelligence · Made in South Africa</span>
+    <span><a href="/privacy" style="color:var(--muted);text-decoration:none;">Privacy Policy</a> · solaire-intelligence.co.za</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navBurger').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+  document.querySelectorAll('.nav-links > li').forEach(li => {
+    li.addEventListener('mouseenter', () => li.classList.add('open'));
+    li.addEventListener('mouseleave', () => li.classList.remove('open'));
+  });
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href*="wa.me/"]');
+    if (!a || typeof gtag !== 'function') return;
+    gtag('event', 'whatsapp_click', {'link_text': (a.textContent||'').trim().slice(0,60), 'page': 'sunsynk-deye-home-assistant'});
+  });
+</script>
+</body>
+</html>
